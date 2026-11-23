@@ -244,6 +244,7 @@ genera.addEventListener("click", async function() {
   genera.disabled = false;
 });
 
+
 document.getElementById("copia").addEventListener("click", async function() {
   const codice = document.getElementById("codice").textContent;
 
@@ -251,10 +252,22 @@ document.getElementById("copia").addEventListener("click", async function() {
     await navigator.clipboard.writeText(codice);
     messaggio.textContent = "Codice copiato correttamente!";
   } catch (error) {
-    messaggio.textContent =
-      "Seleziona il codice e copialo manualmente.";
+    const campo = document.createElement("textarea");
+    campo.value = codice;
+    campo.style.position = "fixed";
+    campo.style.left = "-9999px";
+    document.body.appendChild(campo);
+    campo.select();
+
+    const copiato = document.execCommand("copy");
+    campo.remove();
+
+    messaggio.textContent = copiato
+      ? "Codice copiato correttamente!"
+      : "Seleziona il codice e premi CTRL+C.";
   }
 });
+
 
 controllaSessione();
 </script>
