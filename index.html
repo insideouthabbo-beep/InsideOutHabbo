@@ -422,7 +422,7 @@ footer strong { color: white; }
     try {
       const { data, error } = await supabase
         .from('articles')
-        .select('title, excerpt, content, cover_image_url, category, published_at')
+        .select('id, title, excerpt, content, cover_image_url, category, published_at')
         .eq('status', 'published')
         .order('published_at', { ascending: false, nullsFirst: false })
         .limit(3);
@@ -459,7 +459,14 @@ footer strong { color: white; }
         categoria.textContent = articolo.category || 'ATTUALITÀ';
 
         const titolo = document.createElement('h3');
-        titolo.textContent = articolo.title;
+
+const linkTitolo = document.createElement('a');
+linkTitolo.href = `articolo.html?id=${encodeURIComponent(articolo.id)}`;
+linkTitolo.textContent = articolo.title;
+linkTitolo.style.color = 'inherit';
+linkTitolo.style.textDecoration = 'none';
+
+titolo.appendChild(linkTitolo);
 
         const anteprima = document.createElement('p');
         anteprima.textContent = articolo.excerpt ||
