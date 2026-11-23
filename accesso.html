@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accesso | InsideOutHabbo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #101b35;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #172746;
+      padding: 25px 15px;
+      text-align: center;
+      border-bottom: 4px solid #ffcc33;
+    }
+
+    header a {
+      color: #ffcc33;
+      text-decoration: none;
+      font-size: 27px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 440px;
+      margin: 45px auto;
+      padding: 0 18px;
+      flex: 1;
+    }
+
+    .panel {
+      background: #1b2d50;
+      border: 1px solid #31466d;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 8px 25px #0004;
+    }
+
+    h1 {
+      color: #ffcc33;
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .descrizione {
+      color: #c6d2e7;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #52688f;
+      border-radius: 7px;
+      background: #101b35;
+      color: white;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: 2px solid #ffcc33;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 18px;
+      border: none;
+      border-radius: 7px;
+      background: #ffcc33;
+      color: #172746;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffdc70;
+    }
+
+    .secondario {
+      background: #31466d;
+      color: white;
+    }
+
+    #messaggio {
+      margin-top: 18px;
+      text-align: center;
+      line-height: 1.5;
+      color: #ffdc70;
+      overflow-wrap: anywhere;
+    }
+
+    #areaUtente {
+      display: none;
+      text-align: center;
+    }
+
+    .nota {
+      color: #b9c8df;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #9eacc4;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html">INSIDEOUTHABBO</a>
+</header>
+
+<main>
+  <section class="panel">
+
+    <div id="areaAccesso">
+      <h1>Benvenuto!</h1>
+
+      <p class="descrizione">
+        Accedi alla tua area personale oppure crea un account
+        per entrare nella community di InsideOutHabbo.
+      </p>
+
+      <form id="formRegistrazione">
+        <h3>Nuovo account</h3>
+
+        <label for="habbo">Nickname Habbo</label>
+        <input id="habbo" type="text" required maxlength="30"
+          placeholder="Il tuo nome su Habbo">
+
+        <label for="nome">Nome da visualizzare</label>
+        <input id="nome" type="text" required maxlength="50"
+          placeholder="Come vuoi apparire sul sito">
+
+        <label for="emailRegistrazione">Email</label>
+        <input id="emailRegistrazione" type="email" required
+          placeholder="La tua email">
+
+        <label for="passwordRegistrazione">Password</label>
+        <input id="passwordRegistrazione" type="password"
+          required minlength="8" placeholder="Almeno 8 caratteri">
+
+        <button type="submit">Crea account</button>
+      </form>
+
+      <hr style="border-color:#52688f; margin:28px 0">
+
+      <form id="formLogin">
+        <h3>Hai già un account?</h3>
+
+        <label for="emailLogin">Email</label>
+        <input id="emailLogin" type="email" required
+          placeholder="La tua email">
+
+        <label for="passwordLogin">Password</label>
+        <input id="passwordLogin" type="password" required
+          placeholder="La tua password">
+
+        <button type="submit">Accedi</button>
+      </form>
+
+      <p class="nota">
+        La registrazione crea il tuo account personale.
+        La verifica del personaggio Habbo verrà configurata
+        in un passaggio successivo.
+      </p>
+    </div>
+
+    <div id="areaUtente">
+      <h1>Ciao!</h1>
+      <p id="datiUtente"></p>
+      <p id="ruoloUtente"></p>
+      <button id="logout" class="secondario">Esci dall'account</button>
+    </div>
+
+    <p id="messaggio"></p>
+
+  </section>
+</main>
+
+<footer>
+  © InsideOutHabbo - La community racconta la community
+</footer>
+
+<script>
+  const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+  // Inserisci qui la stessa chiave publishable già utilizzata
+  // nel file index.html.
+  const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const messaggio = document.getElementById("messaggio");
+
+  function mostraMessaggio(testo) {
+    messaggio.textContent = testo;
+  }
+
+  async function aggiornaSchermata(user) {
+    const areaAccesso = document.getElementById("areaAccesso");
+    const areaUtente = document.getElementById("areaUtente");
+
+    if (!user) {
+      areaAccesso.style.display = "block";
+      areaUtente.style.display = "none";
+      return;
+    }
+
+    areaAccesso.style.display = "none";
+    areaUtente.style.display = "block";
+
+    const { data: profilo, error } = await client
+      .from("profiles")
+      .select("habbo_name, display_name, role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      mostraMessaggio("Account attivo. Non è stato possibile caricare il profilo.");
+      return;
+    }
+
+    document.getElementById("datiUtente").textContent =
+      profilo
+        ? "Nickname: " + (profilo.habbo_name || "Da configurare")
+        : "Account creato. Profilo in preparazione.";
+
+    document.getElementById("ruoloUtente").textContent =
+      profilo ? "Ruolo: " + (profilo.role || "user") : "";
+
+    mostraMessaggio("Accesso effettuato correttamente!");
+  }
+
+  document.getElementById("formRegistrazione")
+    .addEventListener("submit", async function(event) {
+      event.preventDefault();
+      mostraMessaggio("Registrazione in corso...");
+
+      const habbo = document.getElementById("habbo").value.trim();
+      const nome = document.getElementById("nome").value.trim();
+      const email = document.getElementById("emailRegistrazione").value.trim();
+      const password = document.getElementById("passwordRegistrazione").value;
+
+      const { data, error } = await client.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            habbo_name: habbo,
+            display_name: nome
+          }
+        }
+      });
+
+      if (error) {
+        mostraMessaggio("Errore: " + error.message);
+        return;
+      }
+
+      if (data.session) {
+        await aggiornaSchermata(data.user);
+        mostraMessaggio("Account creato! Benvenuto su InsideOutHabbo.");
+      } else {
+        mostraMessaggio(
+          "Registrazione completata! Controlla la tua email per confermare l'account."
+        );
+      }
+    });
+
+  document.getElementById("formLogin")
+    .addEventListener("submit", async function(event) {
+      event.preventDefault();
+      mostraMessaggio("Accesso in corso...");
+
+      const email = document.getElementById("emailLogin").value.trim();
+      const password = document.getElementById("passwordLogin").value;
+
+      const { data, error } = await client.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        mostraMessaggio("Errore: " + error.message);
+        return;
+      }
+
+      await aggiornaSchermata(data.user);
+    });
+
+  document.getElementById("logout").addEventListener("click", async function() {
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+      mostraMessaggio("Errore durante l'uscita: " + error.message);
+      return;
+    }
+
+    mostraMessaggio("Hai effettuato la disconnessione.");
+    await aggiornaSchermata(null);
+  });
+
+  client.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+      aggiornaSchermata(session?.user || null);
+    }
+  });
+</script>
+
+</body>
+</html>
