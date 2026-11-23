@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifica Habbo | InsideOutHabbo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #101b35;
+      color: white;
+    }
+
+    header {
+      background: #172746;
+      padding: 24px 15px;
+      text-align: center;
+      border-bottom: 4px solid #ffcc33;
+    }
+
+    header a {
+      color: #ffcc33;
+      text-decoration: none;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 45px auto;
+      padding: 0 18px;
+    }
+
+    .panel {
+      background: #1b2d50;
+      border: 1px solid #31466d;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 8px 25px #0004;
+    }
+
+    h1 {
+      color: #ffcc33;
+      text-align: center;
+    }
+
+    .intro {
+      text-align: center;
+      line-height: 1.6;
+      color: #c6d2e7;
+    }
+
+    .passaggio {
+      background: #172746;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 18px;
+      line-height: 1.6;
+    }
+
+    .numero {
+      color: #ffcc33;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 18px;
+      border: none;
+      border-radius: 7px;
+      background: #ffcc33;
+      color: #172746;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .codice {
+      display: none;
+      background: #101b35;
+      border: 2px dashed #ffcc33;
+      padding: 20px;
+      margin-top: 22px;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    #codiceGenerato {
+      display: block;
+      color: #ffcc33;
+      font-size: 27px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+
+    #messaggio {
+      text-align: center;
+      margin-top: 18px;
+      line-height: 1.5;
+      color: #ffdc70;
+      overflow-wrap: anywhere;
+    }
+
+    .nota {
+      font-size: 13px;
+      color: #b9c8df;
+      line-height: 1.5;
+      margin-top: 22px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #9eacc4;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html">INSIDEOUTHABBO</a>
+</header>
+
+<main>
+  <section class="panel">
+
+    <h1>Verifica il tuo personaggio Habbo</h1>
+
+    <p class="intro">
+      Collega il tuo account InsideOutHabbo al tuo personaggio Habbo.
+      In questo modo potremo riconoscere il tuo personaggio
+      e associare correttamente il tuo profilo.
+    </p>
+
+    <div class="passaggio">
+      <span class="numero">1. Genera il tuo codice</span><br>
+      Premi il pulsante qui sotto per ottenere un codice personale
+      temporaneo.
+    </div>
+
+    <button id="generaCodice">
+      Genera codice di verifica
+    </button>
+
+    <div class="codice" id="areaCodice">
+      Il tuo codice personale è:
+      <span id="codiceGenerato"></span>
+      <button id="copiaCodice">Copia codice</button>
+      <p class="nota">
+        Il codice è valido per 15 minuti. Non condividerlo con altre persone.
+      </p>
+    </div>
+
+    <div class="passaggio">
+      <span class="numero">2. Inserisci il codice nel motto</span><br>
+      Accedi a Habbo, apri il tuo profilo e inserisci il codice
+      generato nel motto del personaggio.
+    </div>
+
+    <div class="passaggio">
+      <span class="numero">3. Torna su InsideOutHabbo</span><br>
+      Dopo aver aggiornato il motto, torna qui. Il controllo automatico
+      del personaggio verrà attivato nel passaggio successivo.
+    </div>
+
+    <p id="messaggio"></p>
+
+    <p class="nota">
+      La verifica serve a dimostrare che controlli realmente il
+      personaggio Habbo indicato nel tuo profilo.
+    </p>
+
+    <p style="text-align:center; margin-top:25px;">
+      <a href="index.html" style="color:#ffcc33;">
+        Torna alla homepage
+      </a>
+    </p>
+
+  </section>
+</main>
+
+<footer>
+  © InsideOutHabbo - La community racconta la community
+</footer>
+
+<script>
+  const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+  // Inserisci la stessa chiave publishable usata in index.html
+  const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const pulsante = document.getElementById("generaCodice");
+  const messaggio = document.getElementById("messaggio");
+  const areaCodice = document.getElementById("areaCodice");
+
+  async function controllaAccesso() {
+    const { data, error } = await client.auth.getSession();
+
+    if (error || !data.session) {
+      messaggio.textContent =
+        "Devi prima accedere al tuo account InsideOutHabbo.";
+      pulsante.disabled = true;
+      return false;
+    }
+
+    return true;
+  }
+
+  pulsante.addEventListener("click", async () => {
+    pulsante.disabled = true;
+    messaggio.textContent = "Generazione del codice in corso...";
+    areaCodice.style.display = "none";
+
+    try {
+      const { data: sessionData } = await client.auth.getSession();
+
+      if (!sessionData.session) {
+        messaggio.textContent =
+          "La sessione è scaduta. Accedi nuovamente.";
+        pulsante.disabled = false;
+        return;
+      }
+
+      const { data, error } = await client.rpc(
+        "generate_habbo_verification_code"
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      document.getElementById("codiceGenerato").textContent = data;
+      areaCodice.style.display = "block";
+      messaggio.textContent =
+        "Codice generato correttamente! Hai 15 minuti per utilizzarlo.";
+
+    } catch (error) {
+      messaggio.textContent = "Errore: " + error.message;
+    }
+
+    pulsante.disabled = false;
+  });
+
+  document.getElementById("copiaCodice").addEventListener("click", async () => {
+    const codice = document.getElementById("codiceGenerato").textContent;
+
+    try {
+      await navigator.clipboard.writeText(codice);
+      messaggio.textContent = "Codice copiato!";
+    } catch (error) {
+      messaggio.textContent = "Non riesco a copiarlo automaticamente. Seleziona il codice e copialo.";
+    }
+  });
+
+  controllaAccesso();
+</script>
+
+</body>
+</html>
