@@ -1,0 +1,425 @@
+
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InsideOutHabbo | Il mondo Habbo raccontato da noi</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f8;
+      color: #202334;
+    }
+
+    header {
+      background: #171a2b;
+      color: white;
+      padding: 22px 7%;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 29px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .logo span {
+      color: #ffb547;
+    }
+
+    .tagline {
+      color: #b8bdd0;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .login {
+      border: 1px solid #ffb547;
+      color: #ffb547;
+      padding: 11px 20px;
+      border-radius: 7px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    nav {
+      background: #24283e;
+      padding: 15px 7%;
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      color: #ffb547;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .breaking {
+      background: white;
+      padding: 13px 18px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      font-size: 13px;
+      border-left: 4px solid #ffb547;
+    }
+
+    .breaking strong {
+      color: #e28b19;
+      margin-right: 10px;
+    }
+
+    .hero {
+      background: linear-gradient(120deg, #292e50, #5555a0);
+      border-radius: 15px;
+      padding: 55px 45px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 35px;
+    }
+
+    .hero:after {
+      content: "▦ ▧ ▦";
+      position: absolute;
+      right: 35px;
+      bottom: 10px;
+      font-size: 100px;
+      color: #ffffff12;
+      letter-spacing: 5px;
+    }
+
+    .hero-label {
+      color: #ffca70;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-bottom: 17px;
+    }
+
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 48px);
+      max-width: 650px;
+      line-height: 1.12;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      color: #e0e2f2;
+      max-width: 560px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title h2 {
+      font-size: 23px;
+    }
+
+    .section-title span {
+      color: #777d94;
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+    }
+
+    .articles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px #2023340a;
+    }
+
+    .cover {
+      height: 155px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 55px;
+      background: linear-gradient(135deg, #dce4ff, #a9b8e9);
+    }
+
+    .cover.orange {
+      background: linear-gradient(135deg, #ffe5b9, #f3b46a);
+    }
+
+    .cover.pink {
+      background: linear-gradient(135deg, #fbd8e9, #d6a2d5);
+    }
+
+    .cover.green {
+      background: linear-gradient(135deg, #d4f0dd, #8bc5a4);
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .category {
+      color: #7770ca;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .card h3 {
+      font-size: 17px;
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+
+    .card p {
+      color: #777d8e;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .date {
+      display: block;
+      margin-top: 16px;
+      color: #a0a4b1;
+      font-size: 11px;
+    }
+
+    aside {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      height: fit-content;
+    }
+
+    aside h3 {
+      margin-bottom: 18px;
+      font-size: 18px;
+    }
+
+    .side-item {
+      padding: 14px 0;
+      border-bottom: 1px solid #eeeef3;
+    }
+
+    .side-item:last-child {
+      border: none;
+    }
+
+    .side-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .side-item span {
+      font-size: 11px;
+      color: #9296a5;
+    }
+
+    footer {
+      background: #171a2b;
+      color: #b8bdd0;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 55px;
+      font-size: 12px;
+      line-height: 2;
+    }
+
+    footer strong {
+      color: white;
+    }
+
+    @media (max-width: 750px) {
+      header, nav {
+        padding-left: 5%;
+        padding-right: 5%;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .articles {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 38px 25px;
+      }
+
+      nav {
+        gap: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="top">
+      <div>
+        <div class="logo">INSIDE<span>OUT</span>HABBO</div>
+        <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+      </div>
+      <a class="login" href="#">ACCEDI / REGISTRATI</a>
+    </div>
+  </header>
+
+  <nav>
+    <a href="#">HOME</a>
+    <a href="#">ATTUALITÀ</a>
+    <a href="#">HABBO</a>
+    <a href="#">ROLEPLAY</a>
+    <a href="#">COMMUNITY</a>
+    <a href="#">REDAZIONE</a>
+  </nav>
+
+  <main class="container">
+
+    <div class="breaking">
+      <strong>INSIDEOUT NEWS</strong>
+      Le storie, le novità e i protagonisti del mondo Habbo e RPG.
+    </div>
+
+    <section class="hero">
+      <div class="hero-label">BENVENUTO SU INSIDEOUTHABBO</div>
+      <h1>Dietro ogni pixel, c'è una storia da raccontare.</h1>
+      <p>
+        Un punto di incontro per informarsi, scoprire novità,
+        raccontare esperienze e dare voce alla community Habbo
+        e al mondo RPG.
+      </p>
+    </section>
+
+    <div class="section-title">
+      <h2>Ultime notizie</h2>
+      <span>LEGGI E SCOPRI</span>
+    </div>
+
+    <div class="layout">
+
+      <section class="articles">
+
+        <article class="card">
+          <div class="cover">📰</div>
+          <div class="card-content">
+            <span class="category">Attualità</span>
+            <h3>Le novità del mondo Habbo</h3>
+            <p>Scopri gli aggiornamenti, le iniziative e le notizie più interessanti della community.</p>
+            <span class="date">InsideOutHabbo · In evidenza</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="cover orange">🎭</div>
+          <div class="card-content">
+            <span class="category">Roleplay</span>
+            <h3>Dentro l'universo RPG</h3>
+            <p>Personaggi, storie, organizzazioni e nuove avventure da conoscere.</p>
+            <span class="date">InsideOutHabbo · Approfondimenti</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="cover pink">💬</div>
+          <div class="card-content">
+            <span class="category">Community</span>
+            <h3>La voce della community</h3>
+            <p>Interviste, racconti e protagonisti che rendono speciale questo universo.</p>
+            <span class="date">InsideOutHabbo · Community</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="cover green">🏆</div>
+          <div class="card-content">
+            <span class="category">Eventi</span>
+            <h3>Eventi e appuntamenti</h3>
+            <p>Le iniziative da non perdere e gli appuntamenti della settimana.</p>
+            <span class="date">InsideOutHabbo · Eventi</span>
+          </div>
+        </article>
+
+      </section>
+
+      <aside>
+        <h3>Dal mondo InsideOut</h3>
+
+        <div class="side-item">
+          <strong>🖊️ La redazione</strong>
+          <span>Scopri chi racconta le nostre storie.</span>
+        </div>
+
+        <div class="side-item">
+          <strong>🌐 La community</strong>
+          <span>Uno spazio dedicato agli utenti.</span>
+        </div>
+
+        <div class="side-item">
+          <strong>🎮 Universo Habbo</strong>
+          <span>Notizie e curiosità dal mondo Habbo.</span>
+        </div>
+
+        <div class="side-item">
+          <strong>📚 Downtown Daily</strong>
+          <span>Le storie e le notizie dell'universo RPG.</span>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <footer>
+    <strong>INSIDEOUTHABBO</strong><br>
+    Il mondo Habbo raccontato da noi.<br>
+    © 2026 InsideOutHabbo · Tutti i diritti riservati.
+  </footer>
+
+</body>
+</html>
