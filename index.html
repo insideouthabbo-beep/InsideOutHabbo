@@ -1,425 +1,401 @@
 
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InsideOutHabbo | Il mondo Habbo raccontato da noi</title>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f4f8;
-      color: #202334;
-    }
-
-    header {
-      background: #171a2b;
-      color: white;
-      padding: 22px 7%;
-    }
-
-    .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .logo {
-      font-size: 29px;
-      font-weight: 900;
-      letter-spacing: -1px;
-    }
-
-    .logo span {
-      color: #ffb547;
-    }
-
-    .tagline {
-      color: #b8bdd0;
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    .login {
-      border: 1px solid #ffb547;
-      color: #ffb547;
-      padding: 11px 20px;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 13px;
-    }
-
-    nav {
-      background: #24283e;
-      padding: 15px 7%;
-      display: flex;
-      gap: 28px;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    nav a:hover {
-      color: #ffb547;
-    }
-
-    .container {
-      max-width: 1180px;
-      margin: 35px auto;
-      padding: 0 20px;
-    }
-
-    .breaking {
-      background: white;
-      padding: 13px 18px;
-      border-radius: 8px;
-      margin-bottom: 25px;
-      font-size: 13px;
-      border-left: 4px solid #ffb547;
-    }
-
-    .breaking strong {
-      color: #e28b19;
-      margin-right: 10px;
-    }
-
-    .hero {
-      background: linear-gradient(120deg, #292e50, #5555a0);
-      border-radius: 15px;
-      padding: 55px 45px;
-      color: white;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 35px;
-    }
-
-    .hero:after {
-      content: "▦ ▧ ▦";
-      position: absolute;
-      right: 35px;
-      bottom: 10px;
-      font-size: 100px;
-      color: #ffffff12;
-      letter-spacing: 5px;
-    }
-
-    .hero-label {
-      color: #ffca70;
-      font-size: 12px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      margin-bottom: 17px;
-    }
-
-    .hero h1 {
-      font-size: clamp(30px, 5vw, 48px);
-      max-width: 650px;
-      line-height: 1.12;
-      margin-bottom: 18px;
-    }
-
-    .hero p {
-      color: #e0e2f2;
-      max-width: 560px;
-      line-height: 1.7;
-      font-size: 15px;
-    }
-
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .section-title h2 {
-      font-size: 23px;
-    }
-
-    .section-title span {
-      color: #777d94;
-      font-size: 12px;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 25px;
-    }
-
-    .articles {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 18px #2023340a;
-    }
-
-    .cover {
-      height: 155px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 55px;
-      background: linear-gradient(135deg, #dce4ff, #a9b8e9);
-    }
-
-    .cover.orange {
-      background: linear-gradient(135deg, #ffe5b9, #f3b46a);
-    }
-
-    .cover.pink {
-      background: linear-gradient(135deg, #fbd8e9, #d6a2d5);
-    }
-
-    .cover.green {
-      background: linear-gradient(135deg, #d4f0dd, #8bc5a4);
-    }
-
-    .card-content {
-      padding: 20px;
-    }
-
-    .category {
-      color: #7770ca;
-      font-size: 10px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .card h3 {
-      font-size: 17px;
-      margin: 10px 0;
-      line-height: 1.4;
-    }
-
-    .card p {
-      color: #777d8e;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .date {
-      display: block;
-      margin-top: 16px;
-      color: #a0a4b1;
-      font-size: 11px;
-    }
-
-    aside {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      height: fit-content;
-    }
-
-    aside h3 {
-      margin-bottom: 18px;
-      font-size: 18px;
-    }
-
-    .side-item {
-      padding: 14px 0;
-      border-bottom: 1px solid #eeeef3;
-    }
-
-    .side-item:last-child {
-      border: none;
-    }
-
-    .side-item strong {
-      display: block;
-      font-size: 13px;
-      margin-bottom: 6px;
-    }
-
-    .side-item span {
-      font-size: 11px;
-      color: #9296a5;
-    }
-
-    footer {
-      background: #171a2b;
-      color: #b8bdd0;
-      text-align: center;
-      padding: 30px 20px;
-      margin-top: 55px;
-      font-size: 12px;
-      line-height: 2;
-    }
-
-    footer strong {
-      color: white;
-    }
-
-    @media (max-width: 750px) {
-      header, nav {
-        padding-left: 5%;
-        padding-right: 5%;
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .articles {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        padding: 38px 25px;
-      }
-
-      nav {
-        gap: 17px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InsideOutHabbo - Il mondo Habbo raccontato da noi</title>
+<style>
+:root {
+  --navy: #101b35;
+  --blue: #1d3158;
+  --yellow: #ffd34e;
+  --light: #f3f5f9;
+  --text: #202b40;
+  --muted: #778198;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--light);
+  color: var(--text);
+}
+header {
+  background: var(--navy);
+  color: white;
+  padding: 22px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.brand {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.brand span { color: var(--yellow); }
+.tagline {
+  color: #c4cde0;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.login {
+  background: var(--yellow);
+  color: var(--navy);
+  text-decoration: none;
+  padding: 11px 18px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 13px;
+}
+nav {
+  background: var(--blue);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 17px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: .6px;
+}
+nav a:hover { background: #304875; color: var(--yellow); }
+.breaking {
+  background: var(--yellow);
+  color: var(--navy);
+  padding: 11px 7%;
+  font-size: 13px;
+  font-weight: bold;
+}
+.breaking span {
+  background: var(--navy);
+  color: white;
+  padding: 5px 9px;
+  margin-right: 10px;
+  font-size: 10px;
+}
+.container {
+  max-width: 1180px;
+  margin: 35px auto;
+  padding: 0 20px;
+}
+.section-title {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  font-weight: 900;
+  color: var(--navy);
+  border-left: 4px solid var(--yellow);
+  padding-left: 11px;
+  margin-bottom: 20px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+.hero {
+  background: linear-gradient(120deg, #172849, #304d7c);
+  color: white;
+  padding: 42px;
+  border-radius: 9px;
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.hero .tag {
+  color: var(--yellow);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-size: clamp(28px, 4vw, 43px);
+  line-height: 1.12;
+  margin: 0 0 15px;
+  max-width: 650px;
+}
+.hero p {
+  color: #d5deed;
+  line-height: 1.6;
+  max-width: 570px;
+  margin: 0;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 17px;
+  margin-top: 25px;
+}
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 23px;
+  border: 1px solid #e7eaf0;
+  transition: transform .2s, box-shadow .2s;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px #15213a12;
+}
+.cover {
+  height: 100px;
+  background: #edf1f8;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 17px;
+}
+.pixel-icon {
+  width: 64px;
+  height: 64px;
+  shape-rendering: crispEdges;
+  image-rendering: pixelated;
+}
+.card small {
+  color: #b18a17;
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.card h3 {
+  margin: 9px 0;
+  font-size: 17px;
+  color: var(--navy);
+}
+.card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+.sidebar {
+  background: white;
+  border: 1px solid #e7eaf0;
+  border-radius: 8px;
+  padding: 24px;
+}
+.sidebar h3 {
+  font-size: 15px;
+  margin: 0 0 20px;
+  color: var(--navy);
+}
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf0f5;
+  font-size: 13px;
+  font-weight: bold;
+  color: #35435d;
+}
+.side-item:last-child { border-bottom: 0; }
+.side-icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  shape-rendering: crispEdges;
+}
+footer {
+  margin-top: 55px;
+  background: var(--navy);
+  color: #c4cde0;
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+footer strong { color: white; }
+@media (max-width: 760px) {
+  header { padding: 20px; }
+  nav a { padding: 13px 11px; font-size: 10px; }
+  .layout { grid-template-columns: 1fr; }
+  .hero { padding: 30px 25px; }
+  .cards { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 450px) {
+  .cards { grid-template-columns: 1fr; }
+  .brand { font-size: 21px; }
+}
+</style>
 </head>
-
 <body>
 
-  <header>
-    <div class="top">
-      <div>
-        <div class="logo">INSIDE<span>OUT</span>HABBO</div>
-        <div class="tagline">Il mondo Habbo raccontato da noi.</div>
-      </div>
-      <a class="login" href="#">ACCEDI / REGISTRATI</a>
-    </div>
-  </header>
+<header>
+  <div>
+    <div class="brand">INSIDEOUT<span>HABBO</span></div>
+    <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+  </div>
+  <a class="login" href="#">ACCEDI / REGISTRATI</a>
+</header>
 
-  <nav>
-    <a href="#">HOME</a>
-    <a href="#">ATTUALITÀ</a>
-    <a href="#">HABBO</a>
-    <a href="#">ROLEPLAY</a>
-    <a href="#">COMMUNITY</a>
-    <a href="#">REDAZIONE</a>
-  </nav>
+<nav>
+  <a href="#">HOME</a>
+  <a href="#">ATTUALITÀ</a>
+  <a href="#">HABBO</a>
+  <a href="#">ROLEPLAY</a>
+  <a href="#">COMMUNITY</a>
+  <a href="#">REDAZIONE</a>
+</nav>
 
-  <main class="container">
+<div class="breaking">
+  <span>ULTIME NOTIZIE</span>
+  Il mondo Habbo è sempre in movimento. Scopri cosa succede!
+</div>
 
-    <div class="breaking">
-      <strong>INSIDEOUT NEWS</strong>
-      Le storie, le novità e i protagonisti del mondo Habbo e RPG.
-    </div>
+<main class="container">
+  <div class="section-title">IN PRIMO PIANO</div>
 
-    <section class="hero">
-      <div class="hero-label">BENVENUTO SU INSIDEOUTHABBO</div>
-      <h1>Dietro ogni pixel, c'è una storia da raccontare.</h1>
-      <p>
-        Un punto di incontro per informarsi, scoprire novità,
-        raccontare esperienze e dare voce alla community Habbo
-        e al mondo RPG.
-      </p>
-    </section>
-
-    <div class="section-title">
-      <h2>Ultime notizie</h2>
-      <span>LEGGI E SCOPRI</span>
-    </div>
-
-    <div class="layout">
-
-      <section class="articles">
-
-        <article class="card">
-          <div class="cover">📰</div>
-          <div class="card-content">
-            <span class="category">Attualità</span>
-            <h3>Le novità del mondo Habbo</h3>
-            <p>Scopri gli aggiornamenti, le iniziative e le notizie più interessanti della community.</p>
-            <span class="date">InsideOutHabbo · In evidenza</span>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="cover orange">🎭</div>
-          <div class="card-content">
-            <span class="category">Roleplay</span>
-            <h3>Dentro l'universo RPG</h3>
-            <p>Personaggi, storie, organizzazioni e nuove avventure da conoscere.</p>
-            <span class="date">InsideOutHabbo · Approfondimenti</span>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="cover pink">💬</div>
-          <div class="card-content">
-            <span class="category">Community</span>
-            <h3>La voce della community</h3>
-            <p>Interviste, racconti e protagonisti che rendono speciale questo universo.</p>
-            <span class="date">InsideOutHabbo · Community</span>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="cover green">🏆</div>
-          <div class="card-content">
-            <span class="category">Eventi</span>
-            <h3>Eventi e appuntamenti</h3>
-            <p>Le iniziative da non perdere e gli appuntamenti della settimana.</p>
-            <span class="date">InsideOutHabbo · Eventi</span>
-          </div>
-        </article>
-
+  <div class="layout">
+    <div>
+      <section class="hero">
+        <div class="tag">BENVENUTI SU INSIDEOUTHABBO</div>
+        <h1>Dietro ogni pixel, c'è una storia da raccontare.</h1>
+        <p>Notizie, personaggi, eventi e storie dalla community Habbo e dal mondo RPG. La tua finestra su un universo tutto da scoprire.</p>
       </section>
 
-      <aside>
-        <h3>Dal mondo InsideOut</h3>
+      <div class="cards">
 
-        <div class="side-item">
-          <strong>🖊️ La redazione</strong>
-          <span>Scopri chi racconta le nostre storie.</span>
-        </div>
+        <article class="card">
+          <div class="cover">
+            <svg class="pixel-icon" viewBox="0 0 32 32" aria-label="Giornale">
+              <rect x="6" y="3" width="20" height="26" fill="#243b68"/>
+              <rect x="9" y="6" width="14" height="20" fill="#fff"/>
+              <rect x="11" y="8" width="10" height="3" fill="#ffd34e"/>
+              <rect x="11" y="14" width="4" height="5" fill="#e5a83a"/>
+              <rect x="17" y="14" width="4" height="2" fill="#243b68"/>
+              <rect x="17" y="18" width="4" height="1" fill="#243b68"/>
+              <rect x="11" y="21" width="10" height="2" fill="#243b68"/>
+            </svg>
+          </div>
+          <small>INFORMAZIONE</small>
+          <h3>Attualità</h3>
+          <p>Le notizie, gli aggiornamenti e gli avvenimenti più importanti della community.</p>
+        </article>
 
-        <div class="side-item">
-          <strong>🌐 La community</strong>
-          <span>Uno spazio dedicato agli utenti.</span>
-        </div>
+        <article class="card">
+          <div class="cover">
+            <svg class="pixel-icon" viewBox="0 0 32 32" aria-label="Maschere teatrali">
+              <rect x="4" y="5" width="10" height="3" fill="#243b68"/>
+              <rect x="3" y="8" width="12" height="13" fill="#f0bd50"/>
+              <rect x="6" y="12" width="2" height="2" fill="#243b68"/>
+              <rect x="11" y="12" width="2" height="2" fill="#243b68"/>
+              <rect x="6" y="17" width="7" height="2" fill="#243b68"/>
+              <rect x="18" y="9" width="11" height="3" fill="#243b68"/>
+              <rect x="17" y="12" width="12" height="13" fill="#80a6d8"/>
+              <rect x="20" y="15" width="2" height="2" fill="#243b68"/>
+              <rect x="25" y="15" width="2" height="2" fill="#243b68"/>
+              <rect x="20" y="21" width="7" height="2" fill="#243b68"/>
+            </svg>
+          </div>
+          <small>STORIE E PERSONAGGI</small>
+          <h3>Roleplay</h3>
+          <p>Universi narrativi, personaggi, interpretazione e avventure RPG.</p>
+        </article>
 
-        <div class="side-item">
-          <strong>🎮 Universo Habbo</strong>
-          <span>Notizie e curiosità dal mondo Habbo.</span>
-        </div>
+        <article class="card">
+          <div class="cover">
+            <svg class="pixel-icon" viewBox="0 0 32 32" aria-label="Chat">
+              <rect x="4" y="5" width="24" height="17" fill="#243b68"/>
+              <rect x="7" y="8" width="18" height="11" fill="#fff"/>
+              <rect x="10" y="12" width="3" height="2" fill="#5b85c5"/>
+              <rect x="15" y="12" width="7" height="2" fill="#5b85c5"/>
+              <rect x="8" y="22" width="5" height="5" fill="#243b68"/>
+              <rect x="8" y="25" width="3" height="3" fill="#243b68"/>
+              <rect x="18" y="16" width="3" height="3" fill="#ffd34e"/>
+            </svg>
+          </div>
+          <small>INCONTRI E CONDIVISIONE</small>
+          <h3>Community</h3>
+          <p>Persone, iniziative, gruppi ed esperienze che rendono viva la community.</p>
+        </article>
 
-        <div class="side-item">
-          <strong>📚 Downtown Daily</strong>
-          <span>Le storie e le notizie dell'universo RPG.</span>
-        </div>
-      </aside>
+        <article class="card">
+          <div class="cover">
+            <svg class="pixel-icon" viewBox="0 0 32 32" aria-label="Trofeo">
+              <rect x="10" y="4" width="12" height="3" fill="#9b681b"/>
+              <rect x="8" y="7" width="16" height="11" fill="#ffd34e"/>
+              <rect x="11" y="10" width="10" height="5" fill="#f3b72e"/>
+              <rect x="4" y="8" width="4" height="3" fill="#9b681b"/>
+              <rect x="3" y="11" width="4" height="5" fill="#9b681b"/>
+              <rect x="24" y="8" width="4" height="3" fill="#9b681b"/>
+              <rect x="25" y="11" width="4" height="5" fill="#9b681b"/>
+              <rect x="14" y="18" width="4" height="6" fill="#9b681b"/>
+              <rect x="10" y="24" width="12" height="4" fill="#9b681b"/>
+              <rect x="12" y="25" width="8" height="2" fill="#ffd34e"/>
+            </svg>
+          </div>
+          <small>EVENTI E INIZIATIVE</small>
+          <h3>Eventi</h3>
+          <p>Competizioni, appuntamenti e momenti speciali da vivere insieme.</p>
+        </article>
 
+      </div>
     </div>
-  </main>
 
-  <footer>
-    <strong>INSIDEOUTHABBO</strong><br>
-    Il mondo Habbo raccontato da noi.<br>
-    © 2026 InsideOutHabbo · Tutti i diritti riservati.
-  </footer>
+    <aside class="sidebar">
+      <h3>ESPLORA INSIDEOUTHABBO</h3>
+
+      <div class="side-item">
+        <svg class="side-icon" viewBox="0 0 16 16">
+          <rect x="3" y="2" width="10" height="12" fill="#243b68"/>
+          <rect x="5" y="4" width="6" height="2" fill="#ffd34e"/>
+          <rect x="5" y="8" width="6" height="1" fill="#fff"/>
+          <rect x="5" y="10" width="4" height="1" fill="#fff"/>
+        </svg>
+        La Redazione
+      </div>
+
+      <div class="side-item">
+        <svg class="side-icon" viewBox="0 0 16 16">
+          <rect x="6" y="1" width="4" height="14" fill="#4e80ba"/>
+          <rect x="1" y="6" width="14" height="4" fill="#4e80ba"/>
+          <rect x="7" y="2" width="2" height="12" fill="#fff"/>
+          <rect x="2" y="7" width="12" height="2" fill="#fff"/>
+        </svg>
+        La Community
+      </div>
+
+      <div class="side-item">
+        <svg class="side-icon" viewBox="0 0 16 16">
+          <rect x="2" y="4" width="12" height="9" fill="#243b68"/>
+          <rect x="5" y="2" width="6" height="3" fill="#243b68"/>
+          <rect x="4" y="7" width="2" height="2" fill="#ffd34e"/>
+          <rect x="10" y="7" width="2" height="2" fill="#ffd34e"/>
+          <rect x="7" y="9" width="2" height="2" fill="#fff"/>
+        </svg>
+        Il mondo Habbo
+      </div>
+
+      <div class="side-item">
+        <svg class="side-icon" viewBox="0 0 16 16">
+          <rect x="2" y="2" width="12" height="12" fill="#243b68"/>
+          <rect x="4" y="4" width="8" height="8" fill="#fff"/>
+          <rect x="5" y="5" width="6" height="2" fill="#ffd34e"/>
+          <rect x="5" y="8" width="6" height="1" fill="#243b68"/>
+          <rect x="5" y="10" width="4" height="1" fill="#243b68"/>
+        </svg>
+        Downtown Daily
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <strong>INSIDEOUTHABBO</strong><br>
+  Il mondo Habbo raccontato da noi.<br>
+  Una community, tante storie, un solo universo.
+</footer>
 
 </body>
 </html>
