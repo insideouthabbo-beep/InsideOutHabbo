@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Articolo | InsideOutHabbo</title>
+  <style>
+    :root {
+      --navy: #101b35;
+      --blue: #1d3158;
+      --yellow: #ffd34e;
+      --light: #f3f5f9;
+      --text: #202b40;
+      --muted: #778198;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--light);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 22px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .brand span { color: var(--yellow); }
+
+    .tagline {
+      color: #c4cde0;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .home-link {
+      background: var(--yellow);
+      color: var(--navy);
+      padding: 11px 18px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    nav {
+      background: var(--blue);
+      padding: 15px 7%;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    main {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .article {
+      background: white;
+      border-radius: 9px;
+      padding: 35px;
+      box-shadow: 0 5px 20px #15213a0d;
+    }
+
+    .category {
+      color: #a47c12;
+      font-weight: bold;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      color: var(--navy);
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.15;
+      margin: 15px 0;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 25px;
+    }
+
+    .cover {
+      width: 100%;
+      max-height: 430px;
+      object-fit: cover;
+      border-radius: 7px;
+      margin-bottom: 25px;
+    }
+
+    .content {
+      font-size: 17px;
+      line-height: 1.85;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 30px;
+      color: var(--blue);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .message {
+      text-align: center;
+      padding: 35px;
+      color: var(--muted);
+      background: white;
+      border-radius: 9px;
+    }
+
+    footer {
+      margin-top: 60px;
+      background: var(--navy);
+      color: #c4cde0;
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    footer strong { color: white; }
+
+    @media (max-width: 600px) {
+      .article { padding: 23px; }
+      header { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">INSIDEOUT<span>HABBO</span></div>
+    <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+  </div>
+  <a class="home-link" href="index.html">TORNA ALLA HOME</a>
+</header>
+
+<nav>IL GIORNALE DIGITALE DELLA COMMUNITY HABBO</nav>
+
+<main>
+  <div id="articolo" class="message">
+    Caricamento dell'articolo...
+  </div>
+</main>
+
+<footer>
+  <strong>INSIDEOUTHABBO</strong><br>
+  Il mondo Habbo raccontato da noi.<br>
+  Una community, tante storie, un solo universo.
+</footer>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const contenitore = document.getElementById('articolo');
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  function escapeHTML(testo) {
+    return String(testo ?? '').replace(/[&<>"']/g, carattere => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[carattere]);
+  }
+
+  async function caricaArticolo() {
+    if (!id) {
+      contenitore.textContent = 'Nessun articolo selezionato.';
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('title, content, excerpt, category, cover_image_url, published_at')
+        .eq('id', id)
+        .eq('status', 'published')
+        .single();
+
+      if (error) throw error;
+
+      const dataArticolo = data.published_at
+        ? new Date(data.published_at).toLocaleDateString('it-IT')
+        : '';
+
+      contenitore.className = 'article';
+
+      contenitore.innerHTML = `
+        <div class="category">${escapeHTML(data.category || 'Attualità')}</div>
+        <h1>${escapeHTML(data.title)}</h1>
+        <div class="date">${escapeHTML(dataArticolo)}</div>
+        ${data.cover_image_url
+          ? `<img class="cover" src="${escapeHTML(data.cover_image_url)}" alt="${escapeHTML(data.title)}">`
+          : ''}
+        <div class="content">${escapeHTML(data.content)}</div>
+        <a class="back" href="index.html">← Torna agli articoli</a>
+      `;
+
+    } catch (errore) {
+      console.error(errore);
+      contenitore.className = 'message';
+      contenitore.textContent = 'Articolo non trovato oppure non disponibile.';
+    }
+  }
+
+  caricaArticolo();
+</script>
+
+</body>
+</html>
