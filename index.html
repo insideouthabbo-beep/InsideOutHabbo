@@ -236,7 +236,10 @@ footer strong { color: white; }
     <div class="brand">INSIDEOUT<span>HABBO</span></div>
     <div class="tagline">Il mondo Habbo raccontato da noi.</div>
   </div>
- <a class="login" id="loginLink" href="accesso.html">ACCEDI / REGISTRATI</a>
+ <a class="login" id="loginLink" href="accesso.html">
+  <img id="miniAvatar" src="" alt="" style="display:none;width:45px;height:55px;object-fit:contain;vertical-align:middle;margin-right:8px;image-rendering:pixelated;">
+  <span id="loginText">ACCEDI / REGISTRATI</span>
+</a>
 </header>
 
 <nav>
@@ -416,27 +419,42 @@ footer strong { color: white; }
   const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-  const loginLink = document.getElementById("loginLink");
+ const loginLink = document.getElementById("loginLink");
+const loginText = document.getElementById("loginText");
+const miniAvatar = document.getElementById("miniAvatar");
 
 async function aggiornaAccesso() {
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
-    loginLink.textContent = "ACCEDI / REGISTRATI";
+    loginText.textContent = "ACCEDI / REGISTRATI";
     loginLink.href = "accesso.html";
+    miniAvatar.style.display = "none";
     return;
   }
 
-  const { data: profilo } = await supabase
+  const { data: profilo, error } = await supabase
     .from("profiles")
-    .select("habbo_name, habbo_unique_id")
+    .select("habbo_name")
     .eq("id", session.user.id)
     .maybeSingle();
 
-  if (profilo) {
-    loginLink.textContent = profilo.habbo_name || "IL MIO PROFILO";
+  if (error || !profilo || !profilo.habbo_name) {
+    loginText.textContent = "IL MIO PROFILO";
     loginLink.href = "accesso.html";
+    miniAvatar.style.display = "none";
+    return;
   }
+
+  loginText.textContent = profilo.habbo_name;
+  loginLink.href = "profilo.html?utente=" + encodeURIComponent(profilo.habbo_name);
+
+  miniAvatar.src =
+    "https://www.habbo.it/habbo-imaging/avatarimage?user=" +
+    encodeURIComponent(profilo.habbo_name) +
+    "&direction=2&head_direction=3&size=s&gesture=std&action=std";
+
+  miniAvatar.style.display = "inline-block";
 }
 
 aggiornaAccesso();
