@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <title>Scrivi un articolo | InsideOutHabbo</title>
 
   <style>
@@ -108,5 +109,49 @@
 
   </div>
 
+  <script>
+  const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+  const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  async function verificaAccesso() {
+    const { data: sessione } = await client.auth.getSession();
+
+    if (!sessione.session) {
+      window.location.href = "accesso.html";
+      return;
+    }
+
+    const user = sessione.session.user;
+
+    const { data: profilo, error } = await client
+      .from("profiles")
+      .select("habbo_name, display_name, role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error || !profilo) {
+      document.body.innerHTML = "<h2>Impossibile caricare il profilo.</h2>";
+      return;
+    }
+
+    const ruoliAutorizzati = ["redattore", "caporedattore", "admin"];
+
+    if (!ruoliAutorizzati.includes(profilo.role)) {
+      document.body.innerHTML = "<h2>Non hai i permessi per scrivere articoli.</h2>";
+      return;
+    }
+
+    document.getElementById("titolo").dataset.autore =
+      profilo.display_name || profilo.habbo_name || user.email;
+  }
+
+  verificaAccesso();
+</script>
 </body>
 </html>
