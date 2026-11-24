@@ -83,8 +83,9 @@
         <option value="Eventi">Eventi</option>
       </select>
 
-      <label for="copertina">Immagine di copertina (URL)</label>
-      <input type="url" id="copertina" placeholder="https://...">
+      <label for="copertina">Immagine di copertina</label>
+<input type="file" id="copertina" accept="image/*">
+<img id="anteprimaCopertina" src="" alt="Anteprima copertina" style="display:none; max-width:300px; margin-top:10px;">
 
       <label for="estratto">Breve descrizione</label>
       <textarea id="estratto" placeholder="Presenta brevemente l'articolo..." style="min-height:100px"></textarea>
@@ -151,6 +152,20 @@
       profilo.display_name || profilo.habbo_name || user.email;
   }
 
+      document.getElementById("copertina").addEventListener("change", function() {
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const anteprima = document.getElementById("anteprimaCopertina");
+    anteprima.src = URL.createObjectURL(file);
+    anteprima.style.display = "block";
+  });
+
+  verificaAccesso();
+</script>
+</body>
+</html>
   verificaAccesso();
 </script>
 </body>
