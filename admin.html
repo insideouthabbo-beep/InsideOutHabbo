@@ -298,6 +298,55 @@ async function caricaUtenti() {
     const stato = document.createElement('p');
     stato.textContent = 'Stato account: ' + (utente.status || 'Non specificato');
 
+    
+const selettoreRuolo = document.createElement('select');
+
+const ruoliDisponibili = [
+  { valore: 'user', testo: 'Membro' },
+  { valore: 'redattore', testo: 'Redattore' },
+  { valore: 'caporedattore', testo: 'Caporedattore' },
+  { valore: 'admin', testo: 'Amministratore' }
+];
+
+ruoliDisponibili.forEach(opzione => {
+  const elemento = document.createElement('option');
+  elemento.value = opzione.valore;
+  elemento.textContent = opzione.testo;
+  selettoreRuolo.append(elemento);
+});
+
+selettoreRuolo.value = utente.role || 'user';
+selettoreRuolo.style.cssText =
+  'padding:10px;background:#172747;color:white;border:1px solid #ffd34e;border-radius:5px;';
+
+const salvaRuolo = document.createElement('button');
+salvaRuolo.type = 'button';
+salvaRuolo.textContent = 'Salva ruolo';
+salvaRuolo.style.cssText =
+  'padding:10px 15px;background:#ffd34e;color:#172747;border:0;border-radius:5px;font-weight:bold;cursor:pointer;';
+
+salvaRuolo.addEventListener('click', async () => {
+  salvaRuolo.disabled = true;
+  salvaRuolo.textContent = 'Salvataggio...';
+
+  const { error } = await supabase.rpc('admin_cambia_ruolo', {
+    p_user_id: utente.id,
+    p_nuovo_ruolo: selettoreRuolo.value
+  });
+
+  if (error) {
+    alert('Errore: ' + error.message);
+    salvaRuolo.disabled = false;
+    salvaRuolo.textContent = 'Salva ruolo';
+    return;
+  }
+
+  alert('Ruolo aggiornato correttamente!');
+  await caricaUtenti();
+});
+
+dati.append(selettoreRuolo, salvaRuolo);
+
     dati.append(nome, nickname, ruolo, verifica, stato);
     scheda.append(avatar, dati);
     elencoUtenti.append(scheda);
