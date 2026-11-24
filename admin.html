@@ -519,7 +519,7 @@ async function caricaArticoli() {
 
   const { data: articoli, error } = await supabase
     .from('articles')
-    .select('id, title, content, excerpt, category, status, created_at, published_at')
+    .select('id, title, content, excerpt, category, status, created_at, published_at, author_id')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -535,6 +535,22 @@ async function caricaArticoli() {
     return;
   }
 
+  const idsAutori = [
+  ...new Set(articoli.map(a => a.author_id).filter(Boolean))
+];
+
+let autori = [];
+
+if (idsAutori.length > 0) {
+  const { data: profili, error: erroreProfili } = await supabase
+    .from('profiles')
+    .select('id, display_name, habbo_name')
+    .in('id', idsAutori);
+
+  if (!erroreProfili && profili) {
+    autori = profili;
+  }
+}
   articoli.forEach(articolo => {
     const scheda = document.createElement('div');
 
@@ -560,6 +576,16 @@ async function caricaArticoli() {
 
     const anteprima = document.createElement('p');
     anteprima.textContent = articolo.excerpt || 'Nessuna descrizione disponibile.';
+    const autore = document.createElement('p');
+const profiloAutore = autori.find(
+  profilo => profilo.id === articolo.author_id
+);
+
+autore.textContent = 'Autore: ' + (
+  profiloAutore?.display_name ||
+  profiloAutore?.habbo_name ||
+  'Non disponibile'
+);
 
     const modifica = document.createElement('button');
 modifica.type = 'button';
@@ -637,6 +663,7 @@ scheda.append(
   categoria,
   stato,
   data,
+  autore,
   anteprima,
   modifica,
   pubblica,
