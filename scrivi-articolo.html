@@ -4,12 +4,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scrivi un articolo | InsideOutHabbo</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 30px 16px;
+      background: #101827;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    .contenitore {
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 30px;
+      background: #19263a;
+      border: 1px solid #30415b;
+      border-radius: 12px;
+    }
+
+    h1 {
+      color: #ffd43b;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #40516c;
+      border-radius: 6px;
+      background: #101827;
+      color: white;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+    }
+
+    .descrizione {
+      color: #b8c4d6;
+      line-height: 1.5;
+    }
+  </style>
 </head>
+
 <body>
 
-  <h1>Scrivi un articolo</h1>
+  <div class="contenitore">
 
-  <p>Prepara e pubblica i tuoi articoli su InsideOutHabbo.</p>
+    <h1>Scrivi un articolo</h1>
+
+    <p class="descrizione">
+      Prepara il tuo articolo per la pubblicazione su InsideOutHabbo.
+    </p>
+
+    <form id="formArticolo">
+
+      <label for="titolo">Titolo dell'articolo</label>
+      <input type="text" id="titolo" placeholder="Inserisci il titolo">
+
+      <label for="categoria">Categoria</label>
+      <select id="categoria">
+        <option value="">Seleziona una categoria</option>
+        <option value="Attualità">Attualità</option>
+        <option value="Habbo">Habbo</option>
+        <option value="Roleplay">Roleplay</option>
+        <option value="Community">Community</option>
+        <option value="Eventi">Eventi</option>
+      </select>
+
+      <label for="copertina">Immagine di copertina (URL)</label>
+      <input type="url" id="copertina" placeholder="https://...">
+
+      <label for="estratto">Breve descrizione</label>
+      <textarea id="estratto" placeholder="Presenta brevemente l'articolo..." style="min-height:100px"></textarea>
+
+      <label for="contenuto">Contenuto dell'articolo</label>
+      <textarea id="contenuto" placeholder="Scrivi qui il tuo articolo..."></textarea>
+
+    </form>
+
+  </div>
 
 </body>
 </html>
