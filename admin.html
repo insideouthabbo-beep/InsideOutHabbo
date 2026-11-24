@@ -171,9 +171,16 @@
     </button>
   </div>
 
-  <div id="elencoUtenti">
-    Caricamento utenti...
-  </div>
+  <input
+  type="search"
+  id="cercaUtente"
+  placeholder="Cerca per nickname Habbo o nome..."
+  style="width:100%;padding:14px;margin:15px 0;background:#172747;color:white;border:1px solid #344d77;border-radius:7px;font-size:15px;"
+>
+
+<div id="elencoUtenti">
+  Caricamento utenti...
+</div>
 </section>
 
     <a href="index.html">← Torna alla homepage</a>
@@ -228,6 +235,19 @@ const apriUtenti = document.getElementById('apriUtenti');
 const utentiPanel = document.getElementById('utentiPanel');
 const tornaDashboard = document.getElementById('tornaDashboard');
 const elencoUtenti = document.getElementById('elencoUtenti');
+  const cercaUtente = document.getElementById('cercaUtente');
+
+cercaUtente.addEventListener('input', () => {
+  const ricerca = cercaUtente.value.toLowerCase().trim();
+
+  Array.from(elencoUtenti.children).forEach(scheda => {
+    const testo = scheda.dataset.search || '';
+
+    scheda.style.display = testo.includes(ricerca)
+      ? 'flex'
+      : 'none';
+  });
+});
 
 apriUtenti.addEventListener('click', async () => {
   document.getElementById('contenuto').hidden = true;
@@ -263,6 +283,10 @@ async function caricaUtenti() {
 
   utenti.forEach(utente => {
     const scheda = document.createElement('div');
+    scheda.dataset.search = (
+  (utente.habbo_name || '') + ' ' +
+  (utente.display_name || '')
+).toLowerCase();
 
     scheda.style.cssText =
       'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;';
