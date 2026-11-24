@@ -607,7 +607,41 @@ pubblica.addEventListener('click', async () => {
   await caricaArticoli();
 });
 
-scheda.append(titolo, categoria, stato, data, anteprima, modifica, pubblica);
+const elimina = document.createElement('button');
+elimina.type = 'button';
+elimina.textContent = 'Elimina articolo';
+
+elimina.addEventListener('click', async () => {
+  const conferma = confirm(
+    'Vuoi davvero eliminare questo articolo? Questa operazione non può essere annullata.'
+  );
+
+  if (!conferma) return;
+
+  const { error } = await supabase
+    .from('articles')
+    .delete()
+    .eq('id', articolo.id);
+
+  if (error) {
+    alert('Errore durante l’eliminazione: ' + error.message);
+    return;
+  }
+
+  alert('Articolo eliminato correttamente!');
+  await caricaArticoli();
+});
+
+scheda.append(
+  titolo,
+  categoria,
+  stato,
+  data,
+  anteprima,
+  modifica,
+  pubblica,
+  elimina
+);
     elenco.append(scheda);
   });
 }
