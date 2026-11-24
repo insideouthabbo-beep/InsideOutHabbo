@@ -576,7 +576,38 @@ modifica.addEventListener('click', () => {
   document.getElementById('editorArticolo').hidden = false;
 });
 
-scheda.append(titolo, categoria, stato, data, anteprima, modifica);
+const pubblica = document.createElement('button');
+pubblica.type = 'button';
+pubblica.textContent =
+  articolo.status === 'published' ? 'Ritira dalla pubblicazione' : 'Pubblica';
+
+pubblica.addEventListener('click', async () => {
+  const nuovoStato =
+    articolo.status === 'published' ? 'draft' : 'published';
+
+  const { error } = await supabase
+    .from('articles')
+    .update({
+      status: nuovoStato,
+      published_at: nuovoStato === 'published'
+        ? new Date().toISOString()
+        : null
+    })
+    .eq('id', articolo.id);
+
+  if (error) {
+    alert('Errore: ' + error.message);
+    return;
+  }
+
+  alert(nuovoStato === 'published'
+    ? 'Articolo pubblicato!'
+    : 'Articolo ritirato dalla pubblicazione!');
+
+  await caricaArticoli();
+});
+
+scheda.append(titolo, categoria, stato, data, anteprima, modifica, pubblica);
     elenco.append(scheda);
   });
 }
