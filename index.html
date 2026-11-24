@@ -236,7 +236,7 @@ footer strong { color: white; }
     <div class="brand">INSIDEOUT<span>HABBO</span></div>
     <div class="tagline">Il mondo Habbo raccontato da noi.</div>
   </div>
-  <a class="login" href="#">ACCEDI / REGISTRATI</a>
+ <a class="login" id="loginLink" href="accesso.html">ACCEDI / REGISTRATI</a>
 </header>
 
 <nav>
@@ -416,6 +416,34 @@ footer strong { color: white; }
   const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const loginLink = document.getElementById("loginLink");
+
+async function aggiornaAccesso() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    loginLink.textContent = "ACCEDI / REGISTRATI";
+    loginLink.href = "accesso.html";
+    return;
+  }
+
+  const { data: profilo } = await supabase
+    .from("profiles")
+    .select("habbo_name, habbo_unique_id")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (profilo) {
+    loginLink.textContent = profilo.habbo_name || "IL MIO PROFILO";
+    loginLink.href = "accesso.html";
+  }
+}
+
+aggiornaAccesso();
+
+supabase.auth.onAuthStateChange(() => {
+  aggiornaAccesso();
+});
   const contenitore = document.getElementById('ultimi-articoli');
 
   async function caricaUltimiArticoli() {
