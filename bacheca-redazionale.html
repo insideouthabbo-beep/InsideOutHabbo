@@ -231,6 +231,14 @@ button:hover { background: #ffe17e; }
   </div>
 </section>
 
+<section id="sezioneArchivio" hidden>
+  <h2>Archivio delle comunicazioni</h2>
+  <p class="intro">
+    Qui trovi gli avvisi scaduti, conservati per consultazione.
+  </p>
+  <div id="archivioAvvisi"></div>
+</section>
+
 </main>
 
 <script type="module">
@@ -300,6 +308,7 @@ async function avviaBacheca() {
   await caricaAvvisi();
 }
 
+
 async function caricaAvvisi() {
   elenco.replaceChildren(
     creaElemento('p', 'Caricamento degli avvisi...')
@@ -318,25 +327,25 @@ async function caricaAvvisi() {
     return;
   }
 
-  elenco.replaceChildren();
-
   const oggi = new Date().toISOString().slice(0, 10);
 
-  const avvisiVisibili = (data || []).filter(avviso =>
-    !avviso.expires_at ||
-    avviso.expires_at.slice(0, 10) >= oggi
-  );
+  const avvisiAttivi = [];
+  const avvisiScaduti = [];
 
-  if (avvisiVisibili.length === 0) {
-    elenco.appendChild(
-      creaElemento('p', 'Non ci sono ancora comunicazioni pubblicate.', 'nessun-avviso')
-    );
-    return;
-  }
+  (data || []).forEach(avviso => {
+    if (avviso.expires_at &&
+        avviso.expires_at.slice(0, 10) < oggi) {
+      avvisiScaduti.push(avviso);
+    } else {
+      avvisiAttivi.push(avviso);
+    }
+  });
 
-  for (const avviso of avvisiVisibili) {
+  function creaScheda(avviso) {
     const scheda = document.createElement('article');
-    scheda.className = avviso.pinned ? 'avviso evidenza' : 'avviso';
+    scheda.className = avviso.pinned
+      ? 'avviso evidenza'
+      : 'avviso';
 
     if (avviso.pinned) {
       scheda.appendChild(
@@ -345,20 +354,22 @@ async function caricaAvvisi() {
     }
 
     scheda.appendChild(creaElemento('h3', avviso.title));
+
     scheda.appendChild(
       creaElemento('div', avviso.content, 'testo-avviso')
     );
 
-    const data = new Date(avviso.created_at).toLocaleString('it-IT');
-
-    let dettagli = 'Pubblicato il ' + data;
+    let dettagli = 'Pubblicato il ' +
+      new Date(avviso.created_at).toLocaleString('it-IT');
 
     if (avviso.expires_at) {
       dettagli += ' · Scadenza: ' +
         new Date(avviso.expires_at).toLocaleDateString('it-IT');
     }
 
-    scheda.appendChild(creaElemento('div', dettagli, 'meta'));
+    scheda.appendChild(
+      creaElemento('div', dettagli, 'meta')
+    );
 
     if (ruoliGestione.includes(ruolo)) {
       const azioni = document.createElement('div');
@@ -376,7 +387,52 @@ async function caricaAvvisi() {
       scheda.appendChild(azioni);
     }
 
-    elenco.appendChild(scheda);
+    return scheda;
+  }
+
+  // Comunicazioni attive
+  elenco.replaceChildren();
+
+  if (avvisiAttivi.length === 0) {
+    elenco.appendChild(
+      creaElemento(
+        'p',
+        'Non ci sono comunicazioni attive.',
+        'nessun-avviso'
+      )
+    );
+  } else {
+    avvisiAttivi.forEach(avviso => {
+      elenco.appendChild(creaScheda(avviso));
+    });
+  }
+
+  // Archivio visibile soltanto agli amministratori
+  const sezioneArchivio =
+    document.getElementById('sezioneArchivio');
+
+  const archivioAvvisi =
+    document.getElementById('archivioAvvisi');
+
+  if (ruolo === 'admin') {
+    sezioneArchivio.hidden = false;
+    archivioAvvisi.replaceChildren();
+
+    if (avvisiScaduti.length === 0) {
+      archivioAvvisi.appendChild(
+        creaElemento(
+          'p',
+          'Non ci sono ancora avvisi scaduti.',
+          'nessun-avviso'
+        )
+      );
+    } else {
+      avvisiScaduti.forEach(avviso => {
+        archivioAvvisi.appendChild(creaScheda(avviso));
+      });
+    }
+  } else {
+    sezioneArchivio.hidden = true;
   }
 }
 
