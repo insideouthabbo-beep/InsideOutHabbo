@@ -188,10 +188,44 @@
 
   const pulsanteGenera = document.getElementById("genera");
   const pulsanteCopia = document.getElementById("copia");
+  const pulsanteVerifica = document.getElementById("verifica");
   const elementoCodice = document.getElementById("codice");
   const messaggio = document.getElementById("messaggio");
 
   let codiceGenerato = "";
+  pulsanteVerifica.addEventListener("click", async function () {
+  messaggio.textContent = "Verifica del personaggio in corso...";
+  pulsanteVerifica.disabled = true;
+
+  try {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const session = sessionData.session;
+
+    if (!session) {
+      throw new Error("Devi effettuare nuovamente l'accesso.");
+    }
+
+    const { data, error } = await supabaseClient.functions.invoke(
+      "verify-habbo",
+      {
+        headers: {
+          Authorization: "Bearer " + session.access_token
+        },
+        body: {}
+      }
+    );
+
+    if (error) throw error;
+    if (data.error) throw new Error(data.error);
+
+    messaggio.textContent = "✓ " + data.message;
+    pulsanteVerifica.textContent = "Personaggio verificato!";
+  } catch (errore) {
+    messaggio.textContent = errore.message || "Errore durante la verifica.";
+  } finally {
+    pulsanteVerifica.disabled = false;
+  }
+});
 
   async function controllaSessione() {
     const { data, error } = await supabaseClient.auth.getSession();
@@ -209,6 +243,7 @@
     messaggio.textContent = "";
     pulsanteGenera.disabled = true;
     pulsanteCopia.disabled = true;
+    pulsanteVerifica.disabled = true;
     elementoCodice.textContent = "Generazione in corso...";
 
     try {
@@ -230,6 +265,7 @@
       codiceGenerato = data;
       elementoCodice.textContent = codiceGenerato;
       pulsanteCopia.disabled = false;
+      pulsanteVerifica.disabled = false;
 
       messaggio.textContent = "Codice generato! Hai 15 minuti per utilizzarlo.";
     } catch (errore) {
