@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bacheca redazionale | InsideOutHabbo</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101b32;
+  color: white;
+}
+
+header {
+  background: #172747;
+  padding: 20px;
+  border-bottom: 3px solid #ffd34e;
+}
+
+header a {
+  color: #ffd34e;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  max-width: 950px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h1 { color: #ffd34e; }
+
+.intro {
+  color: #b8c5dc;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.panel {
+  background: #172747;
+  border: 1px solid #344d77;
+  border-radius: 9px;
+  padding: 24px;
+  margin-bottom: 25px;
+}
+
+h2 {
+  color: #ffd34e;
+  font-size: 19px;
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 13px;
+  background: #0e1930;
+  border: 1px solid #40577e;
+  border-radius: 5px;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+input:focus, textarea:focus {
+  outline: 2px solid #ffd34e;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.checkbox input {
+  width: auto;
+}
+
+button {
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 5px;
+  background: #ffd34e;
+  color: #172747;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover { background: #ffe17e; }
+
+.avviso {
+  background: #1d3154;
+  border: 1px solid #40577e;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.avviso.evidenza {
+  border-left: 4px solid #ffd34e;
+}
+
+.avviso h3 {
+  margin: 0 0 12px;
+  color: #ffd34e;
+}
+
+.testo-avviso {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: #e2e9f5;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  color: #aab9d2;
+  font-size: 12px;
+  margin-top: 16px;
+}
+
+.azioni {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.azioni .elimina {
+  background: #a83d4a;
+  color: white;
+}
+
+.azioni .elimina:hover { background: #c34b59; }
+
+#messaggio, #stato {
+  margin-top: 15px;
+  line-height: 1.5;
+  color: #b8c5dc;
+}
+
+.nessun-avviso {
+  color: #b8c5dc;
+  text-align: center;
+  padding: 30px;
+}
+
+.badge-evidenza {
+  display: inline-block;
+  color: #172747;
+  background: #ffd34e;
+  border-radius: 4px;
+  padding: 4px 7px;
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+@media(max-width:600px) {
+  main { margin: 20px auto; }
+  .panel { padding: 17px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html">← TORNA A INSIDEOUTHABBO</a>
+</header>
+
+<main>
+
+<h1>Bacheca redazionale</h1>
+<p class="intro">
+  Uno spazio riservato alla redazione di InsideOutHabbo.
+  Comunicazioni, riunioni, incarichi e aggiornamenti per il nostro team.
+</p>
+
+<div id="stato">Verifica delle autorizzazioni in corso...</div>
+
+<section class="panel" id="pannelloNuovo" hidden>
+  <h2>Pubblica un nuovo avviso</h2>
+
+  <form id="formAvviso">
+    <label for="titolo">Titolo dell'avviso</label>
+    <input id="titolo" maxlength="150" required>
+
+    <label for="contenuto">Testo della comunicazione</label>
+    <textarea id="contenuto" maxlength="10000" required></textarea>
+
+    <label for="scadenza">Scadenza (facoltativa)</label>
+    <input type="date" id="scadenza">
+
+    <div class="checkbox">
+      <input type="checkbox" id="inEvidenza">
+      <label for="inEvidenza" style="margin:0">
+        Metti questo avviso in evidenza
+      </label>
+    </div>
+
+    <button type="submit" style="margin-top:20px">
+      Pubblica avviso
+    </button>
+
+    <p id="messaggio"></p>
+  </form>
+</section>
+
+<section>
+  <h2>Comunicazioni della redazione</h2>
+  <div id="elencoAvvisi">
+    <p class="nessun-avviso">Caricamento degli avvisi...</p>
+  </div>
+</section>
+
+</main>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const stato = document.getElementById('stato');
+const pannelloNuovo = document.getElementById('pannelloNuovo');
+const elenco = document.getElementById('elencoAvvisi');
+const messaggio = document.getElementById('messaggio');
+
+let utente = null;
+let ruolo = null;
+
+const ruoliAutorizzati = ['redattore', 'caporedattore', 'admin'];
+const ruoliGestione = ['caporedattore', 'admin'];
+
+function creaElemento(tag, testo, classe) {
+  const elemento = document.createElement(tag);
+  elemento.textContent = testo;
+  if (classe) elemento.className = classe;
+  return elemento;
+}
+
+async function avviaBacheca() {
+  const { data: { session }, error: erroreSessione } =
+    await supabase.auth.getSession();
+
+  if (erroreSessione || !session) {
+    window.location.href = 'accesso.html';
+    return;
+  }
+
+  utente = session.user;
+
+  const { data: profilo, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', utente.id)
+    .maybeSingle();
+
+  if (error || !profilo) {
+    stato.textContent = 'Impossibile verificare il tuo profilo.';
+    return;
+  }
+
+  ruolo = profilo.role;
+
+  if (!ruoliAutorizzati.includes(ruolo)) {
+    stato.textContent =
+      'Accesso riservato alla redazione. Il tuo account non dispone delle autorizzazioni necessarie.';
+    elenco.replaceChildren();
+    return;
+  }
+
+  stato.textContent = 'Accesso autorizzato alla bacheca redazionale.';
+
+  if (ruoliGestione.includes(ruolo)) {
+    pannelloNuovo.hidden = false;
+  }
+
+  await caricaAvvisi();
+}
+
+async function caricaAvvisi() {
+  elenco.replaceChildren(
+    creaElemento('p', 'Caricamento degli avvisi...')
+  );
+
+  const { data, error } = await supabase
+    .from('editorial_notices')
+    .select('id, title, content, author_id, pinned, expires_at, created_at')
+    .order('pinned', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    elenco.replaceChildren(
+      creaElemento('p', 'Errore nel caricamento degli avvisi.')
+    );
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  const oggi = new Date().toISOString().slice(0, 10);
+
+  const avvisiVisibili = (data || []).filter(avviso =>
+    !avviso.expires_at ||
+    avviso.expires_at.slice(0, 10) >= oggi
+  );
+
+  if (avvisiVisibili.length === 0) {
+    elenco.appendChild(
+      creaElemento('p', 'Non ci sono ancora comunicazioni pubblicate.', 'nessun-avviso')
+    );
+    return;
+  }
+
+  for (const avviso of avvisiVisibili) {
+    const scheda = document.createElement('article');
+    scheda.className = avviso.pinned ? 'avviso evidenza' : 'avviso';
+
+    if (avviso.pinned) {
+      scheda.appendChild(
+        creaElemento('span', '★ IN EVIDENZA', 'badge-evidenza')
+      );
+    }
+
+    scheda.appendChild(creaElemento('h3', avviso.title));
+    scheda.appendChild(
+      creaElemento('div', avviso.content, 'testo-avviso')
+    );
+
+    const data = new Date(avviso.created_at).toLocaleString('it-IT');
+
+    let dettagli = 'Pubblicato il ' + data;
+
+    if (avviso.expires_at) {
+      dettagli += ' · Scadenza: ' +
+        new Date(avviso.expires_at).toLocaleDateString('it-IT');
+    }
+
+    scheda.appendChild(creaElemento('div', dettagli, 'meta'));
+
+    if (ruoliGestione.includes(ruolo)) {
+      const azioni = document.createElement('div');
+      azioni.className = 'azioni';
+
+      const modifica = creaElemento('button', 'Modifica');
+      modifica.type = 'button';
+      modifica.addEventListener('click', () => modificaAvviso(avviso));
+
+      const elimina = creaElemento('button', 'Elimina', 'elimina');
+      elimina.type = 'button';
+      elimina.addEventListener('click', () => eliminaAvviso(avviso.id));
+
+      azioni.append(modifica, elimina);
+      scheda.appendChild(azioni);
+    }
+
+    elenco.appendChild(scheda);
+  }
+}
+
+document.getElementById('formAvviso').addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+
+  if (!ruoliGestione.includes(ruolo)) return;
+
+  const title = document.getElementById('titolo').value.trim();
+  const content = document.getElementById('contenuto').value.trim();
+  const scadenza = document.getElementById('scadenza').value;
+  const pinned = document.getElementById('inEvidenza').checked;
+
+  if (!title || !content) {
+    messaggio.textContent = 'Compila il titolo e il testo dell’avviso.';
+    return;
+  }
+
+  messaggio.textContent = 'Pubblicazione in corso...';
+
+  const { error } = await supabase
+    .from('editorial_notices')
+    .insert({
+      title,
+      content,
+      author_id: utente.id,
+      pinned,
+      expires_at: scadenza
+        ? new Date(scadenza + 'T23:59:59').toISOString()
+        : null
+    });
+
+  if (error) {
+    messaggio.textContent = 'Errore nella pubblicazione: ' + error.message;
+    return;
+  }
+
+  document.getElementById('formAvviso').reset();
+  messaggio.textContent = 'Avviso pubblicato correttamente!';
+  await caricaAvvisi();
+});
+
+async function modificaAvviso(avviso) {
+  const nuovoTitolo = prompt('Modifica il titolo:', avviso.title);
+  if (nuovoTitolo === null) return;
+
+  const nuovoTesto = prompt('Modifica il testo:', avviso.content);
+  if (nuovoTesto === null) return;
+
+  if (!nuovoTitolo.trim() || !nuovoTesto.trim()) {
+    alert('Titolo e testo non possono essere vuoti.');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('editorial_notices')
+    .update({
+      title: nuovoTitolo.trim(),
+      content: nuovoTesto.trim(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', avviso.id);
+
+  if (error) {
+    alert('Non è stato possibile modificare l’avviso.');
+    return;
+  }
+
+  await caricaAvvisi();
+}
+
+async function eliminaAvviso(id) {
+  if (!confirm('Vuoi davvero eliminare questo avviso?')) return;
+
+  const { error } = await supabase
+    .from('editorial_notices')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    alert('Non è stato possibile eliminare l’avviso.');
+    return;
+  }
+
+  await caricaAvvisi();
+}
+
+avviaBacheca();
+</script>
+
+</body>
+</html>
