@@ -281,7 +281,7 @@ async function caricaUtenti() {
     return;
   }
 
-  utenti.forEach(utente => {
+  const { data: { user: utenteCorrente } } = await supabase.auth.getUser();
     const scheda = document.createElement('div');
     scheda.dataset.search = (
   (utente.habbo_name || '') + ' ' +
@@ -377,15 +377,25 @@ const pulsanteStato = document.createElement('button');
 pulsanteStato.type = 'button';
 
 const accountSospeso = utente.status === 'suspended';
+    
 
-pulsanteStato.textContent = accountSospeso
-  ? 'Riattiva account'
-  : 'Sospendi account';
+const eUtenteCorrente = utente.id === utenteCorrente?.id;
+
+if (eUtenteCorrente) {
+  pulsanteStato.textContent = 'Account amministratore';
+  pulsanteStato.disabled = true;
+  pulsanteStato.style.background = '#52617a';
+  pulsanteStato.style.cursor = 'not-allowed';
+} else {
+  pulsanteStato.textContent = accountSospeso
+    ? 'Riattiva account'
+    : 'Sospendi account';
+}
 
 pulsanteStato.style.cssText = `
   padding: 11px 16px;
   margin-top: 12px;
-  background: ${accountSospeso ? '#287a50' : '#a83b45'};
+  background: ${eUtenteCorrente ? '#52617a' : (accountSospeso ? '#287a50' : '#a83b45')};
   color: white;
   border: 0;
   border-radius: 5px;
