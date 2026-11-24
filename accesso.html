@@ -250,7 +250,7 @@
 
     const { data: profilo, error } = await client
       .from("profiles")
-      .select("habbo_name, display_name, role")
+     .select("habbo_name, display_name, role, habbo_unique_id")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -259,10 +259,11 @@
       return;
     }
 
-    document.getElementById("datiUtente").textContent =
-      profilo
-        ? "Nickname: " + (profilo.habbo_name || "Da configurare")
-        : "Account creato. Profilo in preparazione.";
+   document.getElementById("datiUtente").textContent =
+  profilo
+    ? "Nickname: " + (profilo.habbo_name || "Da configurare") +
+      (profilo.habbo_unique_id ? " ✓ Verificato" : " · Non verificato")
+    : "Account creato. Profilo in preparazione.";
 
     document.getElementById("ruoloUtente").textContent =
       profilo ? "Ruolo: " + (profilo.role || "user") : "";
