@@ -455,6 +455,23 @@ async function aggiornaAccesso() {
     "&direction=2&head_direction=3&size=s&gesture=std&action=std";
 
   miniAvatar.style.display = "inline-block";
+  miniAvatar.style.cursor = "pointer";
+
+miniAvatar.onclick = (evento) => {
+  evento.preventDefault();
+
+  miniAvatar.src =
+    "https://www.habbo.it/habbo-imaging/avatarimage?user=" +
+    encodeURIComponent(profilo.habbo_name) +
+    "&direction=2&head_direction=3&size=s&gesture=wav&action=wav";
+
+  setTimeout(() => {
+    miniAvatar.src =
+      "https://www.habbo.it/habbo-imaging/avatarimage?user=" +
+      encodeURIComponent(profilo.habbo_name) +
+      "&direction=2&head_direction=3&size=s&gesture=std&action=std";
+  }, 1800);
+};
 }
 
 aggiornaAccesso();
