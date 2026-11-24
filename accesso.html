@@ -270,7 +270,9 @@
 
     mostraMessaggio("Accesso effettuato correttamente!");
   }
-
+setTimeout(function () {
+  window.location.href = "index.html";
+}, 2000);
   document.getElementById("formRegistrazione")
     .addEventListener("submit", async function(event) {
       event.preventDefault();
