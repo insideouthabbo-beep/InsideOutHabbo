@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pannello amministrativo | InsideOutHabbo</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101b32;
+      color: #fff;
+    }
+
+    header {
+      background: #172747;
+      border-bottom: 3px solid #ffd34e;
+      padding: 22px;
+    }
+
+    header h1 {
+      margin: 0;
+      color: #ffd34e;
+      font-size: 25px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #c5d2e8;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 35px auto;
+      padding: 20px;
+    }
+
+    .benvenuto {
+      background: #1b2d4d;
+      border: 1px solid #344d77;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 25px;
+    }
+
+    .benvenuto h2 {
+      margin-top: 0;
+      color: #ffd34e;
+    }
+
+    .griglia {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .scheda {
+      background: #1b2d4d;
+      border: 1px solid #344d77;
+      border-radius: 9px;
+      padding: 22px;
+      min-height: 130px;
+    }
+
+    .scheda h3 {
+      margin-top: 0;
+      color: #ffd34e;
+    }
+
+    .scheda p {
+      color: #c5d2e8;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .stato {
+      margin-top: 25px;
+      padding: 15px;
+      background: #172747;
+      border-radius: 8px;
+      color: #c5d2e8;
+    }
+
+    a {
+      color: #ffd34e;
+    }
+
+    #errore {
+      color: #ff9999;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>INSIDEOUTHABBO</h1>
+  <p>Pannello amministrativo</p>
+</header>
+
+<main>
+
+  <section class="benvenuto">
+    <h2>Area amministratore</h2>
+    <p id="messaggio">Verifica dell'accesso in corso...</p>
+    <p id="errore"></p>
+  </section>
+
+  <section class="griglia" id="contenuto" hidden>
+
+    <div class="scheda">
+      <h3>Utenti e ruoli</h3>
+      <p>Gestione degli account, dei ruoli e degli accessi.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Articoli</h3>
+      <p>Gestione degli articoli, delle bozze e delle pubblicazioni.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Forum</h3>
+      <p>Discussioni, segnalazioni e moderazione dei contenuti.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Commenti</h3>
+      <p>Approvazione e gestione dei commenti agli articoli.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Redazione</h3>
+      <p>Gestione della redazione e delle comunicazioni interne.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Social e partner</h3>
+      <p>Gestione dei canali social e delle collaborazioni.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Pubblicità</h3>
+      <p>Gestione degli spazi pubblicitari e dei banner.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Registro attività</h3>
+      <p>Consultazione delle operazioni amministrative.</p>
+    </div>
+
+    <div class="scheda">
+      <h3>Impostazioni</h3>
+      <p>Configurazione generale della piattaforma.</p>
+    </div>
+
+  </section>
+
+  <div class="stato">
+    <a href="index.html">← Torna alla homepage</a>
+  </div>
+
+</main>
+
+<script type="module">
+  import { createClient } from
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+
+  // Inserisci qui la stessa chiave publishable già usata in index.html
+  const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function verificaAmministratore() {
+    const messaggio = document.getElementById('messaggio');
+    const errore = document.getElementById('errore');
+    const contenuto = document.getElementById('contenuto');
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      messaggio.textContent = 'Devi accedere per continuare.';
+      errore.innerHTML = '<a href="accesso.html">Vai alla pagina di accesso</a>';
+      return;
+    }
+
+    const { data: profilo, error } = await supabase
+      .from('profiles')
+      .select('habbo_name, role')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    if (error || !profilo || profilo.role !== 'admin') {
+      messaggio.textContent = 'Accesso non autorizzato.';
+      errore.textContent = 'Questa area è riservata agli amministratori.';
+      return;
+    }
+
+    messaggio.textContent =
+      'Benvenuto ' + profilo.habbo_name + '. Sei entrato come amministratore.';
+
+    contenuto.hidden = false;
+  }
+
+  verificaAmministratore();
+</script>
+
+</body>
+</html>
