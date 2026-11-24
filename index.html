@@ -486,15 +486,16 @@ footer strong { color: white; }
   const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
- const loginLink = document.getElementById("loginLink");
+
+const loginLink = document.getElementById("loginLink");
 const loginText = document.getElementById("loginText");
 const miniAvatar = document.getElementById("miniAvatar");
 const dropdownMenu = document.getElementById("dropdownMenu");
 const menuFreccia = document.getElementById("menuFreccia");
 const voceProfilo = document.getElementById("voceProfilo");
 const logoutButton = document.getElementById("logoutButton");
-  const voceBacheca = document.getElementById("voceBacheca");
-  const voceAdmin = document.getElementById("voceAdmin");
+const voceBacheca = document.getElementById("voceBacheca");
+const voceAdmin = document.getElementById("voceAdmin");
 
 let utenteAutenticato = false;
 
@@ -504,7 +505,8 @@ function chiudiMenu() {
 
 async function aggiornaAccesso() {
   voceBacheca.style.display = "none";
-voceAdmin.style.display = "none";
+  voceAdmin.style.display = "none";
+
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -524,6 +526,7 @@ voceAdmin.style.display = "none";
     .maybeSingle();
 
   if (error || !profilo || !profilo.habbo_name) {
+    utenteAutenticato = false;
     loginText.textContent = "IL MIO PROFILO";
     loginLink.href = "accesso.html";
     miniAvatar.style.display = "none";
@@ -532,20 +535,9 @@ voceAdmin.style.display = "none";
   }
 
   utenteAutenticato = true;
-if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
-  voceBacheca.style.display = "block";
-}
-
-if (profilo.role === "admin") {
-  voceAdmin.style.display = "block";
-}
-  voceAdmin.textContent = "Pannello amministratore";
-  dropdownMenu.insertBefore(voceAdmin, logoutButton);
-}
-  voceBacheca.style.display = "block";
-}
 
   loginText.textContent = profilo.habbo_name;
+
   loginLink.href = "profilo.html?utente=" +
     encodeURIComponent(profilo.habbo_name);
 
@@ -558,10 +550,20 @@ if (profilo.role === "admin") {
 
   miniAvatar.style.display = "inline-block";
   miniAvatar.style.cursor = "pointer";
+
   menuFreccia.style.display = "inline";
+
+  if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
+    voceBacheca.style.display = "block";
+  }
+
+  if (profilo.role === "admin") {
+    voceAdmin.style.display = "block";
+  }
 
   miniAvatar.onclick = (evento) => {
     evento.preventDefault();
+    evento.stopPropagation();
 
     miniAvatar.src =
       "https://www.habbo.it/habbo-imaging/avatarimage?user=" +
@@ -612,6 +614,7 @@ aggiornaAccesso();
 supabase.auth.onAuthStateChange(() => {
   aggiornaAccesso();
 });
+
   const contenitore = document.getElementById('ultimi-articoli');
 
   async function caricaUltimiArticoli() {
