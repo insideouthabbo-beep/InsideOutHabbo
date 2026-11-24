@@ -490,6 +490,7 @@ const dropdownMenu = document.getElementById("dropdownMenu");
 const menuFreccia = document.getElementById("menuFreccia");
 const voceProfilo = document.getElementById("voceProfilo");
 const logoutButton = document.getElementById("logoutButton");
+  const voceBacheca = document.getElementById("voceBacheca");
 
 let utenteAutenticato = false;
 
@@ -512,7 +513,7 @@ async function aggiornaAccesso() {
 
   const { data: profilo, error } = await supabase
     .from("profiles")
-    .select("habbo_name")
+    .select("habbo_name, role")
     .eq("id", session.user.id)
     .maybeSingle();
 
@@ -525,6 +526,9 @@ async function aggiornaAccesso() {
   }
 
   utenteAutenticato = true;
+  if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
+  voceBacheca.style.display = "block";
+}
 
   loginText.textContent = profilo.habbo_name;
   loginLink.href = "profilo.html?utente=" +
