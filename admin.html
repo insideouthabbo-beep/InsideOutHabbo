@@ -113,10 +113,10 @@
 
   <section class="griglia" id="contenuto" hidden>
 
-    <div class="scheda">
-      <h3>Utenti e ruoli</h3>
-      <p>Gestione degli account, dei ruoli e degli accessi.</p>
-    </div>
+    <div class="scheda" id="apriUtenti" style="cursor:pointer;">
+  <h3>Utenti e ruoli</h3>
+  <p>Gestione degli account, dei ruoli e degli accessi.</p>
+</div>
 
     <div class="scheda">
       <h3>Articoli</h3>
@@ -161,6 +161,21 @@
   </section>
 
   <div class="stato">
+    
+<section id="utentiPanel" hidden>
+  <div class="benvenuto">
+    <h2>Gestione utenti e ruoli</h2>
+    <p>Elenco degli account registrati su InsideOutHabbo.</p>
+    <button id="tornaDashboard" type="button">
+      ← Torna al pannello amministrativo
+    </button>
+  </div>
+
+  <div id="elencoUtenti">
+    Caricamento utenti...
+  </div>
+</section>
+
     <a href="index.html">← Torna alla homepage</a>
   </div>
 
@@ -207,6 +222,87 @@
 
     contenuto.hidden = false;
   }
+
+  
+const apriUtenti = document.getElementById('apriUtenti');
+const utentiPanel = document.getElementById('utentiPanel');
+const tornaDashboard = document.getElementById('tornaDashboard');
+const elencoUtenti = document.getElementById('elencoUtenti');
+
+apriUtenti.addEventListener('click', async () => {
+  document.getElementById('contenuto').hidden = true;
+  utentiPanel.hidden = false;
+  await caricaUtenti();
+});
+
+tornaDashboard.addEventListener('click', () => {
+  utentiPanel.hidden = true;
+  document.getElementById('contenuto').hidden = false;
+});
+
+async function caricaUtenti() {
+  elencoUtenti.textContent = 'Caricamento utenti...';
+
+  const { data: utenti, error } = await supabase
+    .from('profiles')
+    .select('id, habbo_name, display_name, role, status, habbo_unique_id, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    elencoUtenti.textContent =
+      'Errore nel caricamento degli utenti: ' + error.message;
+    return;
+  }
+
+  elencoUtenti.replaceChildren();
+
+  if (!utenti || utenti.length === 0) {
+    elencoUtenti.textContent = 'Nessun utente registrato.';
+    return;
+  }
+
+  utenti.forEach(utente => {
+    const scheda = document.createElement('div');
+
+    scheda.style.cssText =
+      'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;';
+
+    const avatar = document.createElement('img');
+    avatar.src =
+      'https://www.habbo.it/habbo-imaging/avatarimage?user=' +
+      encodeURIComponent(utente.habbo_name || '') +
+      '&direction=2&head_direction=3&size=l&action=std';
+
+    avatar.alt = 'Avatar Habbo';
+    avatar.style.cssText =
+      'width:65px;height:85px;object-fit:contain;image-rendering:pixelated;';
+
+    const dati = document.createElement('div');
+    dati.style.flex = '1';
+
+    const nome = document.createElement('h3');
+    nome.style.color = '#ffd34e';
+    nome.textContent = utente.display_name || utente.habbo_name || 'Utente';
+
+    const nickname = document.createElement('p');
+    nickname.textContent = 'Habbo: ' + (utente.habbo_name || 'Non disponibile');
+
+    const ruolo = document.createElement('p');
+    ruolo.textContent = 'Ruolo: ' + (utente.role || 'user');
+
+    const verifica = document.createElement('p');
+    verifica.textContent = utente.habbo_unique_id
+      ? 'Account Habbo verificato'
+      : 'Account Habbo non verificato';
+
+    const stato = document.createElement('p');
+    stato.textContent = 'Stato account: ' + (utente.status || 'Non specificato');
+
+    dati.append(nome, nickname, ruolo, verifica, stato);
+    scheda.append(avatar, dati);
+    elencoUtenti.append(scheda);
+  });
+}
 
   verificaAmministratore();
 </script>
