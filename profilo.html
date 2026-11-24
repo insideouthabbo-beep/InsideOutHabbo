@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profilo Habbo | InsideOutHabbo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #101b35;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 20px 6%;
+      background: #172747;
+      border-bottom: 3px solid #f5c542;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header a {
+      color: #f5c542;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .contenitore {
+      width: min(900px, 92%);
+      margin: 55px auto;
+    }
+
+    .profilo {
+      background: #1b2d50;
+      border: 1px solid #344d77;
+      border-radius: 16px;
+      padding: 35px 25px;
+      text-align: center;
+      box-shadow: 0 15px 40px #0005;
+    }
+
+    .avatar {
+      width: 160px;
+      height: 200px;
+      object-fit: contain;
+      cursor: pointer;
+      image-rendering: pixelated;
+      transition: transform .25s ease;
+    }
+
+    .avatar.saluto {
+      animation: saluta .7s ease;
+    }
+
+    @keyframes saluta {
+      0% { transform: rotate(0); }
+      25% { transform: rotate(12deg) translateY(-8px); }
+      50% { transform: rotate(-12deg) translateY(-8px); }
+      75% { transform: rotate(8deg); }
+      100% { transform: rotate(0); }
+    }
+
+    h1 {
+      margin: 15px 0 8px;
+      font-size: 30px;
+    }
+
+    .verifica {
+      display: inline-block;
+      background: #176b4a;
+      color: #a8ffd5;
+      padding: 7px 13px;
+      border-radius: 20px;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+
+    .non-verificato {
+      background: #594b26;
+      color: #ffe49a;
+    }
+
+    .ruolo {
+      color: #f5c542;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+
+    .data {
+      color: #b9c8df;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+
+    .messaggio {
+      color: #cbd7eb;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .torna {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 20px;
+      background: #f5c542;
+      color: #172747;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .contenitore {
+        margin: 25px auto;
+      }
+
+      .profilo {
+        padding: 25px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <strong>INSIDEOUTHABBO</strong>
+  <a href="index.html">TORNA ALLA HOME</a>
+</header>
+
+<main class="contenitore">
+  <section class="profilo" id="profilo">
+    <p class="messaggio">Caricamento profilo...</p>
+  </section>
+</main>
+
+<script>
+  const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+  // Inserisci qui la stessa chiave publishable già usata in accesso.html.
+  const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const contenitore = document.getElementById("profilo");
+
+  function nomeRuolo(ruolo) {
+    const ruoli = {
+      user: "Membro della community",
+      redattore: "Redattore",
+      caporedattore: "Caporedattore",
+      admin: "Amministratore"
+    };
+
+    return ruoli[ruolo] || "Membro della community";
+  }
+
+  async function caricaProfilo() {
+    const parametri = new URLSearchParams(window.location.search);
+    const nickname = parametri.get("utente");
+
+    if (!nickname) {
+      contenitore.innerHTML = `
+        <p class="messaggio">Nessun nickname specificato.</p>
+        <a class="torna" href="index.html">Torna alla home</a>
+      `;
+      return;
+    }
+
+    const { data, error } = await client
+      .from("public_profiles")
+      .select("*")
+      .ilike("habbo_name", nickname)
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      contenitore.innerHTML = `
+        <p class="messaggio">Profilo non trovato.</p>
+        <a class="torna" href="index.html">Torna alla home</a>
+      `;
+      return;
+    }
+
+    const avatarUrl = "https://www.habbo.it/habbo-imaging/avatarimage?user=" +
+      encodeURIComponent(data.habbo_name) +
+      "&direction=2&head_direction=3&size=l&gesture=std&action=std";
+
+    const dataIscrizione = data.created_at
+      ? new Date(data.created_at).toLocaleDateString("it-IT")
+      : "Non disponibile";
+
+    contenitore.innerHTML = `
+      <img
+        src="${avatarUrl}"
+        class="avatar"
+        id="avatarHabbo"
+        alt="Avatar di ${data.habbo_name}"
+      >
+
+      <h1>${data.display_name || data.habbo_name}</h1>
+
+      <div>@${data.habbo_name}</div>
+
+      <div class="verifica ${data.is_verified ? "" : "non-verificato"}">
+        ${data.is_verified ? "✓ Habbo verificato" : "· Non verificato"}
+      </div>
+
+      <div class="ruolo">${nomeRuolo(data.public_role)}</div>
+
+      <div class="data">Iscritto dal ${dataIscrizione}</div>
+
+      <a class="torna" href="index.html">Torna alla home</a>
+    `;
+
+    const avatar = document.getElementById("avatarHabbo");
+
+    avatar.addEventListener("click", () => {
+      avatar.classList.remove("saluto");
+      void avatar.offsetWidth;
+      avatar.classList.add("saluto");
+    });
+  }
+
+  caricaProfilo();
+</script>
+
+</body>
+</html>
