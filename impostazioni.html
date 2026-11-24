@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impostazioni account | InsideOutHabbo</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101b32;
+  color: #fff;
+}
+
+header {
+  background: #172747;
+  padding: 20px;
+  border-bottom: 3px solid #ffd34e;
+}
+
+header a {
+  color: #ffd34e;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  max-width: 750px;
+  margin: 45px auto;
+  padding: 20px;
+}
+
+h1 {
+  color: #ffd34e;
+  margin-bottom: 8px;
+}
+
+.intro {
+  color: #b8c5dc;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.sezione {
+  background: #172747;
+  border: 1px solid #344d77;
+  border-radius: 9px;
+  padding: 25px;
+  margin-bottom: 22px;
+}
+
+h2 {
+  color: #ffd34e;
+  font-size: 19px;
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 18px 0 8px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  background: #0e1930;
+  border: 1px solid #40577e;
+  border-radius: 5px;
+  color: white;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: 2px solid #ffd34e;
+}
+
+input[readonly] {
+  color: #aebbd1;
+}
+
+button {
+  margin-top: 20px;
+  padding: 13px 20px;
+  background: #ffd34e;
+  color: #172747;
+  border: 0;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffe17e;
+}
+
+#messaggio,
+#messaggioPassword {
+  margin-top: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.stato {
+  color: #79e6a0;
+  font-weight: bold;
+}
+
+@media(max-width:600px) {
+  main {
+    margin: 20px auto;
+  }
+
+  .sezione {
+    padding: 18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html">← TORNA A INSIDEOUTHABBO</a>
+</header>
+
+<main>
+
+<h1>Impostazioni account</h1>
+<p class="intro">
+  Gestisci le informazioni del tuo account e la sicurezza del tuo accesso.
+</p>
+
+<section class="sezione">
+  <h2>Il mio profilo</h2>
+
+  <label>Nickname Habbo</label>
+  <input id="habboName" readonly>
+
+  <label>Email dell'account</label>
+  <input id="emailAccount" readonly>
+
+  <label>Nome visualizzato</label>
+  <input id="displayName" maxlength="40" placeholder="Come vuoi essere chiamato">
+
+  <label>Ruolo nella community</label>
+  <input id="ruolo" readonly>
+
+  <label>Verifica Habbo</label>
+  <p id="verifica" class="stato">Caricamento...</p>
+
+  <button id="salvaProfilo">Salva modifiche</button>
+  <p id="messaggio"></p>
+</section>
+
+<section class="sezione">
+  <h2>Sicurezza account</h2>
+
+  <label>Nuova password</label>
+  <input type="password" id="nuovaPassword" placeholder="Inserisci la nuova password">
+
+  <label>Conferma nuova password</label>
+  <input type="password" id="confermaPassword" placeholder="Ripeti la nuova password">
+
+  <button id="cambiaPassword">Cambia password</button>
+  <p id="messaggioPassword"></p>
+</section>
+
+</main>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let utente = null;
+
+async function caricaImpostazioni() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    window.location.href = 'accesso.html';
+    return;
+  }
+
+  utente = session.user;
+
+  document.getElementById('emailAccount').value =
+    utente.email || '';
+
+  const { data: profilo, error } = await supabase
+    .from('profiles')
+    .select('habbo_name, display_name, role, habbo_unique_id')
+    .eq('id', utente.id)
+    .maybeSingle();
+
+  if (error || !profilo) {
+    document.getElementById('messaggio').textContent =
+      'Impossibile caricare il profilo.';
+    return;
+  }
+
+  document.getElementById('habboName').value =
+    profilo.habbo_name || '';
+
+  document.getElementById('displayName').value =
+    profilo.display_name || '';
+
+  const ruoli = {
+    user: 'Membro della community',
+    redattore: 'Redattore',
+    caporedattore: 'Caporedattore',
+    admin: 'Amministratore'
+  };
+
+  document.getElementById('ruolo').value =
+    ruoli[profilo.role] || 'Membro della community';
+
+  document.getElementById('verifica').textContent =
+    profilo.habbo_unique_id
+      ? '✓ Personaggio Habbo verificato'
+      : 'Personaggio non ancora verificato';
+}
+
+document.getElementById('salvaProfilo').addEventListener('click', async () => {
+  if (!utente) return;
+
+  const displayName =
+    document.getElementById('displayName').value.trim();
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ display_name: displayName || null })
+    .eq('id', utente.id);
+
+  document.getElementById('messaggio').textContent =
+    error
+      ? 'Non è stato possibile salvare le modifiche.'
+      : '✓ Modifiche salvate correttamente!';
+});
+
+document.getElementById('cambiaPassword').addEventListener('click', async () => {
+  const password =
+    document.getElementById('nuovaPassword').value;
+
+  const conferma =
+    document.getElementById('confermaPassword').value;
+
+  const messaggio =
+    document.getElementById('messaggioPassword');
+
+  if (password.length < 8) {
+    messaggio.textContent =
+      'La password deve contenere almeno 8 caratteri.';
+    return;
+  }
+
+  if (password !== conferma) {
+    messaggio.textContent =
+      'Le due password non coincidono.';
+    return;
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: password
+  });
+
+  if (error) {
+    messaggio.textContent =
+      'Errore durante il cambio della password: ' + error.message;
+    return;
+  }
+
+  messaggio.textContent =
+    '✓ Password aggiornata correttamente!';
+
+  document.getElementById('nuovaPassword').value = '';
+  document.getElementById('confermaPassword').value = '';
+});
+
+caricaImpostazioni();
+</script>
+
+</body>
+</html>
