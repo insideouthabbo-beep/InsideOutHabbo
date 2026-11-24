@@ -269,10 +269,10 @@
       profilo ? "Ruolo: " + (profilo.role || "user") : "";
 
     mostraMessaggio("Accesso effettuato correttamente!");
-  }
-setTimeout(function () {
+    setTimeout(function () {
   window.location.href = "index.html";
 }, 2000);
+  }
   document.getElementById("formRegistrazione")
     .addEventListener("submit", async function(event) {
       event.preventDefault();
