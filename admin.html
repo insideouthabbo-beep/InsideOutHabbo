@@ -196,6 +196,26 @@
   <div id="elencoArticoli">
     Caricamento articoli...
   </div>
+  <div id="editorArticolo" hidden>
+  <h2>Modifica articolo</h2>
+
+  <input type="hidden" id="idArticolo">
+
+  <label for="titoloArticolo">Titolo</label>
+  <input type="text" id="titoloArticolo" placeholder="Titolo articolo">
+
+  <label for="categoriaArticolo">Categoria</label>
+  <input type="text" id="categoriaArticolo" placeholder="Categoria">
+
+  <label for="estrattoArticolo">Descrizione breve</label>
+  <textarea id="estrattoArticolo" placeholder="Descrizione breve"></textarea>
+
+  <label for="contenutoArticolo">Contenuto</label>
+  <textarea id="contenutoArticolo" rows="12" placeholder="Testo dell'articolo"></textarea>
+
+  <button type="button" id="salvaArticolo">Salva modifiche</button>
+  <button type="button" id="annullaModificaArticolo">Annulla</button>
+</div>
 </section>
 
     <a href="index.html">← Torna alla homepage</a>
@@ -499,7 +519,7 @@ async function caricaArticoli() {
 
   const { data: articoli, error } = await supabase
     .from('articles')
-    .select('id, title, excerpt, category, status, created_at, published_at')
+    .select('id, title, content, excerpt, category, status, created_at, published_at')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -541,11 +561,64 @@ async function caricaArticoli() {
     const anteprima = document.createElement('p');
     anteprima.textContent = articolo.excerpt || 'Nessuna descrizione disponibile.';
 
-    scheda.append(titolo, categoria, stato, data, anteprima);
+    const modifica = document.createElement('button');
+modifica.type = 'button';
+modifica.textContent = 'Modifica articolo';
+
+modifica.addEventListener('click', () => {
+  document.getElementById('idArticolo').value = articolo.id;
+  document.getElementById('titoloArticolo').value = articolo.title || '';
+  document.getElementById('categoriaArticolo').value = articolo.category || '';
+  document.getElementById('estrattoArticolo').value = articolo.excerpt || '';
+  document.getElementById('contenutoArticolo').value = articolo.content || '';
+
+  document.getElementById('elencoArticoli').hidden = true;
+  document.getElementById('editorArticolo').hidden = false;
+});
+
+scheda.append(titolo, categoria, stato, data, anteprima, modifica);
     elenco.append(scheda);
   });
 }
 
+  document.getElementById('salvaArticolo').addEventListener('click', async () => {
+  const id = document.getElementById('idArticolo').value;
+
+  const aggiornamenti = {
+    title: document.getElementById('titoloArticolo').value.trim(),
+    category: document.getElementById('categoriaArticolo').value.trim(),
+    excerpt: document.getElementById('estrattoArticolo').value.trim(),
+    content: document.getElementById('contenutoArticolo').value.trim(),
+    updated_at: new Date().toISOString()
+  };
+
+  if (!aggiornamenti.title || !aggiornamenti.content) {
+    alert('Inserisci almeno il titolo e il contenuto.');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('articles')
+    .update(aggiornamenti)
+    .eq('id', id);
+
+  if (error) {
+    alert('Errore durante il salvataggio: ' + error.message);
+    return;
+  }
+
+  alert('Articolo aggiornato correttamente!');
+
+  document.getElementById('editorArticolo').hidden = true;
+  document.getElementById('elencoArticoli').hidden = false;
+
+  await caricaArticoli();
+});
+
+document.getElementById('annullaModificaArticolo').addEventListener('click', () => {
+  document.getElementById('editorArticolo').hidden = true;
+  document.getElementById('elencoArticoli').hidden = false;
+});
   verificaAmministratore();
 </script>
 
