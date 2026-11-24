@@ -183,6 +183,21 @@
 </div>
 </section>
 
+    
+<section id="articoliPanel" hidden>
+  <div class="benvenuto">
+    <h2>Gestione articoli</h2>
+    <p>Gestisci bozze, articoli pubblicati e contenuti della redazione.</p>
+    <button id="tornaDashboardArticoli" type="button">
+      ← Torna al pannello amministrativo
+    </button>
+  </div>
+
+  <div id="elencoArticoli">
+    Caricamento articoli...
+  </div>
+</section>
+
     <a href="index.html">← Torna alla homepage</a>
   </div>
 
@@ -232,6 +247,21 @@
 
   
 const apriUtenti = document.getElementById('apriUtenti');
+  const apriArticoli = document.getElementById('apriArticoli');
+const articoliPanel = document.getElementById('articoliPanel');
+const tornaDashboardArticoli = document.getElementById('tornaDashboardArticoli');
+
+apriArticoli.addEventListener('click', async () => {
+  document.getElementById('contenuto').hidden = true;
+  utentiPanel.hidden = true;
+  articoliPanel.hidden = false;
+  await caricaArticoli();
+});
+
+tornaDashboardArticoli.addEventListener('click', () => {
+  articoliPanel.hidden = true;
+  document.getElementById('contenuto').hidden = false;
+});
 const utentiPanel = document.getElementById('utentiPanel');
 const tornaDashboard = document.getElementById('tornaDashboard');
 const elencoUtenti = document.getElementById('elencoUtenti');
@@ -458,6 +488,61 @@ async function caricaUtenti() {
 
     scheda.append(avatar, dati);
     elencoUtenti.append(scheda);
+  });
+}
+
+  
+async function caricaArticoli() {
+  const elenco = document.getElementById('elencoArticoli');
+
+  elenco.textContent = 'Caricamento articoli...';
+
+  const { data: articoli, error } = await supabase
+    .from('articles')
+    .select('id, title, excerpt, category, status, created_at, published_at')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    elenco.textContent =
+      'Errore nel caricamento: ' + error.message;
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!articoli || articoli.length === 0) {
+    elenco.textContent = 'Non ci sono ancora articoli.';
+    return;
+  }
+
+  articoli.forEach(articolo => {
+    const scheda = document.createElement('div');
+
+    scheda.style.cssText =
+      'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:20px;margin-bottom:15px;';
+
+    const titolo = document.createElement('h3');
+    titolo.style.color = '#ffd34e';
+    titolo.textContent = articolo.title || 'Articolo senza titolo';
+
+    const categoria = document.createElement('p');
+    categoria.textContent =
+      'Categoria: ' + (articolo.category || 'Non specificata');
+
+    const stato = document.createElement('p');
+    stato.textContent =
+      'Stato: ' + (articolo.status || 'Non specificato');
+
+    const data = document.createElement('p');
+    data.textContent = articolo.created_at
+      ? 'Creato il: ' + new Date(articolo.created_at).toLocaleDateString('it-IT')
+      : 'Data non disponibile';
+
+    const anteprima = document.createElement('p');
+    anteprima.textContent = articolo.excerpt || 'Nessuna descrizione disponibile.';
+
+    scheda.append(titolo, categoria, stato, data, anteprima);
+    elenco.append(scheda);
   });
 }
 
