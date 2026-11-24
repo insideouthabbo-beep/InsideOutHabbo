@@ -218,8 +218,17 @@
     if (error) throw error;
     if (data.error) throw new Error(data.error);
 
-    messaggio.textContent = "✓ " + data.message;
-    pulsanteVerifica.textContent = "Personaggio verificato!";
+    messaggio.textContent = "✓ Personaggio verificato correttamente!";
+
+pulsanteVerifica.textContent = "Personaggio verificato!";
+pulsanteVerifica.disabled = true;
+
+pulsanteGenera.disabled = true;
+pulsanteCopia.disabled = true;
+
+setTimeout(function () {
+  window.location.href = "index.html";
+}, 2500);
   } catch (errore) {
     messaggio.textContent = errore.message || "Errore durante la verifica.";
   } finally {
