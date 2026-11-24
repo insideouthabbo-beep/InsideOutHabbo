@@ -527,6 +527,12 @@ async function aggiornaAccesso() {
 
   utenteAutenticato = true;
   if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
+    if (profilo.role === "admin") {
+  const voceAdmin = document.createElement("a");
+  voceAdmin.href = "admin.html";
+  voceAdmin.textContent = "Pannello amministratore";
+  dropdownMenu.insertBefore(voceAdmin, logoutButton);
+}
   voceBacheca.style.display = "block";
 }
 
