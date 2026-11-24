@@ -260,6 +260,7 @@ tornaDashboard.addEventListener('click', () => {
   document.getElementById('contenuto').hidden = false;
 });
 
+
 async function caricaUtenti() {
   elencoUtenti.textContent = 'Caricamento utenti...';
 
@@ -281,17 +282,22 @@ async function caricaUtenti() {
     return;
   }
 
-  const { data: { user: utenteCorrente } } = await supabase.auth.getUser();
+  const { data: { user: utenteCorrente } } =
+    await supabase.auth.getUser();
+
+  utenti.forEach(utente => {
     const scheda = document.createElement('div');
+
     scheda.dataset.search = (
-  (utente.habbo_name || '') + ' ' +
-  (utente.display_name || '')
-).toLowerCase();
+      (utente.habbo_name || '') + ' ' +
+      (utente.display_name || '')
+    ).toLowerCase();
 
     scheda.style.cssText =
       'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;';
 
     const avatar = document.createElement('img');
+
     avatar.src =
       'https://www.habbo.it/habbo-imaging/avatarimage?user=' +
       encodeURIComponent(utente.habbo_name || '') +
@@ -306,10 +312,12 @@ async function caricaUtenti() {
 
     const nome = document.createElement('h3');
     nome.style.color = '#ffd34e';
-    nome.textContent = utente.display_name || utente.habbo_name || 'Utente';
+    nome.textContent =
+      utente.display_name || utente.habbo_name || 'Utente';
 
     const nickname = document.createElement('p');
-    nickname.textContent = 'Habbo: ' + (utente.habbo_name || 'Non disponibile');
+    nickname.textContent =
+      'Habbo: ' + (utente.habbo_name || 'Non disponibile');
 
     const ruolo = document.createElement('p');
     ruolo.textContent = 'Ruolo: ' + (utente.role || 'user');
@@ -320,131 +328,133 @@ async function caricaUtenti() {
       : 'Account Habbo non verificato';
 
     const stato = document.createElement('p');
-    stato.textContent = 'Stato account: ' + (utente.status || 'Non specificato');
-
-    
-const selettoreRuolo = document.createElement('select');
-
-const ruoliDisponibili = [
-  { valore: 'user', testo: 'Membro' },
-  { valore: 'redattore', testo: 'Redattore' },
-  { valore: 'caporedattore', testo: 'Caporedattore' },
-  { valore: 'admin', testo: 'Amministratore' }
-];
-
-ruoliDisponibili.forEach(opzione => {
-  const elemento = document.createElement('option');
-  elemento.value = opzione.valore;
-  elemento.textContent = opzione.testo;
-  selettoreRuolo.append(elemento);
-});
-
-selettoreRuolo.value = utente.role || 'user';
-selettoreRuolo.style.cssText =
-  'padding:10px;background:#172747;color:white;border:1px solid #ffd34e;border-radius:5px;';
-
-const salvaRuolo = document.createElement('button');
-salvaRuolo.type = 'button';
-salvaRuolo.textContent = 'Salva ruolo';
-salvaRuolo.style.cssText =
-  'padding:10px 15px;background:#ffd34e;color:#172747;border:0;border-radius:5px;font-weight:bold;cursor:pointer;';
-
-salvaRuolo.addEventListener('click', async () => {
-  salvaRuolo.disabled = true;
-  salvaRuolo.textContent = 'Salvataggio...';
-
-  const { error } = await supabase.rpc('admin_cambia_ruolo', {
-    p_user_id: utente.id,
-    p_nuovo_ruolo: selettoreRuolo.value
-  });
-
-  if (error) {
-    alert('Errore: ' + error.message);
-    salvaRuolo.disabled = false;
-    salvaRuolo.textContent = 'Salva ruolo';
-    return;
-  }
-
-  alert('Ruolo aggiornato correttamente!');
-  await caricaUtenti();
-});
-
-dati.append(selettoreRuolo, salvaRuolo);
+    stato.textContent =
+      'Stato account: ' + (utente.status || 'Non specificato');
 
     dati.append(nome, nickname, ruolo, verifica, stato);
-    
-const pulsanteStato = document.createElement('button');
-pulsanteStato.type = 'button';
 
-const accountSospeso = utente.status === 'suspended';
-    
+    // GESTIONE RUOLI
+    const selettoreRuolo = document.createElement('select');
 
-const eUtenteCorrente = utente.id === utenteCorrente?.id;
+    const ruoliDisponibili = [
+      { valore: 'user', testo: 'Membro' },
+      { valore: 'redattore', testo: 'Redattore' },
+      { valore: 'caporedattore', testo: 'Caporedattore' },
+      { valore: 'admin', testo: 'Amministratore' }
+    ];
 
-if (eUtenteCorrente) {
-  pulsanteStato.textContent = 'Account amministratore';
-  pulsanteStato.disabled = true;
-  pulsanteStato.style.background = '#52617a';
-  pulsanteStato.style.cursor = 'not-allowed';
-} else {
-  pulsanteStato.textContent = accountSospeso
-    ? 'Riattiva account'
-    : 'Sospendi account';
-}
+    ruoliDisponibili.forEach(opzione => {
+      const elemento = document.createElement('option');
+      elemento.value = opzione.valore;
+      elemento.textContent = opzione.testo;
+      selettoreRuolo.append(elemento);
+    });
 
-pulsanteStato.style.cssText = `
-  padding: 11px 16px;
-  margin-top: 12px;
-  background: ${eUtenteCorrente ? '#52617a' : (accountSospeso ? '#287a50' : '#a83b45')};
-  color: white;
-  border: 0;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-`;
+    selettoreRuolo.value = utente.role || 'user';
 
-pulsanteStato.addEventListener('click', async () => {
-  const azione = accountSospeso ? 'reactivate' : 'suspend';
+    const eUtenteCorrente = utente.id === utenteCorrente?.id;
 
-  const conferma = confirm(
-    accountSospeso
-      ? 'Vuoi riattivare questo account?'
-      : 'Vuoi sospendere questo account?'
-  );
+    selettoreRuolo.disabled = eUtenteCorrente;
 
-  if (!conferma) return;
+    selettoreRuolo.style.cssText =
+      'padding:10px;background:#172747;color:white;border:1px solid #ffd34e;border-radius:5px;';
 
-  pulsanteStato.disabled = true;
-  pulsanteStato.textContent = 'Operazione in corso...';
+    const salvaRuolo = document.createElement('button');
+    salvaRuolo.type = 'button';
+    salvaRuolo.textContent = 'Salva ruolo';
+    salvaRuolo.disabled = eUtenteCorrente;
 
-  const { data, error } = await supabase.functions.invoke(
-    'manage-account',
-    {
-      body: {
-        user_id: utente.id,
-        action: azione
+    salvaRuolo.style.cssText =
+      'padding:10px 15px;background:#ffd34e;color:#172747;border:0;border-radius:5px;font-weight:bold;cursor:pointer;';
+
+    salvaRuolo.addEventListener('click', async () => {
+      salvaRuolo.disabled = true;
+
+      const { error } = await supabase.rpc('admin_cambia_ruolo', {
+        p_user_id: utente.id,
+        p_nuovo_ruolo: selettoreRuolo.value
+      });
+
+      if (error) {
+        alert('Errore: ' + error.message);
+        salvaRuolo.disabled = false;
+        return;
       }
-    }
-  );
 
-  if (error || !data?.success) {
-    alert(
-      'Operazione non riuscita: ' +
-      (data?.error || error?.message || 'Errore sconosciuto')
-    );
+      alert('Ruolo aggiornato correttamente!');
+      await caricaUtenti();
+    });
 
-    pulsanteStato.disabled = false;
-    pulsanteStato.textContent = accountSospeso
-      ? 'Riattiva account'
-      : 'Sospendi account';
-    return;
-  }
+    dati.append(selettoreRuolo, salvaRuolo);
 
-  alert(data.message);
-  await caricaUtenti();
-});
+    // SOSPENSIONE E RIATTIVAZIONE
+    const pulsanteStato = document.createElement('button');
+    pulsanteStato.type = 'button';
 
-dati.append(pulsanteStato);
+    const accountSospeso = utente.status === 'suspended';
+
+    pulsanteStato.textContent = eUtenteCorrente
+      ? 'Account amministratore'
+      : accountSospeso
+        ? 'Riattiva account'
+        : 'Sospendi account';
+
+    pulsanteStato.disabled = eUtenteCorrente;
+
+    pulsanteStato.style.cssText = `
+      padding:11px 16px;
+      margin-top:12px;
+      background:${eUtenteCorrente ? '#52617a' : accountSospeso ? '#287a50' : '#a83b45'};
+      color:white;
+      border:0;
+      border-radius:5px;
+      font-weight:bold;
+      cursor:${eUtenteCorrente ? 'not-allowed' : 'pointer'};
+    `;
+
+    pulsanteStato.addEventListener('click', async () => {
+      const azione = accountSospeso ? 'reactivate' : 'suspend';
+
+      const conferma = confirm(
+        accountSospeso
+          ? 'Vuoi riattivare questo account?'
+          : 'Vuoi sospendere questo account?'
+      );
+
+      if (!conferma) return;
+
+      pulsanteStato.disabled = true;
+      pulsanteStato.textContent = 'Operazione in corso...';
+
+      const { data, error } = await supabase.functions.invoke(
+        'manage-account',
+        {
+          body: {
+            user_id: utente.id,
+            action: azione
+          }
+        }
+      );
+
+      if (error || !data?.success) {
+        alert(
+          'Operazione non riuscita: ' +
+          (data?.error || error?.message || 'Errore sconosciuto')
+        );
+
+        pulsanteStato.disabled = false;
+        pulsanteStato.textContent = accountSospeso
+          ? 'Riattiva account'
+          : 'Sospendi account';
+
+        return;
+      }
+
+      alert(data.message);
+      await caricaUtenti();
+    });
+
+    dati.append(pulsanteStato);
 
     scheda.append(avatar, dati);
     elencoUtenti.append(scheda);
