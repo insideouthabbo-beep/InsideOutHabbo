@@ -372,6 +372,70 @@ salvaRuolo.addEventListener('click', async () => {
 dati.append(selettoreRuolo, salvaRuolo);
 
     dati.append(nome, nickname, ruolo, verifica, stato);
+    
+const pulsanteStato = document.createElement('button');
+pulsanteStato.type = 'button';
+
+const accountSospeso = utente.status === 'suspended';
+
+pulsanteStato.textContent = accountSospeso
+  ? 'Riattiva account'
+  : 'Sospendi account';
+
+pulsanteStato.style.cssText = `
+  padding: 11px 16px;
+  margin-top: 12px;
+  background: ${accountSospeso ? '#287a50' : '#a83b45'};
+  color: white;
+  border: 0;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+`;
+
+pulsanteStato.addEventListener('click', async () => {
+  const azione = accountSospeso ? 'reactivate' : 'suspend';
+
+  const conferma = confirm(
+    accountSospeso
+      ? 'Vuoi riattivare questo account?'
+      : 'Vuoi sospendere questo account?'
+  );
+
+  if (!conferma) return;
+
+  pulsanteStato.disabled = true;
+  pulsanteStato.textContent = 'Operazione in corso...';
+
+  const { data, error } = await supabase.functions.invoke(
+    'manage-account',
+    {
+      body: {
+        user_id: utente.id,
+        action: azione
+      }
+    }
+  );
+
+  if (error || !data?.success) {
+    alert(
+      'Operazione non riuscita: ' +
+      (data?.error || error?.message || 'Errore sconosciuto')
+    );
+
+    pulsanteStato.disabled = false;
+    pulsanteStato.textContent = accountSospeso
+      ? 'Riattiva account'
+      : 'Sospendi account';
+    return;
+  }
+
+  alert(data.message);
+  await caricaUtenti();
+});
+
+dati.append(pulsanteStato);
+
     scheda.append(avatar, dati);
     elencoUtenti.append(scheda);
   });
