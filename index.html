@@ -301,6 +301,9 @@ footer strong { color: white; }
   <a href="bacheca-redazionale.html" id="voceBacheca" style="display:none;">
     Bacheca redazionale
   </a>
+    <a href="admin.html" id="voceAdmin" style="display:none;">
+  Pannello amministratore
+</a>
   <button type="button" id="logoutButton">Esci</button>
 </div>
 </div>
@@ -491,6 +494,7 @@ const menuFreccia = document.getElementById("menuFreccia");
 const voceProfilo = document.getElementById("voceProfilo");
 const logoutButton = document.getElementById("logoutButton");
   const voceBacheca = document.getElementById("voceBacheca");
+  const voceAdmin = document.getElementById("voceAdmin");
 
 let utenteAutenticato = false;
 
@@ -499,6 +503,8 @@ function chiudiMenu() {
 }
 
 async function aggiornaAccesso() {
+  voceBacheca.style.display = "none";
+voceAdmin.style.display = "none";
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -526,10 +532,13 @@ async function aggiornaAccesso() {
   }
 
   utenteAutenticato = true;
-  if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
-    if (profilo.role === "admin") {
-  const voceAdmin = document.createElement("a");
-  voceAdmin.href = "admin.html";
+if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
+  voceBacheca.style.display = "block";
+}
+
+if (profilo.role === "admin") {
+  voceAdmin.style.display = "block";
+}
   voceAdmin.textContent = "Pannello amministratore";
   dropdownMenu.insertBefore(voceAdmin, logoutButton);
 }
