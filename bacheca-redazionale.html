@@ -485,24 +485,68 @@ async function caricaArticoli() {
   const mieBozze = (data || []).filter(a => a.status === 'draft');
   const articoliPubblicati = (data || []).filter(a => a.status === 'published');
 
-  function creaSchedaArticolo(articolo) {
-    const scheda = document.createElement('article');
-    scheda.className = 'avviso';
+  
+function creaSchedaArticolo(articolo) {
+  const scheda = document.createElement('article');
+  scheda.className = 'avviso';
 
-    scheda.appendChild(creaElemento('h3', articolo.title));
-    scheda.appendChild(
-      creaElemento('div', 'Categoria: ' + (articolo.category || 'Non indicata'))
-    );
-    scheda.appendChild(
-      creaElemento(
-        'div',
-        'Creato il ' + new Date(articolo.created_at).toLocaleDateString('it-IT'),
-        'meta'
-      )
-    );
+  scheda.appendChild(creaElemento('h3', articolo.title));
 
-    return scheda;
-  }
+  scheda.appendChild(
+    creaElemento('div', 'Categoria: ' + (articolo.category || 'Non indicata'))
+  );
+
+  scheda.appendChild(
+    creaElemento(
+      'div',
+      'Creato il ' + new Date(articolo.created_at).toLocaleDateString('it-IT'),
+      'meta'
+    )
+  );
+
+  const azioni = document.createElement('div');
+  azioni.className = 'azioni';
+
+  const apri = creaElemento('button', 'Apri articolo');
+  apri.type = 'button';
+  apri.disabled = articolo.status !== 'published';
+  apri.addEventListener('click', () => {
+    window.location.href = 'articolo.html?id=' + encodeURIComponent(articolo.id);
+  });
+
+  const modifica = creaElemento('button', 'Modifica');
+  modifica.type = 'button';
+  modifica.addEventListener('click', () => {
+    window.location.href = 'scrivi-articolo.html?id=' + encodeURIComponent(articolo.id);
+  });
+
+  azioni.append(apri, modifica);
+
+  const elimina = creaElemento('button', 'Elimina', 'elimina');
+  elimina.type = 'button';
+  elimina.addEventListener('click', async () => {
+    if (!confirm('Vuoi davvero eliminare questo articolo?')) return;
+
+    const { error } = await supabase
+      .from('articles')
+      .delete()
+      .eq('id', articolo.id);
+
+    if (error) {
+      alert('Errore durante l’eliminazione: ' + error.message);
+      return;
+    }
+
+    alert('Articolo eliminato correttamente.');
+    await caricaArticoli();
+  });
+
+  azioni.appendChild(elimina);
+  scheda.appendChild(azioni);
+
+  return scheda;
+}
+
 
   if (mieBozze.length === 0) {
     bozze.appendChild(
