@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum | InsideOutHabbo</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: #f2f5fa;
+    }
+
+    header {
+      background: #17243a;
+      border-bottom: 3px solid #f5c542;
+      padding: 22px;
+    }
+
+    .header-content {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+      color: #f5c542;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #f5c542;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 35px auto;
+      padding: 0 18px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #203c61, #17243a);
+      border: 1px solid #344d70;
+      border-radius: 12px;
+      padding: 35px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      color: #f5c542;
+      margin-top: 0;
+      font-size: 32px;
+    }
+
+    .hero p {
+      color: #d2dbea;
+      line-height: 1.6;
+    }
+
+    .panel {
+      background: #17243a;
+      border: 1px solid #30435f;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      color: #f5c542;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #f5c542;
+      color: #17243a;
+      border: none;
+      border-radius: 7px;
+      padding: 12px 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffda70;
+    }
+
+    .discussione {
+      background: #202f46;
+      border: 1px solid #344b69;
+      border-radius: 9px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .discussione h3 {
+      margin-top: 0;
+      color: white;
+    }
+
+    .meta {
+      color: #9eafc7;
+      font-size: 13px;
+    }
+
+    .discussione p {
+      color: #d2dbea;
+      line-height: 1.5;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px;
+      margin: 8px 0 18px;
+      background: #101827;
+      border: 1px solid #405675;
+      border-radius: 7px;
+      color: white;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    label {
+      font-weight: bold;
+      color: #dce5f2;
+    }
+
+    #nuovaDiscussione {
+      display: none;
+    }
+
+    .nota {
+      color: #aebdd1;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #91a2ba;
+      border-top: 1px solid #30435f;
+      margin-top: 50px;
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 23px;
+      }
+
+      .hero h1 {
+        font-size: 25px;
+      }
+
+      nav a {
+        margin-left: 0;
+        margin-right: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="logo">INSIDEOUTHABBO</div>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="index.html#attualita">Attualità</a>
+      <a href="forum.html">Forum</a>
+      <a href="accesso.html">Accedi</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>Forum della Community</h1>
+    <p>
+      Il punto d'incontro della community di InsideOutHabbo.
+      Condividi idee, fai domande, confrontati con altri utenti
+      e partecipa alle discussioni.
+    </p>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar">
+      <h2>Discussioni della community</h2>
+      <button id="pulsanteNuovaDiscussione" type="button">
+        + Nuova discussione
+      </button>
+    </div>
+
+    <div id="elencoDiscussioni">
+      <p class="nota">Le discussioni saranno visualizzate qui.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="nuovaDiscussione">
+    <h2>Apri una nuova discussione</h2>
+
+    <form id="formDiscussione">
+      <label for="titoloDiscussione">Titolo</label>
+      <input
+        type="text"
+        id="titoloDiscussione"
+        maxlength="120"
+        placeholder="Di cosa vuoi parlare?"
+        required
+      >
+
+      <label for="testoDiscussione">Messaggio</label>
+      <textarea
+        id="testoDiscussione"
+        maxlength="10000"
+        placeholder="Scrivi qui il tuo messaggio..."
+        required
+      ></textarea>
+
+      <p class="nota">
+        La discussione sarà sottoposta ad approvazione
+        prima di diventare visibile alla community.
+      </p>
+
+      <button type="submit">Invia per approvazione</button>
+      <button type="button" id="annullaDiscussione">
+        Annulla
+      </button>
+    </form>
+  </section>
+
+</main>
+
+<footer>
+  InsideOutHabbo · Il punto d'incontro della community
+</footer>
+
+</body>
+</html>
