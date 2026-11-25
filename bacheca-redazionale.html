@@ -230,6 +230,19 @@ button:hover { background: #ffe17e; }
     <p class="nessun-avviso">Caricamento degli avvisi...</p>
   </div>
 </section>
+  <section class="panel" id="sezioneArticoli">
+  <h2>Gestione articoli</h2>
+
+  <h3>Le mie bozze</h3>
+  <div id="elencoBozze">
+    <p class="nessun-avviso">Caricamento delle bozze...</p>
+  </div>
+
+  <h3>Articoli pubblicati</h3>
+  <div id="elencoPubblicati">
+    <p class="nessun-avviso">Caricamento degli articoli...</p>
+  </div>
+</section>
 
 <section id="sezioneArchivio" hidden>
   <h2>Archivio delle comunicazioni</h2>
@@ -305,7 +318,8 @@ async function avviaBacheca() {
     pannelloNuovo.hidden = false;
   }
 
-  await caricaAvvisi();
+    await caricaAvvisi();
+  await caricaArticoli();
 }
 
 
@@ -433,6 +447,79 @@ async function caricaAvvisi() {
     }
   } else {
     sezioneArchivio.hidden = true;
+  }
+}
+
+  
+async function caricaArticoli() {
+  const bozze = document.getElementById('elencoBozze');
+  const pubblicati = document.getElementById('elencoPubblicati');
+
+  bozze.replaceChildren(
+    creaElemento('p', 'Caricamento delle bozze...')
+  );
+  pubblicati.replaceChildren(
+    creaElemento('p', 'Caricamento degli articoli...')
+  );
+
+  let richiesta = supabase
+    .from('articles')
+    .select('id, title, category, status, created_at, author_id')
+    .order('created_at', { ascending: false });
+
+  if (ruolo === 'redattore') {
+    richiesta = richiesta.eq('author_id', utente.id);
+  }
+
+  const { data, error } = await richiesta;
+
+  if (error) {
+    bozze.textContent = 'Errore nel caricamento delle bozze: ' + error.message;
+    pubblicati.textContent = 'Errore nel caricamento degli articoli.';
+    return;
+  }
+
+  bozze.replaceChildren();
+  pubblicati.replaceChildren();
+
+  const mieBozze = (data || []).filter(a => a.status === 'draft');
+  const articoliPubblicati = (data || []).filter(a => a.status === 'published');
+
+  function creaSchedaArticolo(articolo) {
+    const scheda = document.createElement('article');
+    scheda.className = 'avviso';
+
+    scheda.appendChild(creaElemento('h3', articolo.title));
+    scheda.appendChild(
+      creaElemento('div', 'Categoria: ' + (articolo.category || 'Non indicata'))
+    );
+    scheda.appendChild(
+      creaElemento(
+        'div',
+        'Creato il ' + new Date(articolo.created_at).toLocaleDateString('it-IT'),
+        'meta'
+      )
+    );
+
+    return scheda;
+  }
+
+  if (mieBozze.length === 0) {
+    bozze.appendChild(
+      creaElemento('p', 'Non hai bozze da visualizzare.', 'nessun-avviso')
+    );
+  } else {
+    mieBozze.forEach(a => bozze.appendChild(creaSchedaArticolo(a)));
+  }
+
+  if (articoliPubblicati.length === 0) {
+    pubblicati.appendChild(
+      creaElemento('p', 'Non ci sono articoli pubblicati.', 'nessun-avviso')
+    );
+  } else {
+    articoliPubblicati.forEach(a =>
+      pubblicati.appendChild(creaSchedaArticolo(a))
+    );
   }
 }
 
