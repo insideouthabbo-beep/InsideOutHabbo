@@ -356,6 +356,65 @@ const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Carica e mostra i partner attivi
+async function mostraPartner() {
+  const elenco = document.getElementById('elencoPartnerPubblico');
+
+  const { data, error } = await supabase
+    .from('partners')
+    .select('name, description, logo_url, website_url')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    console.error('Errore caricamento partner:', error);
+    elenco.textContent = 'Non è stato possibile caricare i partner.';
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!data || data.length === 0) {
+    elenco.textContent = 'Presto presenteremo i nostri partner!';
+    return;
+  }
+
+  data.forEach(partner => {
+    const scheda = document.createElement('div');
+    scheda.className = 'benvenuto';
+
+    const titolo = document.createElement('h3');
+    titolo.textContent = partner.name;
+    scheda.appendChild(titolo);
+
+    if (partner.logo_url) {
+      const logo = document.createElement('img');
+      logo.src = partner.logo_url;
+      logo.alt = 'Logo ' + partner.name;
+      logo.style.maxWidth = '180px';
+      logo.style.maxHeight = '130px';
+      logo.style.objectFit = 'contain';
+      scheda.appendChild(logo);
+    }
+
+    const descrizione = document.createElement('p');
+    descrizione.textContent = partner.description || '';
+    scheda.appendChild(descrizione);
+
+    if (partner.website_url) {
+      const link = document.createElement('a');
+      link.href = partner.website_url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Visita il sito';
+      scheda.appendChild(link);
+    }
+
+    elenco.appendChild(scheda);
+  });
+}
+
+mostraPartner();
 
 </script>
 </body>
