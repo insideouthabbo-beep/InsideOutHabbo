@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pubblicità e Partner | InsideOutHabbo</title>
+
+<style>
+:root {
+  --navy: #101b35;
+  --blue: #1d3158;
+  --yellow: #ffd34e;
+  --light: #f3f5f9;
+  --text: #202b40;
+  --muted: #778198;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--light);
+  color: var(--text);
+}
+
+header {
+  background: var(--navy);
+  color: white;
+  padding: 22px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.brand {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.brand span {
+  color: var(--yellow);
+}
+
+.tagline {
+  color: #c4cde0;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.login {
+  background: var(--yellow);
+  color: var(--navy);
+  text-decoration: none;
+  padding: 11px 18px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+nav {
+  background: var(--blue);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 17px 16px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: .5px;
+}
+
+nav a:hover,
+nav a.active {
+  background: #304875;
+  color: var(--yellow);
+}
+
+.hero {
+  background: linear-gradient(120deg, #172849, #304d7c);
+  color: white;
+  padding: 55px 30px;
+  text-align: center;
+}
+
+.hero small {
+  color: var(--yellow);
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  margin: 15px 0;
+}
+
+.hero p {
+  max-width: 650px;
+  margin: auto;
+  color: #d5deed;
+  line-height: 1.7;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 45px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 20px;
+  color: var(--navy);
+  border-left: 5px solid var(--yellow);
+  padding-left: 13px;
+  margin-bottom: 12px;
+}
+
+.intro {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 25px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e7eaf0;
+  border-radius: 9px;
+  padding: 28px;
+}
+
+.card-icon {
+  font-size: 35px;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  color: var(--navy);
+  margin: 0 0 12px;
+}
+
+.card p {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.info-panel {
+  background: white;
+  border: 1px solid #e7eaf0;
+  border-radius: 9px;
+  padding: 30px;
+  margin-top: 25px;
+  line-height: 1.7;
+}
+
+.info-panel h3 {
+  color: var(--navy);
+  margin-top: 0;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid #e4e8ef;
+  margin: 45px 0;
+}
+
+footer {
+  margin-top: 60px;
+  background: var(--navy);
+  color: #c4cde0;
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+footer strong {
+  color: white;
+}
+
+@media (max-width: 650px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  nav a {
+    padding: 13px 10px;
+    font-size: 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <div class="brand">INSIDEOUT<span>HABBO</span></div>
+    <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+  </div>
+
+  <a class="login" href="accesso.html">ACCEDI / REGISTRATI</a>
+</header>
+
+<nav>
+  <a href="index.html">HOME</a>
+  <a href="index.html">ATTUALITÀ</a>
+  <a href="index.html">HABBO</a>
+  <a href="index.html">ROLEPLAY</a>
+  <a href="index.html">COMMUNITY</a>
+  <a href="forum.html">FORUM</a>
+  <a href="chi-siamo.html">CHI SIAMO</a>
+  <a href="pubblicita-partner.html" class="active">PUBBLICITÀ E PARTNER</a>
+  <a href="index.html">REDAZIONE</a>
+</nav>
+
+<section class="hero">
+  <small>COLLABORAZIONI E OPPORTUNITÀ</small>
+  <h1>Pubblicità e Partner</h1>
+  <p>
+    Uno spazio dedicato alle realtà che vogliono entrare
+    in contatto con InsideOutHabbo, collaborare con il nostro
+    progetto e raggiungere la community.
+  </p>
+</section>
+
+<main class="container">
+
+  <section>
+    <h2 class="section-title">PUBBLICITÀ</h2>
+
+    <p class="intro">
+      InsideOutHabbo mette a disposizione uno spazio dedicato
+      alla promozione di progetti, iniziative e realtà legate
+      al mondo Habbo e RPG.
+    </p>
+
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-icon">📰</div>
+        <h3>Spazi pubblicitari</h3>
+        <p>
+          Spazi dedicati alla visibilità di progetti,
+          community e iniziative attraverso banner
+          e contenuti promozionali.
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card-icon">📢</div>
+        <h3>Promuovi il tuo progetto</h3>
+        <p>
+          Un'opportunità per presentare la tua realtà,
+          far conoscere le tue attività e raggiungere
+          nuovi membri della community.
+        </p>
+      </article>
+
+    </div>
+
+    <div class="info-panel">
+      <h3>Informazioni per gli inserzionisti</h3>
+      <p>
+        Le proposte pubblicitarie potranno essere valutate
+        dalla redazione in base alla tipologia di contenuto,
+        alla coerenza con il progetto e agli spazi disponibili.
+      </p>
+      <p>
+        Le modalità di pubblicazione e gli eventuali accordi
+        saranno definiti direttamente con gli interessati.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <h2 class="section-title">I NOSTRI PARTNER</h2>
+
+    <p class="intro">
+      Crediamo nella collaborazione tra community.
+      In questa sezione troveranno spazio i progetti,
+      le organizzazioni e le realtà che condividono
+      con noi la passione per Habbo e il mondo RPG.
+    </p>
+
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-icon">🤝</div>
+        <h3>Community partner</h3>
+        <p>
+          Community e gruppi con cui sviluppare
+          iniziative, collaborazioni e attività condivise.
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card-icon">🌐</div>
+        <h3>Progetti e organizzazioni</h3>
+        <p>
+          Realtà e progetti che desiderano costruire
+          nuove opportunità di collaborazione con
+          InsideOutHabbo.
+        </p>
+      </article>
+
+    </div>
+
+    <div class="info-panel">
+      <h3>Diventa nostro partner</h3>
+      <p>
+        Hai una community, un progetto o un'organizzazione
+        e vuoi collaborare con InsideOutHabbo?
+      </p>
+      <p>
+        Questa sezione sarà dedicata alla presentazione
+        dei partner e delle iniziative realizzate insieme.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>INSIDEOUTHABBO</strong><br>
+  Il mondo Habbo raccontato da noi.<br>
+  Una community, tante storie, un solo universo.
+</footer>
+
+</body>
+</html>
