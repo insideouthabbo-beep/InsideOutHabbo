@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moderazione Forum | InsideOutHabbo</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101b35;
+  color: #fff;
+}
+
+header {
+  background: #172747;
+  padding: 22px;
+  border-bottom: 3px solid #f5c542;
+}
+
+header h1 {
+  margin: 0;
+  color: #f5c542;
+}
+
+header p {
+  margin-bottom: 0;
+  color: #cbd5e1;
+}
+
+main {
+  max-width: 1000px;
+  margin: 35px auto;
+  padding: 20px;
+}
+
+.pannello {
+  background: #1c2d50;
+  border: 1px solid #34496f;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+h2 {
+  color: #f5c542;
+}
+
+.discussione {
+  background: #263a60;
+  border: 1px solid #40577f;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 18px 0;
+}
+
+.discussione h3 {
+  color: #f5c542;
+  margin-top: 0;
+}
+
+.data {
+  color: #aebdd4;
+  font-size: 13px;
+}
+
+.contenuto {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+button {
+  border: 0;
+  padding: 11px 18px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 8px 8px 0 0;
+}
+
+.approva {
+  background: #35a66b;
+  color: white;
+}
+
+.rifiuta {
+  background: #c94b55;
+  color: white;
+}
+
+#messaggio {
+  padding: 12px;
+  margin: 15px 0;
+  border-radius: 5px;
+  background: #263a60;
+}
+
+.nascosto {
+  display: none;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #aebdd4;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>InsideOutHabbo</h1>
+  <p>Centro di moderazione del Forum</p>
+</header>
+
+<main>
+  <section class="pannello">
+    <h2>Discussioni in attesa di approvazione</h2>
+
+    <div id="messaggio">Verifica autorizzazioni in corso...</div>
+
+    <div id="elencoDiscussioni"></div>
+  </section>
+</main>
+
+<footer>
+  InsideOutHabbo - Pannello di moderazione
+</footer>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+
+// Inserisci la stessa chiave publishable usata in forum.html
+const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const messaggio = document.getElementById('messaggio');
+const elenco = document.getElementById('elencoDiscussioni');
+
+async function avviaModerazione() {
+  const { data: { session }, error: erroreSessione } =
+    await supabase.auth.getSession();
+
+  if (erroreSessione || !session) {
+    messaggio.textContent =
+      'Devi accedere al tuo account per entrare nella moderazione.';
+    return;
+  }
+
+  const { data: autorizzato, error: errorePermessi } =
+    await supabase.rpc('can_moderate_forum');
+
+  if (errorePermessi || autorizzato !== true) {
+    messaggio.textContent =
+      'Non hai i permessi necessari per moderare il forum.';
+    return;
+  }
+
+  await caricaDiscussioni();
+}
+
+async function caricaDiscussioni() {
+  messaggio.textContent = 'Caricamento discussioni...';
+  elenco.innerHTML = '';
+
+  const { data, error } = await supabase
+    .from('forum_topics')
+    .select('id, title, content, created_at, author_id')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    messaggio.textContent =
+      'Errore nel caricamento: ' + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    messaggio.textContent =
+      'Non ci sono discussioni in attesa di approvazione.';
+    return;
+  }
+
+  messaggio.textContent =
+    'Discussioni da moderare: ' + data.length;
+
+  data.forEach(discussione => {
+    const scheda = document.createElement('article');
+    scheda.className = 'discussione';
+
+    const titolo = document.createElement('h3');
+    titolo.textContent = discussione.title;
+
+    const autore = document.createElement('p');
+    autore.textContent = 'ID autore: ' + discussione.author_id;
+
+    const dataCreazione = document.createElement('p');
+    dataCreazione.className = 'data';
+    dataCreazione.textContent =
+      'Inviata il: ' +
+      new Date(discussione.created_at).toLocaleString('it-IT');
+
+    const contenuto = document.createElement('p');
+    contenuto.className = 'contenuto';
+    contenuto.textContent = discussione.content;
+
+    const approva = document.createElement('button');
+    approva.className = 'approva';
+    approva.textContent = 'Approva';
+
+    const rifiuta = document.createElement('button');
+    rifiuta.className = 'rifiuta';
+    rifiuta.textContent = 'Rifiuta';
+
+    approva.addEventListener('click', () =>
+      modificaStato(discussione.id, 'approved')
+    );
+
+    rifiuta.addEventListener('click', () =>
+      modificaStato(discussione.id, 'rejected')
+    );
+
+    scheda.append(
+      titolo,
+      autore,
+      dataCreazione,
+      contenuto,
+      approva,
+      rifiuta
+    );
+
+    elenco.appendChild(scheda);
+  });
+}
+
+async function modificaStato(id, nuovoStato) {
+  const conferma = confirm(
+    nuovoStato === 'approved'
+      ? 'Vuoi approvare questa discussione?'
+      : 'Vuoi rifiutare questa discussione?'
+  );
+
+  if (!conferma) return;
+
+  const { error } = await supabase
+    .from('forum_topics')
+    .update({ status: nuovoStato })
+    .eq('id', id)
+    .eq('status', 'pending');
+
+  if (error) {
+    alert('Errore: ' + error.message);
+    return;
+  }
+
+  alert(
+    nuovoStato === 'approved'
+      ? 'Discussione approvata!'
+      : 'Discussione rifiutata!'
+  );
+
+  await caricaDiscussioni();
+}
+
+avviaModerazione();
+
+supabase.auth.onAuthStateChange(() => {
+  avviaModerazione();
+});
+</script>
+
+</body>
+</html>
