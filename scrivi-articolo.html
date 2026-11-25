@@ -132,6 +132,40 @@
     messaggio.textContent = testo;
   }
 
+  const parametri = new URLSearchParams(window.location.search);
+const idArticolo = parametri.get("id");
+
+async function caricaArticoloDaModificare() {
+  if (!idArticolo) return;
+
+  mostraMessaggio("Caricamento articolo...");
+
+  const { data, error } = await client
+    .from("articles")
+    .select("*")
+    .eq("id", idArticolo)
+    .maybeSingle();
+
+  if (error || !data) {
+    mostraMessaggio("Impossibile caricare l'articolo.");
+    return;
+  }
+
+  articoloInModifica = data;
+
+  document.getElementById("titolo").value = data.title || "";
+  document.getElementById("categoria").value = data.category || "";
+  document.getElementById("estratto").value = data.excerpt || "";
+  document.getElementById("contenuto").value = data.content || "";
+
+  if (data.cover_image_url) {
+    const anteprima = document.getElementById("anteprimaCopertina");
+    anteprima.src = data.cover_image_url;
+    anteprima.style.display = "block";
+  }
+
+  mostraMessaggio("Stai modificando: " + data.title);
+}
   async function verificaAccesso() {
     const { data, error } = await client.auth.getSession();
 
@@ -161,7 +195,10 @@
     }
 
     profiloUtente = profilo;
-    return true;
+
+await caricaArticoloDaModificare();
+
+return true;;
   }
 
   document.getElementById("copertina").addEventListener("change", function () {
