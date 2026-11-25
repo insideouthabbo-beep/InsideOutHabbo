@@ -122,6 +122,7 @@
 
   let utente = null;
   let profiloUtente = null;
+  let articoloInModifica = null;
 
   const messaggio = document.getElementById("messaggio");
   const pulsanteBozza = document.getElementById("salvaBozza");
@@ -182,94 +183,110 @@
     anteprima.style.display = "block";
   });
 
-  async function salvaArticolo(stato) {
-    pulsanteBozza.disabled = true;
-    pulsantePubblica.disabled = true;
-    mostraMessaggio("Salvataggio in corso...");
+ 
+async function salvaArticolo(stato) {
+  pulsanteBozza.disabled = true;
+  pulsantePubblica.disabled = true;
+  mostraMessaggio("Salvataggio in corso...");
 
-    try {
-      if (!utente || !profiloUtente) {
-        throw new Error("Accesso non verificato. Ricarica la pagina.");
+  try {
+    if (!utente || !profiloUtente) {
+      throw new Error("Accesso non verificato.");
+    }
+
+    const titolo = document.getElementById("titolo").value.trim();
+    const categoria = document.getElementById("categoria").value;
+    const estratto = document.getElementById("estratto").value.trim();
+    const contenuto = document.getElementById("contenuto").value.trim();
+    const file = document.getElementById("copertina").files[0];
+
+    if (!titolo || !categoria || !contenuto) {
+      throw new Error("Compila titolo, categoria e contenuto.");
+    }
+
+    let copertinaUrl = articoloInModifica?.cover_image_url || null;
+
+    if (file) {
+      if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+        throw new Error("Immagine non valida o superiore a 5 MB.");
       }
 
-      const titolo = document.getElementById("titolo").value.trim();
-      const categoria = document.getElementById("categoria").value;
-      const estratto = document.getElementById("estratto").value.trim();
-      const contenuto = document.getElementById("contenuto").value.trim();
-      const file = document.getElementById("copertina").files[0];
+      const nomePulito = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const percorso = utente.id + "/" + crypto.randomUUID() + "-" + nomePulito;
 
-      if (!titolo || !categoria || !contenuto) {
-        throw new Error("Compila titolo, categoria e contenuto.");
-      }
+      const { error } = await client.storage
+        .from("copertine")
+        .upload(percorso, file);
 
-      let copertinaUrl = null;
+      if (error) throw error;
 
-      if (file) {
-        if (!file.type.startsWith("image/")) {
-          throw new Error("Il file selezionato non è un'immagine.");
-        }
+      const { data } = client.storage
+        .from("copertine")
+        .getPublicUrl(percorso);
 
-        if (file.size > 5 * 1024 * 1024) {
-          throw new Error("L'immagine non può superare 5 MB.");
-        }
+      copertinaUrl = data.publicUrl;
+    }
 
-        const nomePulito = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const percorso = utente.id + "/" + crypto.randomUUID() + "-" + nomePulito;
+    const articolo = {
+      title: titolo,
+      category: categoria,
+      excerpt: estratto,
+      content: contenuto,
+      cover_image_url: copertinaUrl,
+      status: stato,
+      published_at: stato === "published"
+        ? (articoloInModifica?.published_at || new Date().toISOString())
+        : null
+    };
 
-        const { error: erroreUpload } = await client.storage
-          .from("copertine")
-          .upload(percorso, file, {
-            cacheControl: "3600",
-            upsert: false
-          });
+    let erroreSalvataggio;
 
-        if (erroreUpload) {
-          throw erroreUpload;
-        }
-
-        const { data: immagine } = client.storage
-          .from("copertine")
-          .getPublicUrl(percorso);
-
-        copertinaUrl = immagine.publicUrl;
-      }
-
-      const articolo = {
-        title: titolo,
-        category: categoria,
-        excerpt: estratto,
-        content: contenuto,
-        cover_image_url: copertinaUrl,
-        author_id: utente.id,
-        status: stato,
-        published_at: stato === "published" ? new Date().toISOString() : null
-      };
-
-      const { error: erroreSalvataggio } = await client
+    if (articoloInModifica) {
+      const risultato = await client
         .from("articles")
-        .insert(articolo);
+        .update(articolo)
+        .eq("id", articoloInModifica.id);
 
-      if (erroreSalvataggio) {
-        throw erroreSalvataggio;
-      }
+      erroreSalvataggio = risultato.error;
+    } else {
+      const risultato = await client
+        .from("articles")
+        .insert({
+          ...articolo,
+          author_id: utente.id
+        });
 
-      mostraMessaggio(
-        stato === "published"
+      erroreSalvataggio = risultato.error;
+    }
+
+    if (erroreSalvataggio) throw erroreSalvataggio;
+
+    mostraMessaggio(
+      articoloInModifica
+        ? "Articolo aggiornato correttamente!"
+        : stato === "published"
           ? "Articolo pubblicato correttamente!"
           : "Bozza salvata correttamente!"
-      );
+    );
 
+    if (articoloInModifica) {
+      articoloInModifica = {
+        ...articoloInModifica,
+        ...articolo
+      };
+    } else {
       document.getElementById("formArticolo").reset();
       document.getElementById("anteprimaCopertina").style.display = "none";
-
-    } catch (errore) {
-      console.error(errore);
-      mostraMessaggio("Errore: " + (errore.message || "salvataggio non riuscito."));
-    } finally {
-      pulsanteBozza.disabled = false;
-      pulsantePubblica.disabled = false;
     }
+
+  } catch (errore) {
+    console.error(errore);
+    mostraMessaggio("Errore: " + (errore.message || "salvataggio non riuscito."));
+  } finally {
+    pulsanteBozza.disabled = false;
+    pulsantePubblica.disabled = false;
   }
+}
 
   pulsanteBozza.addEventListener("click", function () {
     salvaArticolo("draft");
