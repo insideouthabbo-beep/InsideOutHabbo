@@ -110,9 +110,9 @@
 
   </div>
 
-  <script>
+ 
+<script>
   const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
-
   const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
 
   const client = window.supabase.createClient(
@@ -120,50 +120,168 @@
     SUPABASE_KEY
   );
 
-  async function verificaAccesso() {
-    const { data: sessione } = await client.auth.getSession();
+  let utente = null;
+  let profiloUtente = null;
 
-    if (!sessione.session) {
-      window.location.href = "accesso.html";
-      return;
-    }
+  const messaggio = document.getElementById("messaggio");
+  const pulsanteBozza = document.getElementById("salvaBozza");
+  const pulsantePubblica = document.getElementById("pubblicaArticolo");
 
-    const user = sessione.session.user;
-
-    const { data: profilo, error } = await client
-      .from("profiles")
-      .select("habbo_name, display_name, role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (error || !profilo) {
-      document.body.innerHTML = "<h2>Impossibile caricare il profilo.</h2>";
-      return;
-    }
-
-    const ruoliAutorizzati = ["redattore", "caporedattore", "admin"];
-
-    if (!ruoliAutorizzati.includes(profilo.role)) {
-      document.body.innerHTML = "<h2>Non hai i permessi per scrivere articoli.</h2>";
-      return;
-    }
-
-    document.getElementById("titolo").dataset.autore =
-      profilo.display_name || profilo.habbo_name || user.email;
+  function mostraMessaggio(testo) {
+    messaggio.textContent = testo;
   }
 
-      document.getElementById("copertina").addEventListener("change", function() {
+  async function verificaAccesso() {
+    const { data, error } = await client.auth.getSession();
+
+    if (error || !data.session) {
+      window.location.href = "accesso.html";
+      return false;
+    }
+
+    utente = data.session.user;
+
+    const { data: profilo, error: erroreProfilo } = await client
+      .from("profiles")
+      .select("habbo_name, display_name, role")
+      .eq("id", utente.id)
+      .maybeSingle();
+
+    if (erroreProfilo || !profilo) {
+      mostraMessaggio("Impossibile caricare il profilo.");
+      return false;
+    }
+
+    const ruoli = ["redattore", "caporedattore", "admin"];
+
+    if (!ruoli.includes(profilo.role)) {
+      mostraMessaggio("Non hai i permessi per scrivere articoli.");
+      return false;
+    }
+
+    profiloUtente = profilo;
+    return true;
+  }
+
+  document.getElementById("copertina").addEventListener("change", function () {
     const file = this.files[0];
-
-    if (!file) return;
-
     const anteprima = document.getElementById("anteprimaCopertina");
+
+    if (!file) {
+      anteprima.style.display = "none";
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      mostraMessaggio("Seleziona un file immagine valido.");
+      this.value = "";
+      return;
+    }
+
     anteprima.src = URL.createObjectURL(file);
     anteprima.style.display = "block";
   });
 
+  async function salvaArticolo(stato) {
+    pulsanteBozza.disabled = true;
+    pulsantePubblica.disabled = true;
+    mostraMessaggio("Salvataggio in corso...");
+
+    try {
+      if (!utente || !profiloUtente) {
+        throw new Error("Accesso non verificato. Ricarica la pagina.");
+      }
+
+      const titolo = document.getElementById("titolo").value.trim();
+      const categoria = document.getElementById("categoria").value;
+      const estratto = document.getElementById("estratto").value.trim();
+      const contenuto = document.getElementById("contenuto").value.trim();
+      const file = document.getElementById("copertina").files[0];
+
+      if (!titolo || !categoria || !contenuto) {
+        throw new Error("Compila titolo, categoria e contenuto.");
+      }
+
+      let copertinaUrl = null;
+
+      if (file) {
+        if (!file.type.startsWith("image/")) {
+          throw new Error("Il file selezionato non è un'immagine.");
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error("L'immagine non può superare 5 MB.");
+        }
+
+        const nomePulito = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const percorso = utente.id + "/" + crypto.randomUUID() + "-" + nomePulito;
+
+        const { error: erroreUpload } = await client.storage
+          .from("copertine")
+          .upload(percorso, file, {
+            cacheControl: "3600",
+            upsert: false
+          });
+
+        if (erroreUpload) {
+          throw erroreUpload;
+        }
+
+        const { data: immagine } = client.storage
+          .from("copertine")
+          .getPublicUrl(percorso);
+
+        copertinaUrl = immagine.publicUrl;
+      }
+
+      const articolo = {
+        title: titolo,
+        category: categoria,
+        excerpt: estratto,
+        content: contenuto,
+        cover_image_url: copertinaUrl,
+        author_id: utente.id,
+        status: stato,
+        published_at: stato === "published" ? new Date().toISOString() : null
+      };
+
+      const { error: erroreSalvataggio } = await client
+        .from("articles")
+        .insert(articolo);
+
+      if (erroreSalvataggio) {
+        throw erroreSalvataggio;
+      }
+
+      mostraMessaggio(
+        stato === "published"
+          ? "Articolo pubblicato correttamente!"
+          : "Bozza salvata correttamente!"
+      );
+
+      document.getElementById("formArticolo").reset();
+      document.getElementById("anteprimaCopertina").style.display = "none";
+
+    } catch (errore) {
+      console.error(errore);
+      mostraMessaggio("Errore: " + (errore.message || "salvataggio non riuscito."));
+    } finally {
+      pulsanteBozza.disabled = false;
+      pulsantePubblica.disabled = false;
+    }
+  }
+
+  pulsanteBozza.addEventListener("click", function () {
+    salvaArticolo("draft");
+  });
+
+  pulsantePubblica.addEventListener("click", function () {
+    salvaArticolo("published");
+  });
+
   verificaAccesso();
 </script>
+
 </body>
 </html>
   
