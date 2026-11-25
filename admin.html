@@ -138,15 +138,15 @@
       <p>Gestione della redazione e delle comunicazioni interne.</p>
     </div>
 
-    <div class="scheda">
-      <h3>Social e partner</h3>
-      <p>Gestione dei canali social e delle collaborazioni.</p>
-    </div>
+    <div class="scheda" id="apriPartner" style="cursor:pointer;">
+  <h3>Social e partner</h3>
+  <p>Gestione dei partner e delle collaborazioni.</p>
+</div>
 
-    <div class="scheda">
-      <h3>Pubblicità</h3>
-      <p>Gestione degli spazi pubblicitari e dei banner.</p>
-    </div>
+    <div class="scheda" id="apriPubblicita" style="cursor:pointer;">
+  <h3>Pubblicità</h3>
+  <p>Gestione degli spazi pubblicitari e dei banner.</p>
+</div>
 
     <div class="scheda">
       <h3>Registro attività</h3>
@@ -216,6 +216,57 @@
   <button type="button" id="salvaArticolo">Salva modifiche</button>
   <button type="button" id="annullaModificaArticolo">Annulla</button>
 </div>
+</section>
+
+    
+<section id="partnerPanel" hidden>
+  <div class="benvenuto">
+    <h2>Gestione partner</h2>
+    <p>Aggiungi e gestisci le community e le organizzazioni partner.</p>
+    <button type="button" id="tornaPartner">← Torna al pannello</button>
+  </div>
+
+  <div class="benvenuto">
+    <h3>Nuovo partner</h3>
+    <input type="hidden" id="partnerId">
+    <p>Nome</p>
+    <input type="text" id="partnerNome" placeholder="Nome del partner">
+    <p>Descrizione</p>
+    <textarea id="partnerDescrizione" placeholder="Descrizione del partner"></textarea>
+    <p>Indirizzo logo</p>
+    <input type="url" id="partnerLogo" placeholder="URL del logo">
+    <p>Sito web</p>
+    <input type="url" id="partnerSito" placeholder="URL del sito">
+    <p><label><input type="checkbox" id="partnerAttivo" checked> Partner visibile</label></p>
+    <button type="button" id="salvaPartner">Salva partner</button>
+    <button type="button" id="annullaPartner">Annulla</button>
+  </div>
+
+  <div id="elencoPartner">Caricamento partner...</div>
+</section>
+
+<section id="pubblicitaPanel" hidden>
+  <div class="benvenuto">
+    <h2>Gestione pubblicità</h2>
+    <p>Gestisci gli spazi promozionali e i banner del sito.</p>
+    <button type="button" id="tornaPubblicita">← Torna al pannello</button>
+  </div>
+
+  <div class="benvenuto">
+    <h3>Nuovo spazio pubblicitario</h3>
+    <input type="hidden" id="bannerId">
+    <p>Titolo</p>
+    <input type="text" id="bannerTitolo" placeholder="Titolo del banner">
+    <p>Descrizione</p>
+    <textarea id="bannerDescrizione" placeholder="Descrizione"></textarea>
+    <p>Indirizzo immagine</p>
+    <input type="url" id="bannerImmagine" placeholder="URL dell'immagine">
+    <p><label><input type="checkbox" id="bannerAttivo" checked> Banner visibile</label></p>
+    <button type="button" id="salvaBanner">Salva banner</button>
+    <button type="button" id="annullaBanner">Annulla</button>
+  </div>
+
+  <div id="elencoBanner">Caricamento banner...</div>
 </section>
 
     <a href="index.html">← Torna alla homepage</a>
