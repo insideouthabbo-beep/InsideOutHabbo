@@ -252,6 +252,9 @@ footer strong {
     </p>
 
     <div class="grid">
+      <div id="elencoBannerPubblicitari" class="grid">
+  <p>Caricamento pubblicità...</p>
+</div>
 
       <article class="card">
         <div class="card-icon">📰</div>
@@ -414,6 +417,56 @@ async function mostraPartner() {
   });
 }
 
+    // Carica e mostra i banner pubblicitari attivi
+async function mostraBanner() {
+  const elenco = document.getElementById('elencoBannerPubblicitari');
+
+  const { data, error } = await supabase
+    .from('advertising_banners')
+    .select('title, description, image_url')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    console.error('Errore caricamento banner:', error);
+    elenco.textContent = 'Non è stato possibile caricare la pubblicità.';
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!data || data.length === 0) {
+    elenco.textContent = 'Al momento non ci sono spazi pubblicitari.';
+    return;
+  }
+
+  data.forEach(banner => {
+    const scheda = document.createElement('article');
+    scheda.className = 'card';
+
+    if (banner.image_url) {
+      const immagine = document.createElement('img');
+      immagine.src = banner.image_url;
+      immagine.alt = banner.title;
+      immagine.style.width = '100%';
+      immagine.style.maxHeight = '260px';
+      immagine.style.objectFit = 'contain';
+      scheda.appendChild(immagine);
+    }
+
+    const titolo = document.createElement('h3');
+    titolo.textContent = banner.title;
+    scheda.appendChild(titolo);
+
+    const descrizione = document.createElement('p');
+    descrizione.textContent = banner.description || '';
+    scheda.appendChild(descrizione);
+
+    elenco.appendChild(scheda);
+  });
+}
+
+mostraBanner();
 mostraPartner();
 
 </script>
