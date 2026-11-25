@@ -762,6 +762,34 @@ document.getElementById('annullaModificaArticolo').addEventListener('click', () 
   document.getElementById('editorArticolo').hidden = true;
   document.getElementById('elencoArticoli').hidden = false;
 });
+  // Apertura gestione partner
+document.getElementById('apriPartner').addEventListener('click', () => {
+  document.getElementById('contenuto').hidden = true;
+  document.getElementById('utentiPanel').hidden = true;
+  document.getElementById('articoliPanel').hidden = true;
+  document.getElementById('pubblicitaPanel').hidden = true;
+  document.getElementById('partnerPanel').hidden = false;
+});
+
+// Apertura gestione pubblicità
+document.getElementById('apriPubblicita').addEventListener('click', () => {
+  document.getElementById('contenuto').hidden = true;
+  document.getElementById('utentiPanel').hidden = true;
+  document.getElementById('articoliPanel').hidden = true;
+  document.getElementById('partnerPanel').hidden = true;
+  document.getElementById('pubblicitaPanel').hidden = false;
+});
+
+// Ritorno al pannello principale
+document.getElementById('tornaPartner').addEventListener('click', () => {
+  document.getElementById('partnerPanel').hidden = true;
+  document.getElementById('contenuto').hidden = false;
+});
+
+document.getElementById('tornaPubblicita').addEventListener('click', () => {
+  document.getElementById('pubblicitaPanel').hidden = true;
+  document.getElementById('contenuto').hidden = false;
+});
   verificaAmministratore();
 </script>
 
