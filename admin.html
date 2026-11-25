@@ -233,8 +233,9 @@
     <input type="text" id="partnerNome" placeholder="Nome del partner">
     <p>Descrizione</p>
     <textarea id="partnerDescrizione" placeholder="Descrizione del partner"></textarea>
-    <p>Indirizzo logo</p>
-    <input type="url" id="partnerLogo" placeholder="URL del logo">
+    <p>Carica il logo del partner</p>
+<input type="file" id="partnerLogoFile" accept="image/*">
+<div id="anteprimaPartnerLogo"></div>
     <p>Sito web</p>
     <input type="url" id="partnerSito" placeholder="URL del sito">
     <p><label><input type="checkbox" id="partnerAttivo" checked> Partner visibile</label></p>
@@ -259,8 +260,9 @@
     <input type="text" id="bannerTitolo" placeholder="Titolo del banner">
     <p>Descrizione</p>
     <textarea id="bannerDescrizione" placeholder="Descrizione"></textarea>
-    <p>Indirizzo immagine</p>
-    <input type="url" id="bannerImmagine" placeholder="URL dell'immagine">
+    <p>Carica l'immagine del banner</p>
+<input type="file" id="bannerImmagineFile" accept="image/*">
+<div id="anteprimaBanner"></div>
     <p><label><input type="checkbox" id="bannerAttivo" checked> Banner visibile</label></p>
     <button type="button" id="salvaBanner">Salva banner</button>
     <button type="button" id="annullaBanner">Annulla</button>
@@ -790,6 +792,406 @@ document.getElementById('tornaPubblicita').addEventListener('click', () => {
   document.getElementById('pubblicitaPanel').hidden = true;
   document.getElementById('contenuto').hidden = false;
 });
+  // Anteprima del logo del partner
+document.getElementById('partnerLogoFile').addEventListener('change', function () {
+  const file = this.files[0];
+  const anteprima = document.getElementById('anteprimaPartnerLogo');
+
+  anteprima.replaceChildren();
+
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    alert('Seleziona un file immagine valido.');
+    this.value = '';
+    return;
+  }
+
+  const immagine = document.createElement('img');
+  immagine.src = URL.createObjectURL(file);
+  immagine.alt = 'Anteprima logo partner';
+  immagine.style.maxWidth = '160px';
+  immagine.style.maxHeight = '120px';
+  immagine.style.objectFit = 'contain';
+
+  anteprima.appendChild(immagine);
+});
+  // Carica un'immagine su Supabase Storage
+async function caricaImmagine(file, cartella) {
+  if (!file) return null;
+
+  if (!file.type.startsWith('image/')) {
+    alert('Il file selezionato non è un’immagine valida.');
+    return null;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert('L’immagine non può superare i 5 MB.');
+    return null;
+  }
+
+  const nomeFile = file.name
+    .replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  const percorso = `${cartella}/${crypto.randomUUID()}-${nomeFile}`;
+
+  const { error } = await supabase.storage
+    .from('site-media')
+    .upload(percorso, file);
+
+  if (error) {
+    console.error('Errore caricamento immagine:', error);
+    alert('Non è stato possibile caricare l’immagine.');
+    return null;
+  }
+
+  const { data } = supabase.storage
+    .from('site-media')
+    .getPublicUrl(percorso);
+
+  return data.publicUrl;
+}
+  // Salvataggio partner
+document.getElementById('salvaPartner').addEventListener('click', async () => {
+  const pulsante = document.getElementById('salvaPartner');
+  pulsante.disabled = true;
+
+  try {
+    const id = document.getElementById('partnerId').value;
+    const file = document.getElementById('partnerLogoFile').files[0];
+
+    const dati = {
+      name: document.getElementById('partnerNome').value.trim(),
+      description: document.getElementById('partnerDescrizione').value.trim(),
+      website_url: document.getElementById('partnerSito').value.trim() || null,
+      is_active: document.getElementById('partnerAttivo').checked
+    };
+
+    if (!dati.name) {
+      alert('Inserisci il nome del partner.');
+      return;
+    }
+
+    if (file) {
+      const logoUrl = await caricaImmagine(file, 'partner');
+      if (!logoUrl) return;
+      dati.logo_url = logoUrl;
+    }
+
+    let risultato;
+
+    if (id) {
+      risultato = await supabase
+        .from('partners')
+        .update(dati)
+        .eq('id', id);
+    } else {
+      risultato = await supabase
+        .from('partners')
+        .insert(dati);
+    }
+
+    if (risultato.error) throw risultato.error;
+
+    alert('Partner salvato correttamente!');
+
+    document.getElementById('partnerId').value = '';
+    document.getElementById('partnerNome').value = '';
+    document.getElementById('partnerDescrizione').value = '';
+    document.getElementById('partnerSito').value = '';
+    document.getElementById('partnerLogoFile').value = '';
+    document.getElementById('partnerAttivo').checked = true;
+    document.getElementById('anteprimaPartnerLogo').replaceChildren();
+
+    if (typeof caricaPartner === 'function') {
+      await caricaPartner();
+    }
+
+  } catch (errore) {
+    console.error('Errore salvataggio partner:', errore);
+    alert('Errore durante il salvataggio del partner.');
+  } finally {
+    pulsante.disabled = false;
+  }
+});
+  // Caricamento elenco partner
+async function caricaPartner() {
+  const elenco = document.getElementById('elencoPartner');
+  elenco.textContent = 'Caricamento partner...';
+
+  const { data, error } = await supabase
+    .from('partners')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    elenco.textContent = 'Errore nel caricamento dei partner.';
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!data || data.length === 0) {
+    elenco.textContent = 'Non ci sono ancora partner inseriti.';
+    return;
+  }
+
+  data.forEach(partner => {
+    const scheda = document.createElement('div');
+    scheda.className = 'benvenuto';
+
+    const nome = document.createElement('h3');
+    nome.textContent = partner.name;
+
+    const descrizione = document.createElement('p');
+    descrizione.textContent = partner.description || '';
+
+    const stato = document.createElement('p');
+    stato.textContent = partner.is_active ? 'Visibile sul sito' : 'Non visibile sul sito';
+
+    scheda.append(nome, descrizione, stato);
+    // Pulsante modifica
+const modifica = document.createElement('button');
+modifica.type = 'button';
+modifica.textContent = 'Modifica';
+
+modifica.addEventListener('click', () => {
+  document.getElementById('partnerId').value = partner.id;
+  document.getElementById('partnerNome').value = partner.name || '';
+  document.getElementById('partnerDescrizione').value = partner.description || '';
+  document.getElementById('partnerSito').value = partner.website_url || '';
+  document.getElementById('partnerAttivo').checked = partner.is_active;
+
+  document.getElementById('partnerLogoFile').value = '';
+  document.getElementById('anteprimaPartnerLogo').replaceChildren();
+
+  document.getElementById('partnerNome').scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+});
+
+// Pulsante elimina
+const elimina = document.createElement('button');
+elimina.type = 'button';
+elimina.textContent = 'Elimina';
+
+elimina.addEventListener('click', async () => {
+  if (!confirm(`Vuoi eliminare il partner "${partner.name}"?`)) return;
+
+  const { error } = await supabase
+    .from('partners')
+    .delete()
+    .eq('id', partner.id);
+
+  if (error) {
+    console.error(error);
+    alert('Errore durante l’eliminazione del partner.');
+    return;
+  }
+
+  alert('Partner eliminato.');
+  await caricaPartner();
+});
+
+scheda.append(modifica, elimina);
+
+    if (partner.logo_url) {
+      const logo = document.createElement('img');
+      logo.src = partner.logo_url;
+      logo.alt = 'Logo ' + partner.name;
+      logo.style.maxWidth = '120px';
+      logo.style.maxHeight = '100px';
+      scheda.appendChild(logo);
+    }
+
+    elenco.appendChild(scheda);
+  });
+}
+
+// Aggiorna l'elenco quando si apre Gestione partner
+document.getElementById('apriPartner').addEventListener('click', caricaPartner);
+  // Anteprima immagine del banner
+document.getElementById('bannerImmagineFile').addEventListener('change', function () {
+  const file = this.files[0];
+  const anteprima = document.getElementById('anteprimaBanner');
+
+  anteprima.replaceChildren();
+
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    alert('Seleziona un file immagine valido.');
+    this.value = '';
+    return;
+  }
+
+  const immagine = document.createElement('img');
+  immagine.src = URL.createObjectURL(file);
+  immagine.alt = 'Anteprima banner';
+  immagine.style.maxWidth = '300px';
+  immagine.style.maxHeight = '180px';
+  immagine.style.objectFit = 'contain';
+
+  anteprima.appendChild(immagine);
+});
+  // Salvataggio banner pubblicitario
+document.getElementById('salvaBanner').addEventListener('click', async () => {
+  const pulsante = document.getElementById('salvaBanner');
+  pulsante.disabled = true;
+
+  try {
+    const id = document.getElementById('bannerId').value;
+    const file = document.getElementById('bannerImmagineFile').files[0];
+
+    const dati = {
+      title: document.getElementById('bannerTitolo').value.trim(),
+      description: document.getElementById('bannerDescrizione').value.trim(),
+      is_active: document.getElementById('bannerAttivo').checked
+    };
+
+    if (!dati.title) {
+      alert('Inserisci il titolo del banner.');
+      return;
+    }
+
+    if (file) {
+      const immagineUrl = await caricaImmagine(file, 'banner');
+      if (!immagineUrl) return;
+      dati.image_url = immagineUrl;
+    }
+
+    let risultato;
+
+    if (id) {
+      risultato = await supabase
+        .from('advertising_banners')
+        .update(dati)
+        .eq('id', id);
+    } else {
+      risultato = await supabase
+        .from('advertising_banners')
+        .insert(dati);
+    }
+
+    if (risultato.error) throw risultato.error;
+
+    alert('Banner salvato correttamente!');
+
+    document.getElementById('bannerId').value = '';
+    document.getElementById('bannerTitolo').value = '';
+    document.getElementById('bannerDescrizione').value = '';
+    document.getElementById('bannerImmagineFile').value = '';
+    document.getElementById('bannerAttivo').checked = true;
+    document.getElementById('anteprimaBanner').replaceChildren();
+
+    await caricaBanner();
+
+  } catch (errore) {
+    console.error('Errore salvataggio banner:', errore);
+    alert('Errore durante il salvataggio del banner.');
+  } finally {
+    pulsante.disabled = false;
+  }
+});
+  // Caricamento elenco banner
+async function caricaBanner() {
+  const elenco = document.getElementById('elencoBanner');
+  elenco.textContent = 'Caricamento banner...';
+
+  const { data, error } = await supabase
+    .from('advertising_banners')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    elenco.textContent = 'Errore nel caricamento dei banner.';
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!data || data.length === 0) {
+    elenco.textContent = 'Non ci sono ancora banner inseriti.';
+    return;
+  }
+
+  data.forEach(banner => {
+    const scheda = document.createElement('div');
+    scheda.className = 'benvenuto';
+
+    const titolo = document.createElement('h3');
+    titolo.textContent = banner.title;
+
+    const descrizione = document.createElement('p');
+    descrizione.textContent = banner.description || '';
+
+    const stato = document.createElement('p');
+    stato.textContent = banner.is_active
+      ? 'Visibile sul sito'
+      : 'Non visibile sul sito';
+
+    scheda.append(titolo, descrizione, stato);
+
+    if (banner.image_url) {
+      const immagine = document.createElement('img');
+      immagine.src = banner.image_url;
+      immagine.alt = banner.title;
+      immagine.style.maxWidth = '300px';
+      immagine.style.maxHeight = '150px';
+      immagine.style.objectFit = 'contain';
+      scheda.appendChild(immagine);
+    }
+
+    const modifica = document.createElement('button');
+    modifica.type = 'button';
+    modifica.textContent = 'Modifica';
+
+    modifica.addEventListener('click', () => {
+      document.getElementById('bannerId').value = banner.id;
+      document.getElementById('bannerTitolo').value = banner.title || '';
+      document.getElementById('bannerDescrizione').value = banner.description || '';
+      document.getElementById('bannerAttivo').checked = banner.is_active;
+
+      document.getElementById('bannerImmagineFile').value = '';
+      document.getElementById('anteprimaBanner').replaceChildren();
+
+      document.getElementById('bannerTitolo').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    });
+
+    const elimina = document.createElement('button');
+    elimina.type = 'button';
+    elimina.textContent = 'Elimina';
+
+    elimina.addEventListener('click', async () => {
+      if (!confirm(`Vuoi eliminare il banner "${banner.title}"?`)) return;
+
+      const { error } = await supabase
+        .from('advertising_banners')
+        .delete()
+        .eq('id', banner.id);
+
+      if (error) {
+        console.error(error);
+        alert('Errore durante l’eliminazione del banner.');
+        return;
+      }
+
+      alert('Banner eliminato.');
+      await caricaBanner();
+    });
+
+    scheda.append(modifica, elimina);
+    elenco.appendChild(scheda);
+  });
+}
   verificaAmministratore();
 </script>
 
