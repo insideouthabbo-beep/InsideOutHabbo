@@ -260,5 +260,184 @@
     © 2026 InsideOutHabbo · Tutti i diritti riservati
   </footer>
 
+  
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const campi = {
+  hero_title: '.hero h1',
+  hero_text: '.hero p',
+  about_text: 'main section:nth-of-type(1) p:first-of-type',
+  mission_text: 'main section:nth-of-type(2) p',
+  roleplay_text: 'main section:nth-of-type(4) p',
+  community_text: '.value:nth-child(1) p',
+  information_text: '.value:nth-child(2) p',
+  creativity_text: '.value:nth-child(3) p',
+  collaboration_text: '.value:nth-child(4) p'
+};
+
+let paginaOriginale = null;
+
+async function caricaPagina() {
+  const { data, error } = await supabase
+    .from('site_pages')
+    .select('*')
+    .eq('slug', 'chi-siamo')
+    .single();
+
+  if (error) {
+    console.error('Errore caricamento pagina:', error);
+    return;
+  }
+
+  paginaOriginale = data;
+
+  for (const [campo, selettore] of Object.entries(campi)) {
+    const elemento = document.querySelector(selettore);
+    if (elemento && data[campo] !== null) {
+      elemento.textContent = data[campo];
+    }
+  }
+}
+
+await caricaPagina();
+
+const { data: sessionData } = await supabase.auth.getSession();
+const session = sessionData?.session;
+
+if (session) {
+  const { data: profilo } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (profilo?.role === 'admin') {
+    const pulsante = document.createElement('button');
+    pulsante.textContent = 'MODIFICA PAGINA';
+    pulsante.style.cssText = `
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 9999;
+      background: #ffd43b;
+      color: #17243b;
+      border: 2px solid #17243b;
+      border-radius: 8px;
+      padding: 14px 20px;
+      font-weight: bold;
+      cursor: pointer;
+    `;
+
+    document.body.appendChild(pulsante);
+
+    pulsante.addEventListener('click', () => {
+      if (document.getElementById('editorChiSiamo')) return;
+
+      const pannello = document.createElement('div');
+      pannello.id = 'editorChiSiamo';
+      pannello.style.cssText = `
+        position: fixed;
+        inset: 5%;
+        z-index: 10000;
+        overflow-y: auto;
+        background: #17243b;
+        color: white;
+        border: 3px solid #ffd43b;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 0 0 100vmax rgba(0,0,0,.7);
+      `;
+
+      const titolo = document.createElement('h2');
+      titolo.textContent = 'Modifica la pagina Chi siamo';
+      pannello.appendChild(titolo);
+
+      const campiEditor = {};
+
+      for (const [campo] of Object.entries(campi)) {
+        const etichetta = document.createElement('label');
+        etichetta.textContent = campo.replaceAll('_', ' ');
+        etichetta.style.cssText = 'display:block;margin-top:16px;font-weight:bold;';
+
+        const area = document.createElement('textarea');
+        area.value = paginaOriginale[campo] || '';
+        area.style.cssText = `
+          display:block;
+          width:100%;
+          min-height:75px;
+          box-sizing:border-box;
+          margin-top:6px;
+          padding:10px;
+          border-radius:6px;
+          font:inherit;
+        `;
+
+        campiEditor[campo] = area;
+        pannello.appendChild(etichetta);
+        pannello.appendChild(area);
+      }
+
+      const salva = document.createElement('button');
+      salva.textContent = 'SALVA MODIFICHE';
+      salva.style.cssText = `
+        margin-top:24px;
+        padding:12px 20px;
+        background:#ffd43b;
+        color:#17243b;
+        border:0;
+        border-radius:6px;
+        font-weight:bold;
+        cursor:pointer;
+      `;
+
+      const chiudi = document.createElement('button');
+      chiudi.textContent = 'CHIUDI';
+      chiudi.style.cssText = `
+        margin:24px 0 0 12px;
+        padding:12px 20px;
+        cursor:pointer;
+      `;
+      chiudi.addEventListener('click', () => pannello.remove());
+
+      salva.addEventListener('click', async () => {
+        salva.disabled = true;
+        salva.textContent = 'SALVATAGGIO...';
+
+        const modifiche = {};
+        for (const [campo, area] of Object.entries(campiEditor)) {
+          modifiche[campo] = area.value;
+        }
+
+        const { error } = await supabase
+          .from('site_pages')
+          .update(modifiche)
+          .eq('slug', 'chi-siamo');
+
+        if (error) {
+          alert('Errore durante il salvataggio: ' + error.message);
+          salva.disabled = false;
+          salva.textContent = 'SALVA MODIFICHE';
+          return;
+        }
+
+        alert('Pagina aggiornata correttamente!');
+        pannello.remove();
+        await caricaPagina();
+      });
+
+      pannello.appendChild(salva);
+      pannello.appendChild(chiudi);
+      document.body.appendChild(pannello);
+    });
+  }
+}
+</script>
+
 </body>
 </html>
