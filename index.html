@@ -500,6 +500,7 @@ const menuFreccia = document.getElementById("menuFreccia");
 const voceProfilo = document.getElementById("voceProfilo");
 const logoutButton = document.getElementById("logoutButton");
 const voceBacheca = document.getElementById("voceBacheca");
+  const voceScriviArticolo = document.getElementById("voceScriviArticolo");
 const voceAdmin = document.getElementById("voceAdmin");
   const voceModerazione = document.getElementById("voceModerazione");
 
@@ -513,6 +514,7 @@ async function aggiornaAccesso() {
   voceBacheca.style.display = "none";
   voceAdmin.style.display = "none";
   voceModerazione.style.display = "none";
+  voceScriviArticolo.style.display = "none";
 
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -563,6 +565,9 @@ async function aggiornaAccesso() {
   if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
     voceBacheca.style.display = "block";
   }
+  if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
+  voceScriviArticolo.style.display = "block";
+}
 
   if (profilo.role === "admin") {
     voceAdmin.style.display = "block";
