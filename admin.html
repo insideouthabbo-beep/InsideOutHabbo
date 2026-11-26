@@ -729,6 +729,12 @@ await registraAttivita(
   articolo.id,
   articolo.title || ''
 );
+  await registraAttivita(
+  nuovoStato === 'published' ? 'Pubblicazione articolo' : 'Ritiro articolo',
+  'Articolo',
+  articolo.id,
+  articolo.title
+);
   alert(nuovoStato === 'published'
     ? 'Articolo pubblicato!'
     : 'Articolo ritirato dalla pubblicazione!');
@@ -762,6 +768,12 @@ await registraAttivita(
   'Articolo',
   articolo.id,
   articolo.title || ''
+);
+  await registraAttivita(
+  'Eliminazione articolo',
+  'Articolo',
+  articolo.id,
+  articolo.title
 );
   alert('Articolo eliminato correttamente!');
   await caricaArticoli();
@@ -808,6 +820,12 @@ scheda.append(
     return;
   }
 
+    await registraAttivita(
+  'Modifica articolo',
+  'Articolo',
+  id,
+  aggiornamenti.title
+);
     await registraAttivita(
   'Modifica articolo',
   'Articolo',
