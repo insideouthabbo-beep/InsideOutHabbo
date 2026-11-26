@@ -233,15 +233,7 @@
     <h2>Apri una nuova discussione</h2>
 
     <form id="formDiscussione">
-      <label for="titoloDiscussione">Titolo</label>
-      <input
-        type="text"
-        id="titoloDiscussione"
-        maxlength="120"
-        placeholder="Di cosa vuoi parlare?"
-        required
-      >
-
+      
       <label for="testoDiscussione">Messaggio</label>
       <textarea
         id="testoDiscussione"
@@ -316,9 +308,7 @@ async function caricaDiscussioni() {
     const scheda = document.createElement('article');
     scheda.className = 'discussione';
 
-    const titolo = document.createElement('h3');
-    titolo.textContent = discussione.title || 'Discussione senza titolo';
-
+  
     const testo = document.createElement('p');
     testo.textContent = discussione.content || '';
 
@@ -333,9 +323,8 @@ async function caricaDiscussioni() {
       meta.textContent = 'Discussione approvata';
     }
 
-    scheda.appendChild(titolo);
-    scheda.appendChild(meta);
-    scheda.appendChild(testo);
+   scheda.appendChild(meta);
+scheda.appendChild(testo);
 
     elenco.appendChild(scheda);
   });
@@ -386,13 +375,12 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
-  const titolo = document.getElementById('titoloDiscussione').value.trim();
   const contenuto = document.getElementById('testoDiscussione').value.trim();
 
-  if (!titolo || !contenuto) {
-    alert('Compila tutti i campi.');
-    return;
-  }
+if (!contenuto) {
+  alert('Scrivi il tuo messaggio.');
+  return;
+}
 
   const invia = form.querySelector('button[type="submit"]');
   invia.disabled = true;
@@ -401,11 +389,11 @@ form.addEventListener('submit', async (event) => {
   const { error } = await supabase
     .from('forum_topics')
     .insert({
-      title: titolo,
-      content: contenuto,
-      author_id: utenteCorrente.id,
-      status: 'pending'
-    });
+  title: contenuto.substring(0, 80),
+  content: contenuto,
+  author_id: utenteCorrente.id,
+  status: 'pending'
+});
 
   if (error) {
     alert('Errore durante l’invio: ' + error.message);
