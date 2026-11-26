@@ -708,7 +708,12 @@ pubblica.addEventListener('click', async () => {
     alert('Errore: ' + error.message);
     return;
   }
-
+await registraAttivita(
+  nuovoStato === 'published' ? 'Pubblicazione articolo' : 'Ritiro articolo',
+  'Articolo',
+  articolo.id,
+  articolo.title || ''
+);
   alert(nuovoStato === 'published'
     ? 'Articolo pubblicato!'
     : 'Articolo ritirato dalla pubblicazione!');
@@ -736,7 +741,13 @@ elimina.addEventListener('click', async () => {
     alert('Errore durante l’eliminazione: ' + error.message);
     return;
   }
-
+  
+await registraAttivita(
+  'Eliminazione articolo',
+  'Articolo',
+  articolo.id,
+  articolo.title || ''
+);
   alert('Articolo eliminato correttamente!');
   await caricaArticoli();
 });
@@ -782,6 +793,12 @@ scheda.append(
     return;
   }
 
+    await registraAttivita(
+  'Modifica articolo',
+  'Articolo',
+  id,
+  aggiornamenti.title
+);
   alert('Articolo aggiornato correttamente!');
 
   document.getElementById('editorArticolo').hidden = true;
@@ -925,6 +942,12 @@ document.getElementById('salvaPartner').addEventListener('click', async () => {
 
     if (risultato.error) throw risultato.error;
 
+    await registraAttivita(
+  id ? 'Modifica partner' : 'Inserimento partner',
+  'Partner',
+  id || dati.name,
+  dati.name
+);
     alert('Partner salvato correttamente!');
 
     document.getElementById('partnerId').value = '';
@@ -992,6 +1015,12 @@ async function caricaPartner() {
     }
   }
 
+    await registraAttivita(
+  'Riordino partner',
+  'Partner',
+  null,
+  'Ordine dei partner modificato'
+);
   await caricaPartner();
 }
   data.forEach((partner, index) => {
@@ -1048,6 +1077,12 @@ elimina.addEventListener('click', async () => {
     return;
   }
 
+  await registraAttivita(
+  'Eliminazione partner',
+  'Partner',
+  partner.id,
+  partner.name
+);
   alert('Partner eliminato.');
   await caricaPartner();
 });
@@ -1146,6 +1181,12 @@ document.getElementById('salvaBanner').addEventListener('click', async () => {
 
     if (risultato.error) throw risultato.error;
 
+    await registraAttivita(
+  id ? 'Modifica banner' : 'Inserimento banner',
+  'Banner pubblicitario',
+  id || dati.title,
+  dati.title
+);
     alert('Banner salvato correttamente!');
 
     document.getElementById('bannerId').value = '';
@@ -1276,7 +1317,19 @@ async function caricaBanner() {
         return;
       }
 
+      await registraAttivita(
+  'Eliminazione banner',
+  'Banner pubblicitario',
+  banner.id,
+  banner.title
+);
       alert('Banner eliminato.');
+      await registraAttivita(
+  'Riordino banner',
+  'Banner pubblicitario',
+  null,
+  'Ordine dei banner modificato'
+);
       await caricaBanner();
     });
            const su = document.createElement('button');
