@@ -40,7 +40,7 @@
 
     main {
       width: 100%;
-      max-width: 440px;
+      max-width: 500px;
       margin: 45px auto;
       padding: 0 18px;
       flex: 1;
@@ -58,6 +58,10 @@
       color: #ffcc33;
       text-align: center;
       margin-top: 0;
+    }
+
+    h3 {
+      color: #ffdc70;
     }
 
     .descrizione {
@@ -105,6 +109,11 @@
       background: #ffdc70;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
     .secondario {
       background: #31466d;
       color: white;
@@ -121,6 +130,37 @@
     #areaUtente {
       display: none;
       text-align: center;
+    }
+
+    #areaVerifica {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      background: #101b35;
+      border: 1px solid #52688f;
+      border-radius: 10px;
+      text-align: left;
+    }
+
+    #codiceVerifica {
+      display: block;
+      margin: 18px 0;
+      padding: 17px 10px;
+      background: #263c61;
+      border: 2px dashed #ffcc33;
+      border-radius: 8px;
+      color: #ffcc33;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      overflow-wrap: anywhere;
+      letter-spacing: 1px;
+    }
+
+    .istruzioni {
+      color: #c6d2e7;
+      font-size: 14px;
+      line-height: 1.7;
     }
 
     .nota {
@@ -195,17 +235,57 @@
       </form>
 
       <p class="nota">
-        La registrazione crea il tuo account personale.
-        La verifica del personaggio Habbo verrà configurata
-        in un passaggio successivo.
+        Per completare la registrazione dovrai verificare
+        il tuo personaggio attraverso il motto del profilo Habbo ufficiale.
       </p>
     </div>
 
     <div id="areaUtente">
       <h1>Ciao!</h1>
+
       <p id="datiUtente"></p>
       <p id="ruoloUtente"></p>
-      <button id="logout" class="secondario">Esci dall'account</button>
+
+      <div id="areaVerifica">
+        <h3>Verifica il tuo personaggio Habbo</h3>
+
+        <p class="istruzioni">
+          Per confermare che il personaggio appartiene a te,
+          segui questi passaggi:
+        </p>
+
+        <ol class="istruzioni">
+          <li>Accedi al tuo account sul sito ufficiale Habbo.</li>
+          <li>Apri il profilo del personaggio indicato qui sotto.</li>
+          <li>Modifica temporaneamente il motto del tuo personaggio.</li>
+          <li>Inserisci il codice personale che trovi qui sotto.</li>
+          <li>Torna su InsideOutHabbo e premi il pulsante di verifica.</li>
+        </ol>
+
+        <p class="istruzioni">
+          Il tuo nickname:
+          <strong id="nicknameVerifica"></strong>
+        </p>
+
+        <div id="codiceVerifica">Generazione codice...</div>
+
+        <p class="nota">
+          Il codice ha una validità di 30 minuti.
+          Dopo la verifica potrai modificare nuovamente il motto.
+        </p>
+
+        <button type="button" id="verificaHabbo">
+          Verifica personaggio
+        </button>
+
+        <button type="button" id="generaCodice" class="secondario">
+          Genera un nuovo codice
+        </button>
+      </div>
+
+      <button id="logout" class="secondario">
+        Esci dall'account
+      </button>
     </div>
 
     <p id="messaggio"></p>
@@ -220,8 +300,6 @@
 <script>
   const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
 
-  // Inserisci qui la stessa chiave publishable già utilizzata
-  // nel file index.html.
   const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
 
   const client = window.supabase.createClient(
@@ -231,17 +309,106 @@
 
   const messaggio = document.getElementById("messaggio");
 
+  let utenteCorrente = null;
+  let verificaInCorso = false;
+
   function mostraMessaggio(testo) {
     messaggio.textContent = testo;
   }
 
-  async function aggiornaSchermata(user) {
+  async function generaCodice() {
+    const pulsante = document.getElementById("generaCodice");
+    const codice = document.getElementById("codiceVerifica");
+
+    pulsante.disabled = true;
+    codice.textContent = "Generazione codice...";
+    mostraMessaggio("Preparazione della verifica Habbo...");
+
+    try {
+      const { data, error } = await client.functions.invoke(
+        "generate-habbo-verification",
+        { body: {} }
+      );
+
+      if (error) {
+        throw new Error(
+          data?.error || error.message || "Errore durante la generazione."
+        );
+      }
+
+      if (!data || !data.success || !data.verification_code) {
+        throw new Error(
+          data?.error || "Non è stato possibile generare il codice."
+        );
+      }
+
+      codice.textContent = data.verification_code;
+
+      document.getElementById("nicknameVerifica").textContent =
+        data.habbo_name;
+
+      mostraMessaggio(data.message || "Codice pronto! Inseriscilo nel motto Habbo.");
+
+    } catch (error) {
+      codice.textContent = "Codice non disponibile.";
+      mostraMessaggio("Verifica: " + error.message);
+
+    } finally {
+      pulsante.disabled = false;
+    }
+  }
+
+  async function verificaPersonaggio() {
+    const pulsante = document.getElementById("verificaHabbo");
+
+    pulsante.disabled = true;
+    mostraMessaggio("Controllo del motto Habbo in corso...");
+
+    try {
+      const { data, error } = await client.functions.invoke(
+        "verify-habbo",
+        { body: {} }
+      );
+
+      if (error) {
+        throw new Error(
+          data?.error || error.message || "Errore durante la verifica."
+        );
+      }
+
+      if (!data || !data.success) {
+        throw new Error(
+          data?.error || "Il personaggio non è stato verificato."
+        );
+      }
+
+      document.getElementById("areaVerifica").style.display = "none";
+
+      mostraMessaggio(
+        data.message || "Personaggio Habbo verificato correttamente!"
+      );
+
+      await aggiornaSchermata(utenteCorrente, false);
+
+    } catch (error) {
+      mostraMessaggio("Verifica non riuscita: " + error.message);
+
+    } finally {
+      pulsante.disabled = false;
+    }
+  }
+
+  async function aggiornaSchermata(user, preparaVerifica = true) {
     const areaAccesso = document.getElementById("areaAccesso");
     const areaUtente = document.getElementById("areaUtente");
+    const areaVerifica = document.getElementById("areaVerifica");
+
+    utenteCorrente = user;
 
     if (!user) {
       areaAccesso.style.display = "block";
       areaUtente.style.display = "none";
+      areaVerifica.style.display = "none";
       return;
     }
 
@@ -250,29 +417,68 @@
 
     const { data: profilo, error } = await client
       .from("profiles")
-     .select("habbo_name, display_name, role, habbo_unique_id")
+      .select("habbo_name, display_name, role, habbo_unique_id")
       .eq("id", user.id)
       .maybeSingle();
 
     if (error) {
-      mostraMessaggio("Account attivo. Non è stato possibile caricare il profilo.");
+      mostraMessaggio(
+        "Account attivo. Non è stato possibile caricare il profilo."
+      );
       return;
     }
 
-   document.getElementById("datiUtente").textContent =
-  profilo
-    ? "Nickname: " + (profilo.habbo_name || "Da configurare") +
-      (profilo.habbo_unique_id ? " ✓ Verificato" : " · Non verificato")
-    : "Account creato. Profilo in preparazione.";
+    if (!profilo) {
+      document.getElementById("datiUtente").textContent =
+        "Account creato. Profilo in preparazione.";
+
+      document.getElementById("ruoloUtente").textContent = "";
+
+      areaVerifica.style.display = "none";
+
+      mostraMessaggio(
+        "Il profilo è in preparazione. Ricarica la pagina tra qualche istante."
+      );
+      return;
+    }
+
+    document.getElementById("datiUtente").textContent =
+      "Nickname: " + (profilo.habbo_name || "Da configurare") +
+      (profilo.habbo_unique_id ? " ✓ Verificato" : " · Non verificato");
 
     document.getElementById("ruoloUtente").textContent =
-      profilo ? "Ruolo: " + (profilo.role || "user") : "";
+      "Ruolo: " + (profilo.role || "user");
 
-    mostraMessaggio("Accesso effettuato correttamente!");
+    if (profilo.habbo_unique_id) {
+      areaVerifica.style.display = "none";
+
+      mostraMessaggio("Personaggio Habbo verificato correttamente!");
+      return;
+    }
+
+    if (!profilo.habbo_name) {
+      areaVerifica.style.display = "none";
+
+      mostraMessaggio(
+        "Il nickname Habbo non è ancora presente nel tuo profilo."
+      );
+      return;
+    }
+
+    areaVerifica.style.display = "block";
+
+    document.getElementById("nicknameVerifica").textContent =
+      profilo.habbo_name;
+
+    if (preparaVerifica) {
+      await generaCodice();
+    }
   }
+
   document.getElementById("formRegistrazione")
     .addEventListener("submit", async function(event) {
       event.preventDefault();
+
       mostraMessaggio("Registrazione in corso...");
 
       const habbo = document.getElementById("habbo").value.trim();
@@ -297,11 +503,10 @@
       }
 
       if (data.session) {
-        await aggiornaSchermata(data.user);
-        mostraMessaggio("Account creato! Benvenuto su InsideOutHabbo.");
+        mostraMessaggio("Account creato! Preparazione della verifica...");
       } else {
         mostraMessaggio(
-          "Registrazione completata! Controlla la tua email per confermare l'account."
+          "Registrazione completata! Controlla la tua email per confermare l'account. Dopo la conferma, accedi per ricevere il codice Habbo."
         );
       }
     });
@@ -309,12 +514,13 @@
   document.getElementById("formLogin")
     .addEventListener("submit", async function(event) {
       event.preventDefault();
+
       mostraMessaggio("Accesso in corso...");
 
       const email = document.getElementById("emailLogin").value.trim();
       const password = document.getElementById("passwordLogin").value;
 
-      const { data, error } = await client.auth.signInWithPassword({
+      const { error } = await client.auth.signInWithPassword({
         email: email,
         password: password
       });
@@ -324,24 +530,35 @@
         return;
       }
 
-      await aggiornaSchermata(data.user);
+      mostraMessaggio("Accesso effettuato. Caricamento del profilo...");
     });
 
-  document.getElementById("logout").addEventListener("click", async function() {
-    const { error } = await client.auth.signOut();
+  document.getElementById("verificaHabbo")
+    .addEventListener("click", verificaPersonaggio);
 
-    if (error) {
-      mostraMessaggio("Errore durante l'uscita: " + error.message);
-      return;
-    }
+  document.getElementById("generaCodice")
+    .addEventListener("click", generaCodice);
 
-    mostraMessaggio("Hai effettuato la disconnessione.");
-    await aggiornaSchermata(null);
-  });
+  document.getElementById("logout")
+    .addEventListener("click", async function() {
+      const { error } = await client.auth.signOut();
+
+      if (error) {
+        mostraMessaggio("Errore durante l'uscita: " + error.message);
+        return;
+      }
+
+      mostraMessaggio("Hai effettuato la disconnessione.");
+      await aggiornaSchermata(null);
+    });
 
   client.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
       aggiornaSchermata(session?.user || null);
+    }
+
+    if (event === "SIGNED_OUT") {
+      aggiornaSchermata(null);
     }
   });
 </script>
