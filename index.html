@@ -307,6 +307,9 @@ footer strong { color: white; }
     <a href="moderazione-forum.html" id="voceModerazione" style="display:none;">
   Moderazione Forum
 </a>
+    <a href="pannello-redazione.html" id="voceModerazioneCommenti" style="display:none;">
+  Moderazione commenti
+</a>
     <a href="admin.html" id="voceAdmin" style="display:none;">
   Pannello amministratore
 </a>
@@ -508,6 +511,7 @@ const voceBacheca = document.getElementById("voceBacheca");
   const voceScriviArticolo = document.getElementById("voceScriviArticolo");
 const voceAdmin = document.getElementById("voceAdmin");
   const voceModerazione = document.getElementById("voceModerazione");
+  const voceModerazioneCommenti = document.getElementById("voceModerazioneCommenti");
 
 let utenteAutenticato = false;
 
@@ -519,6 +523,7 @@ async function aggiornaAccesso() {
   voceBacheca.style.display = "none";
   voceAdmin.style.display = "none";
   voceModerazione.style.display = "none";
+  voceModerazioneCommenti.style.display = "none";
   voceScriviArticolo.style.display = "none";
 
   const { data: { session } } = await supabase.auth.getSession();
@@ -572,6 +577,7 @@ async function aggiornaAccesso() {
   }
   if (["redattore", "caporedattore", "admin"].includes(profilo.role)) {
   voceScriviArticolo.style.display = "block";
+  voceModerazioneCommenti.style.display = "block";
 }
 
   if (profilo.role === "admin") {
