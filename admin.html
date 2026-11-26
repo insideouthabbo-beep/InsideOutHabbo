@@ -1122,7 +1122,31 @@ async function caricaBanner() {
     return;
   }
 
-  data.forEach(banner => {
+  async function spostaBanner(indice, direzione) {
+  const nuovoOrdine = [...data];
+  const nuovoIndice = indice + direzione;
+
+  if (nuovoIndice < 0 || nuovoIndice >= nuovoOrdine.length) return;
+
+  [nuovoOrdine[indice], nuovoOrdine[nuovoIndice]] =
+    [nuovoOrdine[nuovoIndice], nuovoOrdine[indice]];
+
+  for (let i = 0; i < nuovoOrdine.length; i++) {
+    const { error } = await supabase
+      .from('advertising_banners')
+      .update({ sort_order: i + 1 })
+      .eq('id', nuovoOrdine[i].id);
+
+    if (error) {
+      console.error(error);
+      alert('Non è stato possibile salvare il nuovo ordine dei banner.');
+      return;
+    }
+  }
+
+  await caricaBanner();
+}
+ data.forEach((banner, index) => {
     const scheda = document.createElement('div');
     scheda.className = 'benvenuto';
 
@@ -1189,7 +1213,19 @@ async function caricaBanner() {
       alert('Banner eliminato.');
       await caricaBanner();
     });
-           scheda.append(modifica, elimina);
+           const su = document.createElement('button');
+su.type = 'button';
+su.textContent = '↑ Sposta su';
+su.disabled = index === 0;
+su.addEventListener('click', () => spostaBanner(index, -1));
+
+const giu = document.createElement('button');
+giu.type = 'button';
+giu.textContent = '↓ Sposta giù';
+giu.disabled = index === data.length - 1;
+giu.addEventListener('click', () => spostaBanner(index, 1));
+
+scheda.append(modifica, elimina, su, giu);
     elenco.appendChild(scheda);
   });
 }
