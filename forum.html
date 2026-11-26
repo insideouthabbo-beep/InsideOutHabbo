@@ -361,39 +361,75 @@ async function caricaDiscussioni() {
     (autori || []).map(a => [a.id, a])
   );
 
-  data.forEach(discussione => {
-    const scheda = document.createElement('article');
-    scheda.className = 'discussione';
+ data.forEach(discussione => {
+  const scheda = document.createElement('article');
+  scheda.className = 'discussione';
 
-    const autore = mappaAutori.get(discussione.author_id);
+  const autore = mappaAutori.get(discussione.author_id);
 
-    const nome = document.createElement('h3');
-    nome.textContent =
-      autore?.habbo_name || 'Utente non disponibile';
+  // Riga autore
+  const autoreRiga = document.createElement('div');
+  autoreRiga.className = 'autore-riga';
 
-    const pg = document.createElement('div');
-    pg.className = 'meta';
-    pg.textContent =
-      'PG: ' + (autore?.display_name || 'Non indicato');
+  // Avatar Habbo
+  const avatar = document.createElement('img');
+  avatar.className = 'avatar-pg';
+  avatar.alt = 'Avatar Habbo';
 
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.textContent = discussione.created_at
-      ? 'Pubblicata il ' +
-        new Date(discussione.created_at).toLocaleDateString('it-IT')
-      : 'Discussione approvata';
+  if (autore?.habbo_name) {
+    avatar.src =
+      'https://www.habbo.it/habbo-imaging/avatarimage?user=' +
+      encodeURIComponent(autore.habbo_name) +
+      '&headonly=1&size=m&direction=2&head_direction=3';
+  } else {
+    avatar.style.display = 'none';
+  }
 
-    const testo = document.createElement('p');
-testo.textContent = discussione.content || '';
+  // Nickname
+  const nome = document.createElement('h3');
+  nome.className = 'autore-nome';
+  nome.textContent =
+    autore?.habbo_name || 'Utente non disponibile';
 
-const fumetto = document.createElement('div');
-fumetto.className = 'fumetto-avatar';
-fumetto.textContent = discussione.content || '';
+  autoreRiga.append(avatar, nome);
 
-avatar.title = 'Clicca per leggere il messaggio nel fumetto';
+  // Nome PG
+  const pg = document.createElement('div');
+  pg.className = 'meta';
+  pg.textContent =
+    'PG: ' + (autore?.display_name || 'Non indicato');
 
-avatar.addEventListener('click', () => {
-  fumetto.classList.toggle('aperto');
+  // Data
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  meta.textContent =
+    'Pubblicata il ' +
+    new Date(discussione.created_at).toLocaleDateString('it-IT');
+
+  // Messaggio
+  const testo = document.createElement('p');
+  testo.textContent = discussione.content || '';
+
+  // Fumetto
+  const fumetto = document.createElement('div');
+  fumetto.className = 'fumetto-avatar';
+  fumetto.textContent = discussione.content || '';
+
+  avatar.title = 'Clicca per leggere il messaggio';
+
+  avatar.addEventListener('click', () => {
+    fumetto.classList.toggle('aperto');
+  });
+
+  scheda.append(
+    autoreRiga,
+    pg,
+    meta,
+    fumetto,
+    testo
+  );
+
+  elenco.appendChild(scheda);
 });
 
 scheda.append(
