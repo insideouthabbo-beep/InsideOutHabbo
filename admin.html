@@ -1281,6 +1281,44 @@ scheda.append(modifica, elimina, su, giu);
     elenco.appendChild(scheda);
   });
 }
+  // FUNZIONE PER REGISTRARE LE ATTIVITÀ AMMINISTRATIVE
+
+async function registraAttivita(azione, tipo, idElemento, descrizione) {
+  try {
+    const { data: sessione } = await supabase.auth.getUser();
+    const utente = sessione?.user;
+
+    if (!utente) return;
+
+    const { data: profilo } = await supabase
+      .from('profiles')
+      .select('display_name, habbo_name')
+      .eq('id', utente.id)
+      .maybeSingle();
+
+    const nomeAmministratore =
+      profilo?.display_name ||
+      profilo?.habbo_name ||
+      'Amministratore';
+
+    const { error } = await supabase
+      .from('admin_activity_log')
+      .insert({
+        actor_id: utente.id,
+        actor_name: nomeAmministratore,
+        action: azione,
+        entity_type: tipo,
+        entity_id: idElemento ? String(idElemento) : null,
+        description: descrizione
+      });
+
+    if (error) {
+      console.error('Errore registrazione attività:', error);
+    }
+  } catch (errore) {
+    console.error('Errore nel registro attività:', errore);
+  }
+}
   // REGISTRO ATTIVITÀ
 
 async function caricaRegistro() {
