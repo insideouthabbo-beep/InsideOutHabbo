@@ -429,9 +429,10 @@ async function caricaDiscussioni() {
     testo
   );
 
-  elenco.appendChild(scheda);
+ elenco.appendChild(scheda);
 });
 
+}
 
 async function verificaAccesso() {
   const { data: { session } } = await supabase.auth.getSession();
