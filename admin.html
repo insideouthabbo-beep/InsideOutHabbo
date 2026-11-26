@@ -282,6 +282,21 @@
 
   <div class="benvenuto">
     <h3>Attività recenti</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin:15px 0;">
+
+  <select id="filtroRegistroAdmin">
+    <option value="">Tutti gli amministratori</option>
+  </select>
+
+  <select id="filtroRegistroTipo">
+    <option value="">Tutte le categorie</option>
+  </select>
+
+  <select id="filtroRegistroAzione">
+    <option value="">Tutte le operazioni</option>
+  </select>
+
+</div>
     <div id="elencoRegistro">
       Caricamento delle attività...
     </div>
@@ -1388,52 +1403,136 @@ async function registraAttivita(azione, tipo, idElemento, descrizione) {
 }
   // REGISTRO ATTIVITÀ
 
+
 async function caricaRegistro() {
   const elenco = document.getElementById('elencoRegistro');
+
+  const filtroAdmin = document.getElementById('filtroRegistroAdmin');
+  const filtroTipo = document.getElementById('filtroRegistroTipo');
+  const filtroAzione = document.getElementById('filtroRegistroAzione');
+
   elenco.textContent = 'Caricamento attività...';
 
+  // Elimina le attività più vecchie di 90 giorni
+  const scadenza = new Date(
+    Date.now() - 90 * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  const { error: errorePulizia } = await supabase
+    .from('admin_activity_log')
+    .delete()
+    .lt('created_at', scadenza);
+
+  if (errorePulizia) {
+    console.error('Errore pulizia registro:', errorePulizia);
+  }
+
+  // Carica le attività degli ultimi 90 giorni
   const { data, error } = await supabase
     .from('admin_activity_log')
     .select('id, actor_name, action, entity_type, entity_id, description, created_at')
+    .gte('created_at', scadenza)
     .order('created_at', { ascending: false })
-    .limit(100);
+    .limit(500);
 
   if (error) {
     elenco.textContent = 'Errore nel caricamento: ' + error.message;
     return;
   }
 
-  elenco.replaceChildren();
+  // Aggiorna le opzioni dei filtri
+  function aggiornaFiltro(selettore, valori, testoIniziale) {
+    const valorePrecedente = selettore.value;
 
-  if (!data || data.length === 0) {
-    elenco.textContent = 'Non ci sono ancora attività registrate.';
-    return;
+    selettore.replaceChildren();
+
+    const iniziale = document.createElement('option');
+    iniziale.value = '';
+    iniziale.textContent = testoIniziale;
+    selettore.appendChild(iniziale);
+
+    [...new Set(valori.filter(Boolean))].sort().forEach(valore => {
+      const opzione = document.createElement('option');
+      opzione.value = valore;
+      opzione.textContent = valore;
+      selettore.appendChild(opzione);
+    });
+
+    if ([...selettore.options].some(o => o.value === valorePrecedente)) {
+      selettore.value = valorePrecedente;
+    }
   }
 
-  data.forEach(attivita => {
-    const scheda = document.createElement('div');
-    scheda.style.cssText =
-      'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:16px;margin-bottom:12px;';
+  aggiornaFiltro(
+    filtroAdmin,
+    data.map(a => a.actor_name),
+    'Tutti gli amministratori'
+  );
 
-    const titolo = document.createElement('h3');
-    titolo.style.color = '#ffd34e';
-    titolo.textContent = attivita.action || 'Attività';
+  aggiornaFiltro(
+    filtroTipo,
+    data.map(a => a.entity_type),
+    'Tutte le categorie'
+  );
 
-    const dettagli = document.createElement('p');
-    dettagli.textContent =
-      (attivita.actor_name || 'Amministratore') +
-      ' · ' + (attivita.entity_type || '') +
-      (attivita.description ? ' · ' + attivita.description : '');
+  aggiornaFiltro(
+    filtroAzione,
+    data.map(a => a.action),
+    'Tutte le operazioni'
+  );
 
-    const data = document.createElement('p');
-    data.textContent = attivita.created_at
-      ? new Date(attivita.created_at).toLocaleString('it-IT')
-      : '';
+  // Visualizza le attività filtrate
+  function applicaFiltri() {
+    const adminScelto = filtroAdmin.value;
+    const tipoScelto = filtroTipo.value;
+    const azioneScelta = filtroAzione.value;
 
-    scheda.append(titolo, dettagli, data);
-    elenco.append(scheda);
-  });
+    const filtrate = data.filter(attivita =>
+      (!adminScelto || attivita.actor_name === adminScelto) &&
+      (!tipoScelto || attivita.entity_type === tipoScelto) &&
+      (!azioneScelta || attivita.action === azioneScelta)
+    );
+
+    elenco.replaceChildren();
+
+    if (filtrate.length === 0) {
+      elenco.textContent = 'Nessuna attività corrisponde ai filtri selezionati.';
+      return;
+    }
+
+    filtrate.forEach(attivita => {
+      const scheda = document.createElement('div');
+
+      scheda.style.cssText =
+        'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:16px;margin-bottom:12px;';
+
+      const titolo = document.createElement('h3');
+      titolo.style.color = '#ffd34e';
+      titolo.textContent = attivita.action || 'Attività';
+
+      const dettagli = document.createElement('p');
+      dettagli.textContent =
+        (attivita.actor_name || 'Amministratore') +
+        ' · ' + (attivita.entity_type || '') +
+        (attivita.description ? ' · ' + attivita.description : '');
+
+      const dataAttivita = document.createElement('p');
+      dataAttivita.textContent = attivita.created_at
+        ? new Date(attivita.created_at).toLocaleString('it-IT')
+        : '';
+
+      scheda.append(titolo, dettagli, dataAttivita);
+      elenco.appendChild(scheda);
+    });
+  }
+
+  filtroAdmin.onchange = applicaFiltri;
+  filtroTipo.onchange = applicaFiltri;
+  filtroAzione.onchange = applicaFiltri;
+
+  applicaFiltri();
 }
+
 
 document.getElementById('apriRegistro').addEventListener('click', async () => {
   document.getElementById('contenuto').hidden = true;
