@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interviste | InsideOutHabbo</title>
+<style>
+:root{
+  --navy:#101b35;
+  --blue:#1d3158;
+  --blue-light:#304d7c;
+  --yellow:#ffd34e;
+  --light:#f3f5f9;
+  --text:#202b40;
+  --muted:#778198;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--light);color:var(--text)}
+header{background:var(--navy);color:#fff;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.brand{font-size:25px;font-weight:900;letter-spacing:1px}
+.brand span{color:var(--yellow)}
+.tagline{color:#c4cde0;font-size:12px;margin-top:5px}
+.home-link{background:var(--yellow);color:var(--navy);text-decoration:none;padding:11px 18px;border-radius:5px;font-size:13px;font-weight:bold}
+nav{background:var(--blue);display:flex;justify-content:center;flex-wrap:wrap}
+nav a{color:#fff;text-decoration:none;padding:15px 19px;font-size:12px;font-weight:bold;letter-spacing:.5px}
+nav a:hover{background:#304875;color:var(--yellow)}
+.hero{background:linear-gradient(120deg,#172849,#304d7c);color:#fff;padding:48px 7%}
+.hero-inner{max-width:1180px;margin:auto}
+.hero .eyebrow{color:var(--yellow);font-size:11px;font-weight:bold;letter-spacing:1.6px;margin-bottom:13px}
+.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 14px}
+.hero p{max-width:680px;color:#d5deed;line-height:1.65;margin:0}
+.container{max-width:1180px;margin:38px auto;padding:0 20px 20px}
+.section-title{font-size:13px;letter-spacing:1.5px;font-weight:900;color:var(--navy);border-left:4px solid var(--yellow);padding-left:11px;margin-bottom:20px}
+.interviews-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.interview-card{background:#fff;border:1px solid #e7eaf0;border-radius:9px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.interview-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px #15213a12}
+.cover{height:190px;background:#e8edf5;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:#52688f;font-size:12px;font-weight:bold;letter-spacing:.7px}
+.cover-placeholder svg{width:58px;height:58px;image-rendering:pixelated;shape-rendering:crispEdges}
+.card-content{padding:21px;display:flex;flex-direction:column;flex:1}
+.card-label{color:#b18a17;font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase}
+.card-content h2{font-size:19px;line-height:1.3;color:var(--navy);margin:9px 0}
+.interviewee{font-size:13px;font-weight:bold;color:#52688f;margin:0 0 10px}
+.description{font-size:13px;line-height:1.6;color:var(--muted);margin:0 0 18px}
+.read-link{display:inline-block;align-self:flex-start;margin-top:auto;background:var(--navy);color:#fff;text-decoration:none;padding:11px 15px;border-radius:5px;font-size:12px;font-weight:bold}
+.read-link:hover{background:var(--blue-light);color:var(--yellow)}
+.state-message{background:#fff;border:1px solid #e7eaf0;border-radius:8px;padding:25px;color:var(--muted);line-height:1.6}
+.state-message strong{color:var(--navy)}
+footer{margin-top:45px;background:var(--navy);color:#c4cde0;text-align:center;padding:28px 20px;font-size:12px;line-height:1.8}
+footer strong{color:#fff}
+@media(max-width:850px){.interviews-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){header{padding:19px 20px}.brand{font-size:21px}.hero{padding:36px 22px}.interviews-grid{grid-template-columns:1fr}.cover{height:200px}nav a{padding:12px 10px;font-size:10px}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">INSIDEOUT<span>HABBO</span></div>
+    <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+  </div>
+  <a class="home-link" href="index.html">TORNA ALLA HOME</a>
+</header>
+
+<nav>
+  <a href="index.html">HOME</a>
+  <a href="categoria.html?categoria=Attualit%C3%A0">ATTUALITÀ</a>
+  <a href="categoria.html?categoria=Habbo">HABBO</a>
+  <a href="categoria.html?categoria=Roleplay">ROLEPLAY</a>
+  <a href="categoria.html?categoria=Community">COMMUNITY</a>
+  <a href="categoria.html?categoria=Eventi">EVENTI</a>
+  <a href="forum.html">FORUM</a>
+  <a href="chi-siamo.html">CHI SIAMO</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">VOCI, STORIE E PERCORSI</div>
+    <h1>Le nostre interviste</h1>
+    <p>Incontriamo i protagonisti della community, ascoltiamo le loro esperienze e raccontiamo le storie che si nascondono dietro ogni avatar.</p>
+  </div>
+</section>
+
+<main class="container">
+  <div class="section-title">TUTTE LE INTERVISTE</div>
+  <div id="elencoInterviste" class="interviews-grid">
+    <div class="state-message">Caricamento delle interviste...</div>
+  </div>
+</main>
+
+<footer>
+  <strong>INSIDEOUTHABBO</strong><br>
+  Il mondo Habbo raccontato da noi.<br>
+  Una community, tante storie, un solo universo.
+</footer>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const elenco = document.getElementById('elencoInterviste');
+
+function mostraMessaggio(testo, titolo = '') {
+  elenco.innerHTML = '';
+  const messaggio = document.createElement('div');
+  messaggio.className = 'state-message';
+  messaggio.style.gridColumn = '1 / -1';
+
+  if (titolo) {
+    const strong = document.createElement('strong');
+    strong.textContent = titolo;
+    messaggio.appendChild(strong);
+    messaggio.appendChild(document.createElement('br'));
+  }
+
+  messaggio.appendChild(document.createTextNode(testo));
+  elenco.appendChild(messaggio);
+}
+
+function creaSegnaposto() {
+  const contenitore = document.createElement('div');
+  contenitore.className = 'cover-placeholder';
+  contenitore.innerHTML = `
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="3" y="5" width="26" height="19" fill="#243b68"/>
+      <rect x="6" y="8" width="20" height="13" fill="#fff"/>
+      <rect x="9" y="11" width="5" height="5" fill="#ffd34e"/>
+      <rect x="17" y="11" width="6" height="2" fill="#4e80ba"/>
+      <rect x="17" y="15" width="6" height="2" fill="#4e80ba"/>
+      <rect x="11" y="24" width="10" height="3" fill="#243b68"/>
+    </svg>
+    <span>INSIDEOUTHABBO</span>
+  `;
+  return contenitore;
+}
+
+function creaScheda(intervista) {
+  const scheda = document.createElement('article');
+  scheda.className = 'interview-card';
+
+  const copertina = document.createElement('div');
+  copertina.className = 'cover';
+
+  if (intervista.cover_image_url) {
+    const immagine = document.createElement('img');
+    immagine.src = intervista.cover_image_url;
+    immagine.alt = 'Immagine dell’intervista a ' + intervista.interviewee;
+    immagine.loading = 'lazy';
+    immagine.onerror = () => {
+      copertina.innerHTML = '';
+      copertina.appendChild(creaSegnaposto());
+    };
+    copertina.appendChild(immagine);
+  } else {
+    copertina.appendChild(creaSegnaposto());
+  }
+
+  const contenuto = document.createElement('div');
+  contenuto.className = 'card-content';
+
+  const etichetta = document.createElement('div');
+  etichetta.className = 'card-label';
+  etichetta.textContent = 'INTERVISTA';
+
+  const titolo = document.createElement('h2');
+  titolo.textContent = intervista.title;
+
+  const intervistato = document.createElement('p');
+  intervistato.className = 'interviewee';
+  intervistato.textContent = 'Con ' + intervista.interviewee;
+
+  const descrizione = document.createElement('p');
+  descrizione.className = 'description';
+  descrizione.textContent = intervista.introduction || 'Scopri la sua storia e le sue esperienze nella community.';
+
+  const link = document.createElement('a');
+  link.className = 'read-link';
+  link.href = 'intervista.html?id=' + encodeURIComponent(intervista.id);
+  link.textContent = 'LEGGI L’INTERVISTA';
+
+  contenuto.append(etichetta, titolo, intervistato, descrizione, link);
+  scheda.append(copertina, contenuto);
+  return scheda;
+}
+
+async function caricaInterviste() {
+  try {
+    const { data, error } = await supabase
+      .from('interviews')
+      .select('id, title, interviewee, introduction, cover_image_url, published_at, created_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      mostraMessaggio(
+        'Non ci sono ancora interviste pubblicate. Torna a trovarci: presto arriveranno nuove storie!'
+      );
+      return;
+    }
+
+    elenco.innerHTML = '';
+    data.forEach(intervista => elenco.appendChild(creaScheda(intervista)));
+
+  } catch (errore) {
+    console.error('Errore nel caricamento delle interviste:', errore);
+    mostraMessaggio(
+      'Non è stato possibile caricare le interviste. Riprova tra qualche momento.'
+    );
+  }
+}
+
+caricaInterviste();
+</script>
+</body>
+</html>
