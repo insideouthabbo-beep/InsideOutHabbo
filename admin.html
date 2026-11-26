@@ -271,6 +271,22 @@
   <div id="elencoBanner">Caricamento banner...</div>
 </section>
 
+    <section id="registroPanel" hidden>
+  <div class="benvenuto">
+    <h2>Registro attività</h2>
+    <p>Storico delle operazioni effettuate dagli amministratori.</p>
+    <button type="button" id="tornaRegistro">
+      ← Torna al pannello amministrativo
+    </button>
+  </div>
+
+  <div class="benvenuto">
+    <h3>Attività recenti</h3>
+    <div id="elencoRegistro">
+      Caricamento delle attività...
+    </div>
+  </div>
+</section>
     <a href="index.html">← Torna alla homepage</a>
   </div>
 
@@ -1265,6 +1281,71 @@ scheda.append(modifica, elimina, su, giu);
     elenco.appendChild(scheda);
   });
 }
+  // REGISTRO ATTIVITÀ
+
+async function caricaRegistro() {
+  const elenco = document.getElementById('elencoRegistro');
+  elenco.textContent = 'Caricamento attività...';
+
+  const { data, error } = await supabase
+    .from('admin_activity_log')
+    .select('id, actor_name, action, entity_type, entity_id, description, created_at')
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (error) {
+    elenco.textContent = 'Errore nel caricamento: ' + error.message;
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!data || data.length === 0) {
+    elenco.textContent = 'Non ci sono ancora attività registrate.';
+    return;
+  }
+
+  data.forEach(attivita => {
+    const scheda = document.createElement('div');
+    scheda.style.cssText =
+      'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:16px;margin-bottom:12px;';
+
+    const titolo = document.createElement('h3');
+    titolo.style.color = '#ffd34e';
+    titolo.textContent = attivita.action || 'Attività';
+
+    const dettagli = document.createElement('p');
+    dettagli.textContent =
+      (attivita.actor_name || 'Amministratore') +
+      ' · ' + (attivita.entity_type || '') +
+      (attivita.description ? ' · ' + attivita.description : '');
+
+    const data = document.createElement('p');
+    data.textContent = attivita.created_at
+      ? new Date(attivita.created_at).toLocaleString('it-IT')
+      : '';
+
+    scheda.append(titolo, dettagli, data);
+    elenco.append(scheda);
+  });
+}
+
+document.getElementById('apriRegistro').addEventListener('click', async () => {
+  document.getElementById('contenuto').hidden = true;
+  document.getElementById('utentiPanel').hidden = true;
+  document.getElementById('articoliPanel').hidden = true;
+  document.getElementById('partnerPanel').hidden = true;
+  document.getElementById('pubblicitaPanel').hidden = true;
+
+  document.getElementById('registroPanel').hidden = false;
+
+  await caricaRegistro();
+});
+
+document.getElementById('tornaRegistro').addEventListener('click', () => {
+  document.getElementById('registroPanel').hidden = true;
+  document.getElementById('contenuto').hidden = false;
+});
   verificaAmministratore();
 </script>
 
