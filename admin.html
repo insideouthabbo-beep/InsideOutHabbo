@@ -940,7 +940,31 @@ async function caricaPartner() {
     return;
   }
 
-  data.forEach(partner => {
+  async function spostaPartner(indice, direzione) {
+  const nuovoOrdine = [...data];
+  const nuovoIndice = indice + direzione;
+
+  if (nuovoIndice < 0 || nuovoIndice >= nuovoOrdine.length) return;
+
+  [nuovoOrdine[indice], nuovoOrdine[nuovoIndice]] =
+    [nuovoOrdine[nuovoIndice], nuovoOrdine[indice]];
+
+  for (let i = 0; i < nuovoOrdine.length; i++) {
+    const { error } = await supabase
+      .from('partners')
+      .update({ sort_order: i + 1 })
+      .eq('id', nuovoOrdine[i].id);
+
+    if (error) {
+      console.error(error);
+      alert('Non è stato possibile salvare il nuovo ordine dei partner.');
+      return;
+    }
+  }
+
+  await caricaPartner();
+}
+  data.forEach((partner, index) => {
     const scheda = document.createElement('div');
     scheda.className = 'benvenuto';
 
@@ -998,7 +1022,19 @@ elimina.addEventListener('click', async () => {
   await caricaPartner();
 });
 
-scheda.append(modifica, elimina);
+const su = document.createElement('button');
+su.type = 'button';
+su.textContent = '↑ Sposta su';
+su.disabled = index === 0;
+su.addEventListener('click', () => spostaPartner(index, -1));
+
+const giu = document.createElement('button');
+giu.type = 'button';
+giu.textContent = '↓ Sposta giù';
+giu.disabled = index === data.length - 1;
+giu.addEventListener('click', () => spostaPartner(index, 1));
+
+scheda.append(modifica, elimina, su, giu);
 
     if (partner.logo_url) {
       const logo = document.createElement('img');
