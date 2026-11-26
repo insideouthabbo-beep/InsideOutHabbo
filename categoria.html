@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Categoria | InsideOutHabbo</title>
+  <style>
+    :root { --navy:#101b35; --blue:#1d3158; --yellow:#ffd34e; --light:#f3f5f9; --text:#202b40; --muted:#778198; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--light); color:var(--text); }
+    header { background:var(--navy); color:white; padding:22px 7%; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+    .brand { font-size:25px; font-weight:900; letter-spacing:1px; color:white; text-decoration:none; }
+    .brand span { color:var(--yellow); }
+    .tagline { color:#c4cde0; font-size:12px; margin-top:5px; }
+    .login { background:var(--yellow); color:var(--navy); text-decoration:none; padding:11px 18px; border-radius:5px; font-weight:bold; font-size:13px; }
+    nav { background:var(--blue); display:flex; justify-content:center; flex-wrap:wrap; }
+    nav a { color:white; text-decoration:none; padding:17px 16px; font-size:12px; font-weight:bold; letter-spacing:.5px; }
+    nav a:hover { background:#304875; color:var(--yellow); }
+    .container { max-width:1180px; margin:35px auto; padding:0 20px; min-height:55vh; }
+    .section-title { font-size:13px; letter-spacing:1.5px; font-weight:900; color:var(--navy); border-left:4px solid var(--yellow); padding-left:11px; margin-bottom:20px; text-transform:uppercase; }
+    .intro { background:linear-gradient(120deg,#172849,#304d7c); color:white; padding:32px; border-radius:9px; margin-bottom:28px; }
+    .intro h1 { margin:0 0 10px; font-size:clamp(27px,4vw,40px); }
+    .intro p { color:#d5deed; margin:0; line-height:1.6; }
+    .cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+    .card { background:white; border:1px solid #e7eaf0; border-radius:8px; padding:20px; }
+    .cover { height:180px; background:#edf1f8; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+    .cover img { width:100%; height:100%; object-fit:cover; }
+    .card small { color:#b18a17; font-weight:bold; font-size:10px; letter-spacing:1px; }
+    .card h2 { margin:9px 0; font-size:19px; color:var(--navy); }
+    .card h2 a { color:inherit; text-decoration:none; }
+    .card p { color:var(--muted); font-size:13px; line-height:1.6; }
+    .data { color:var(--muted); font-size:11px; }
+    .stato { color:var(--muted); line-height:1.6; }
+    footer { margin-top:55px; background:var(--navy); color:#c4cde0; text-align:center; padding:30px 20px; font-size:12px; line-height:1.8; }
+    footer strong { color:white; }
+    @media(max-width:800px) { .cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media(max-width:520px) { .cards { grid-template-columns:1fr; } header { padding:20px; } nav a { padding:13px 10px; font-size:10px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <a class="brand" href="index.html">INSIDEOUT<span>HABBO</span></a>
+      <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+    </div>
+    <a class="login" href="accesso.html">ACCEDI / REGISTRATI</a>
+  </header>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="categoria.html?categoria=Attualit%C3%A0">ATTUALITÀ</a>
+    <a href="categoria.html?categoria=Habbo">HABBO</a>
+    <a href="categoria.html?categoria=Roleplay">ROLEPLAY</a>
+    <a href="categoria.html?categoria=Community">COMMUNITY</a>
+    <a href="categoria.html?categoria=Eventi">EVENTI</a>
+    <a href="forum.html">FORUM</a>
+    <a href="chi-siamo.html">CHI SIAMO</a>
+    <a href="pubblicita-partner.html">PUBBLICITÀ E PARTNER</a>
+  </nav>
+  <main class="container">
+    <section class="intro">
+      <h1 id="titoloCategoria">Categoria</h1>
+      <p id="descrizioneCategoria">Tutti gli articoli pubblicati in questa sezione di InsideOutHabbo.</p>
+    </section>
+    <div class="section-title">ARTICOLI DELLA CATEGORIA</div>
+    <div class="cards" id="elencoArticoli"><p class="stato">Caricamento degli articoli...</p></div>
+  </main>
+  <footer><strong>INSIDEOUTHABBO</strong><br>Il mondo Habbo raccontato da noi.<br>Una community, tante storie, un solo universo.</footer>
+
+  <script>
+    const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const categorieConsentite = ['Attualità', 'Habbo', 'Roleplay', 'Community', 'Eventi'];
+    const parametro = new URLSearchParams(window.location.search).get('categoria');
+    const categoria = categorieConsentite.find(voce => voce.toLowerCase() === (parametro || '').toLowerCase());
+    const titolo = document.getElementById('titoloCategoria');
+    const elenco = document.getElementById('elencoArticoli');
+
+    function mostraStato(testo) {
+      elenco.innerHTML = '';
+      const p = document.createElement('p');
+      p.className = 'stato';
+      p.textContent = testo;
+      elenco.appendChild(p);
+    }
+
+    async function caricaArticoli() {
+      if (!categoria) {
+        titolo.textContent = 'Categoria non trovata';
+        mostraStato('La categoria richiesta non è valida. Torna alla homepage e seleziona una sezione dal menu.');
+        return;
+      }
+      titolo.textContent = categoria;
+      document.title = categoria + ' | InsideOutHabbo';
+      const { data, error } = await client
+        .from('articles')
+        .select('id, title, excerpt, content, cover_image_url, category, published_at')
+        .eq('status', 'published')
+        .eq('category', categoria)
+        .order('published_at', { ascending: false, nullsFirst: false });
+
+      if (error) {
+        console.error('Errore nel caricamento degli articoli:', error);
+        mostraStato('Non è stato possibile caricare gli articoli. Riprova più tardi.');
+        return;
+      }
+      if (!data || data.length === 0) {
+        mostraStato('Non ci sono ancora articoli pubblicati in questa categoria.');
+        return;
+      }
+      elenco.innerHTML = '';
+      data.forEach(articolo => {
+        const scheda = document.createElement('article');
+        scheda.className = 'card';
+        if (articolo.cover_image_url) {
+          const copertina = document.createElement('div');
+          copertina.className = 'cover';
+          const img = document.createElement('img');
+          img.src = articolo.cover_image_url;
+          img.alt = articolo.title || 'Copertina articolo';
+          copertina.appendChild(img);
+          scheda.appendChild(copertina);
+        }
+        const etichetta = document.createElement('small');
+        etichetta.textContent = articolo.category;
+        const h2 = document.createElement('h2');
+        const link = document.createElement('a');
+        link.href = 'articolo.html?id=' + encodeURIComponent(articolo.id);
+        link.textContent = articolo.title || 'Articolo senza titolo';
+        h2.appendChild(link);
+        const descrizione = document.createElement('p');
+        descrizione.textContent = articolo.excerpt || (articolo.content || '').slice(0, 180);
+        const dataPubblicazione = document.createElement('div');
+        dataPubblicazione.className = 'data';
+        dataPubblicazione.textContent = articolo.published_at ? new Date(articolo.published_at).toLocaleDateString('it-IT') : '';
+        scheda.append(etichetta, h2, descrizione, dataPubblicazione);
+        elenco.appendChild(scheda);
+      });
+    }
+    caricaArticoli();
+  </script>
+</body>
+</html>
