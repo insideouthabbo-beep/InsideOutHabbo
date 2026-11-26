@@ -175,7 +175,7 @@ async function caricaDiscussioni() {
 
   const { data, error } = await supabase
     .from('forum_topics')
-    .select('id, title, content, created_at, author_id')
+    .select('id, content, created_at, author_id')
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
 
@@ -191,6 +191,23 @@ async function caricaDiscussioni() {
     return;
   }
 
+  const authorIds = [...new Set(data.map(d => d.author_id).filter(Boolean))];
+
+  const { data: autori, error: erroreAutori } = await supabase
+    .from('forum_authors')
+    .select('id, habbo_name, display_name')
+    .in('id', authorIds);
+
+  if (erroreAutori) {
+    messaggio.textContent =
+      'Errore nel caricamento degli autori: ' + erroreAutori.message;
+    return;
+  }
+
+  const mappaAutori = new Map(
+    (autori || []).map(a => [a.id, a])
+  );
+
   messaggio.textContent =
     'Discussioni da moderare: ' + data.length;
 
@@ -198,11 +215,16 @@ async function caricaDiscussioni() {
     const scheda = document.createElement('article');
     scheda.className = 'discussione';
 
-    const titolo = document.createElement('h3');
-    titolo.textContent = discussione.title;
+    const autore = mappaAutori.get(discussione.author_id);
 
-    const autore = document.createElement('p');
-    autore.textContent = 'ID autore: ' + discussione.author_id;
+    const nome = document.createElement('h3');
+    nome.textContent =
+      autore?.habbo_name || 'Utente non disponibile';
+
+    const pg = document.createElement('p');
+    pg.className = 'data';
+    pg.textContent =
+      'PG: ' + (autore?.display_name || 'Non indicato');
 
     const dataCreazione = document.createElement('p');
     dataCreazione.className = 'data';
@@ -231,8 +253,8 @@ async function caricaDiscussioni() {
     );
 
     scheda.append(
-      titolo,
-      autore,
+      nome,
+      pg,
       dataCreazione,
       contenuto,
       approva,
