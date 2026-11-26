@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -123,9 +122,9 @@
   <p>Gestione degli articoli, delle bozze e delle pubblicazioni.</p>
 </div>
 
-    <div class="scheda">
+    <div class="scheda" id="apriForum" style="cursor:pointer;">
       <h3>Forum</h3>
-      <p>Discussioni, segnalazioni e moderazione dei contenuti.</p>
+      <p>Visualizza ed elimina le discussioni pubblicate dagli utenti.</p>
     </div>
 
     <div class="scheda">
@@ -271,6 +270,15 @@
   <div id="elencoBanner">Caricamento banner...</div>
 </section>
 
+<section id="forumPanel" hidden>
+  <div class="benvenuto">
+    <h2>Gestione forum</h2>
+    <p>Qui puoi consultare ed eliminare le discussioni pubblicate nel forum.</p>
+    <button type="button" id="tornaForum">← Torna al pannello amministrativo</button>
+  </div>
+  <div id="elencoDiscussioniAdmin">Caricamento discussioni...</div>
+</section>
+
     <section id="registroPanel" hidden>
   <div class="benvenuto">
     <h2>Registro attività</h2>
@@ -352,6 +360,108 @@
   
 const apriUtenti = document.getElementById('apriUtenti');
   const apriArticoli = document.getElementById('apriArticoli');
+
+// GESTIONE DISCUSSIONI DEL FORUM
+const apriForum = document.getElementById('apriForum');
+const forumPanel = document.getElementById('forumPanel');
+const elencoDiscussioniAdmin = document.getElementById('elencoDiscussioniAdmin');
+const tornaForum = document.getElementById('tornaForum');
+
+apriForum.addEventListener('click', async () => {
+  document.getElementById('contenuto').hidden = true;
+  document.getElementById('utentiPanel').hidden = true;
+  document.getElementById('articoliPanel').hidden = true;
+  document.getElementById('partnerPanel').hidden = true;
+  document.getElementById('pubblicitaPanel').hidden = true;
+  document.getElementById('registroPanel').hidden = true;
+  forumPanel.hidden = false;
+  await caricaDiscussioniAdmin();
+});
+
+tornaForum.addEventListener('click', () => {
+  forumPanel.hidden = true;
+  document.getElementById('contenuto').hidden = false;
+});
+
+async function caricaDiscussioniAdmin() {
+  elencoDiscussioniAdmin.textContent = 'Caricamento discussioni...';
+
+  // Nel forum pubblico vengono mostrate le discussioni con stato "approved".
+  const { data: discussioni, error } = await supabase
+    .from('forum_topics')
+    .select('id, title, content, created_at, author_id')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Errore caricamento forum:', error);
+    elencoDiscussioniAdmin.textContent =
+      'Errore nel caricamento delle discussioni: ' + error.message;
+    return;
+  }
+
+  elencoDiscussioniAdmin.replaceChildren();
+
+  if (!discussioni || discussioni.length === 0) {
+    elencoDiscussioniAdmin.textContent = 'Non ci sono discussioni pubblicate nel forum.';
+    return;
+  }
+
+  discussioni.forEach(discussione => {
+    const scheda = document.createElement('div');
+    scheda.style.cssText =
+      'background:#1b2d4d;border:1px solid #344d77;border-radius:9px;padding:20px;margin-bottom:15px;';
+
+    const titolo = document.createElement('h3');
+    titolo.style.color = '#ffd34e';
+    titolo.textContent = discussione.title || 'Discussione senza titolo';
+
+    const data = document.createElement('p');
+    data.textContent = discussione.created_at
+      ? 'Pubblicata il: ' + new Date(discussione.created_at).toLocaleString('it-IT')
+      : 'Data non disponibile';
+
+    const contenutoDiscussione = document.createElement('p');
+    contenutoDiscussione.style.whiteSpace = 'pre-wrap';
+    contenutoDiscussione.textContent = discussione.content || 'Contenuto non disponibile.';
+
+    const elimina = document.createElement('button');
+    elimina.type = 'button';
+    elimina.textContent = 'Elimina discussione';
+    elimina.style.cssText =
+      'padding:10px 15px;background:#a83b45;color:white;border:0;border-radius:5px;font-weight:bold;cursor:pointer;';
+
+    elimina.addEventListener('click', async () => {
+      const conferma = confirm(
+        'Vuoi eliminare definitivamente questa discussione dal forum? L’operazione non può essere annullata.'
+      );
+      if (!conferma) return;
+
+      elimina.disabled = true;
+      elimina.textContent = 'Eliminazione...';
+
+      const { error: erroreEliminazione } = await supabase
+        .from('forum_topics')
+        .delete()
+        .eq('id', discussione.id);
+
+      if (erroreEliminazione) {
+        console.error('Errore eliminazione discussione:', erroreEliminazione);
+        alert('Non è stato possibile eliminare la discussione: ' + erroreEliminazione.message);
+        elimina.disabled = false;
+        elimina.textContent = 'Elimina discussione';
+        return;
+      }
+
+      alert('Discussione eliminata correttamente.');
+      await caricaDiscussioniAdmin();
+    });
+
+    scheda.append(titolo, data, contenutoDiscussione, elimina);
+    elencoDiscussioniAdmin.appendChild(scheda);
+  });
+}
+
 const articoliPanel = document.getElementById('articoliPanel');
 const tornaDashboardArticoli = document.getElementById('tornaDashboardArticoli');
 
@@ -1572,4 +1682,4 @@ document.getElementById('tornaRegistro').addEventListener('click', () => {
 </script>
 
 </body>
-</html>
+</ht
