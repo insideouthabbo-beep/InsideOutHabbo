@@ -145,7 +145,7 @@
 
       const { data: intervista, error } = await supabase
         .from("interviews")
-        .select("id, title, interviewee, introduction, cover_image_url, published_at, created_at")
+        .select("id, title, interviewee, introduction, conclusion, cover_image_url, published_at, created_at")
         .eq("id", id)
         .eq("status", "published")
         .maybeSingle();
@@ -179,6 +179,10 @@
         ? `<div class="intro">${escapeHtml(intervista.introduction)}</div>`
         : "";
 
+      const conclusione = intervista.conclusion
+        ? `<div class="intro"><strong>Conclusione</strong><br><br>${escapeHtml(intervista.conclusion)}</div>`
+        : "";
+
       const blocchi = (domande || []).map((elemento, indice) => `
         <section class="qa-item">
           <div class="question-label">Domanda ${indice + 1}</div>
@@ -195,6 +199,7 @@
         ${copertina}
         ${introduzione}
         <div class="qa-list">${blocchi || '<p class="status">Questa intervista non contiene ancora domande e risposte.</p>'}</div>
+        ${conclusione}
         <div class="date">${dataFormattata ? `Pubblicata il ${dataFormattata}` : ""}</div>
       `;
       document.title = `${intervista.title} | InsideOutHabbo`;
