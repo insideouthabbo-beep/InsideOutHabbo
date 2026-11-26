@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intervista | InsideOutHabbo</title>
+  <style>
+    :root {
+      --bg: #071426;
+      --panel: #10243d;
+      --panel-2: #152d49;
+      --text: #f3f6fb;
+      --muted: #aabbd0;
+      --yellow: #ffd447;
+      --blue: #4ca4ff;
+      --line: rgba(255,255,255,.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #142d4b 0, var(--bg) 48%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+    a { color: inherit; }
+    .topbar {
+      background: rgba(5,15,29,.92);
+      border-bottom: 1px solid var(--line);
+      padding: 15px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand { color: var(--yellow); font-weight: 900; letter-spacing: 1px; text-decoration: none; }
+    .back {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 13px;
+      font-size: 14px;
+    }
+    .back:hover { border-color: var(--yellow); color: var(--yellow); }
+    main { width: min(900px, 92%); margin: 42px auto 70px; }
+    .status { color: var(--muted); text-align: center; padding: 45px 10px; }
+    .eyebrow {
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.12; margin: 0 0 12px; }
+    .interviewee { color: var(--blue); font-weight: 700; font-size: 18px; margin-bottom: 20px; }
+    .cover {
+      display: block;
+      width: 100%;
+      max-height: 420px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin: 28px 0;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .intro {
+      background: var(--panel);
+      border-left: 4px solid var(--yellow);
+      padding: 22px 25px;
+      border-radius: 0 12px 12px 0;
+      color: #dce7f4;
+      font-size: 17px;
+      margin: 25px 0 38px;
+      white-space: pre-wrap;
+    }
+    .qa-list { display: grid; gap: 24px; }
+    .qa-item {
+      background: linear-gradient(145deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .question-label {
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .question { font-size: 21px; font-weight: 800; margin: 0 0 18px; line-height: 1.35; }
+    .answer {
+      margin: 0;
+      padding: 4px 0 4px 18px;
+      border-left: 3px solid var(--blue);
+      color: #d9e5f2;
+      white-space: pre-wrap;
+      font-size: 16px;
+    }
+    .date { color: var(--muted); font-size: 13px; margin-top: 24px; }
+    .error {
+      background: #3a1b25;
+      border: 1px solid #8b394d;
+      border-radius: 12px;
+      padding: 20px;
+      color: #ffe3e8;
+    }
+    footer { border-top: 1px solid var(--line); padding: 22px 5%; color: var(--muted); text-align: center; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">INSIDEOUTHABBO</a>
+    <a class="back" href="interviste.html">← Tutte le interviste</a>
+  </header>
+
+  <main>
+    <div id="contenuto" class="status">Caricamento dell'intervista...</div>
+  </main>
+
+  <footer>InsideOutHabbo · La community, raccontata da chi la vive.</footer>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const contenuto = document.getElementById("contenuto");
+
+    function escapeHtml(value = "") {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      })[char]);
+    }
+
+    async function caricaIntervista() {
+      const id = new URLSearchParams(window.location.search).get("id");
+      if (!id) {
+        contenuto.innerHTML = '<div class="error">Non è stata indicata un’intervista. Torna all’archivio e scegline una.</div>';
+        return;
+      }
+
+      const { data: intervista, error } = await supabase
+        .from("interviews")
+        .select("id, title, interviewee, introduction, cover_image_url, published_at, created_at")
+        .eq("id", id)
+        .eq("status", "published")
+        .maybeSingle();
+
+      if (error || !intervista) {
+        contenuto.innerHTML = '<div class="error">Intervista non trovata o non ancora pubblicata.</div>';
+        return;
+      }
+
+      const { data: domande, error: erroreDomande } = await supabase
+        .from("interview_questions")
+        .select("question, answer, sort_order")
+        .eq("interview_id", id)
+        .order("sort_order", { ascending: true });
+
+      if (erroreDomande) {
+        contenuto.innerHTML = '<div class="error">Non è stato possibile caricare le domande e le risposte. Riprova più tardi.</div>';
+        return;
+      }
+
+      const data = intervista.published_at || intervista.created_at;
+      const dataFormattata = data
+        ? new Date(data).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" })
+        : "";
+
+      const copertina = intervista.cover_image_url
+        ? `<img class="cover" src="${escapeHtml(intervista.cover_image_url)}" alt="Copertina dell'intervista" onerror="this.style.display='none'">`
+        : "";
+
+      const introduzione = intervista.introduction
+        ? `<div class="intro">${escapeHtml(intervista.introduction)}</div>`
+        : "";
+
+      const blocchi = (domande || []).map((elemento, indice) => `
+        <section class="qa-item">
+          <div class="question-label">Domanda ${indice + 1}</div>
+          <h2 class="question">${escapeHtml(elemento.question)}</h2>
+          <blockquote class="answer">${escapeHtml(elemento.answer)}</blockquote>
+        </section>
+      `).join("");
+
+      contenuto.className = "";
+      contenuto.innerHTML = `
+        <div class="eyebrow">Interviste · InsideOutHabbo</div>
+        <h1>${escapeHtml(intervista.title)}</h1>
+        <div class="interviewee">Con ${escapeHtml(intervista.interviewee)}</div>
+        ${copertina}
+        ${introduzione}
+        <div class="qa-list">${blocchi || '<p class="status">Questa intervista non contiene ancora domande e risposte.</p>'}</div>
+        <div class="date">${dataFormattata ? `Pubblicata il ${dataFormattata}` : ""}</div>
+      `;
+      document.title = `${intervista.title} | InsideOutHabbo`;
+    }
+
+    caricaIntervista();
+  </script>
+</body>
+</html>
