@@ -500,8 +500,15 @@ async function caricaUtenti() {
         return;
       }
 
-      alert('Ruolo aggiornato correttamente!');
-      await caricaUtenti();
+     await registraAttivita(
+  'Modifica ruolo',
+  'Utente',
+  utente.id,
+  `${utente.habbo_name || utente.display_name || utente.id}: ${utente.role || 'user'} → ${selettoreRuolo.value}`
+);
+
+alert('Ruolo aggiornato correttamente!');
+await caricaUtenti();
     });
 
     dati.append(selettoreRuolo, salvaRuolo);
@@ -569,8 +576,15 @@ async function caricaUtenti() {
         return;
       }
 
-      alert(data.message);
-      await caricaUtenti();
+      await registraAttivita(
+  accountSospeso ? 'Riattivazione account' : 'Sospensione account',
+  'Utente',
+  utente.id,
+  `${utente.habbo_name || utente.display_name || utente.id}`
+);
+
+alert(data.message);
+await caricaUtenti();
     });
 
     dati.append(pulsanteStato);
