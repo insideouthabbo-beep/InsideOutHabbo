@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pannello redazione | InsideOutHabbo</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101b32;
+  color: white;
+}
+
+header {
+  background: #172747;
+  border-bottom: 3px solid #ffd34e;
+  padding: 24px;
+}
+
+header h1 {
+  margin: 0;
+  color: #ffd34e;
+  font-size: 25px;
+}
+
+header p {
+  color: #c5d2e8;
+  margin-bottom: 0;
+}
+
+main {
+  max-width: 1100px;
+  margin: 35px auto;
+  padding: 20px;
+}
+
+.pannello {
+  background: #1b2d4d;
+  border: 1px solid #344d77;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 22px;
+}
+
+h2, h3 {
+  color: #ffd34e;
+}
+
+.testo {
+  color: #c5d2e8;
+  line-height: 1.6;
+}
+
+.griglia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.azione {
+  background: #1b2d4d;
+  border: 1px solid #344d77;
+  border-radius: 9px;
+  padding: 22px;
+}
+
+button, .pulsante {
+  display: inline-block;
+  background: #ffd34e;
+  color: #172747;
+  border: 0;
+  border-radius: 5px;
+  padding: 12px 17px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  margin: 5px 5px 5px 0;
+}
+
+button.secondario, .pulsante.secondario {
+  background: #304875;
+  color: white;
+}
+
+button.pericolo {
+  background: #a83b45;
+  color: white;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.articolo {
+  background: #172747;
+  border: 1px solid #344d77;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 14px 0;
+}
+
+.articolo h3 {
+  margin-top: 0;
+}
+
+.etichetta {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #304875;
+  color: white;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.stato {
+  color: #ffd34e;
+  font-weight: bold;
+}
+
+#messaggio {
+  color: #c5d2e8;
+}
+
+#errore {
+  color: #ff9999;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #c5d2e8;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media(max-width:600px) {
+  main { padding: 12px; }
+  .pannello { padding: 18px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>INSIDEOUTHABBO</h1>
+  <p>Pannello di gestione della redazione</p>
+</header>
+
+<main>
+
+<section class="pannello">
+  <h2 id="titoloBenvenuto">Area redazionale</h2>
+  <p id="messaggio">Verifica dell'accesso in corso...</p>
+  <p id="errore"></p>
+</section>
+
+<section id="contenuto" hidden>
+
+  <div class="griglia">
+
+    <div class="azione">
+      <h3>✍️ Scrivi un articolo</h3>
+      <p class="testo">
+        Prepara un nuovo contenuto per InsideOutHabbo.
+      </p>
+      <a class="pulsante" href="scrivi-articolo.html">
+        Scrivi articolo
+      </a>
+    </div>
+
+    <div class="azione">
+      <h3>📋 Bacheca redazionale</h3>
+      <p class="testo">
+        Consulta gli avvisi e le comunicazioni interne.
+      </p>
+      <a class="pulsante secondario" href="bacheca-redazionale.html">
+        Apri bacheca
+      </a>
+    </div>
+
+  </div>
+
+  <section class="pannello" style="margin-top:22px;">
+    <h2 id="titoloArticoli">I miei articoli</h2>
+    <p class="testo" id="descrizioneArticoli"></p>
+    <div id="elencoArticoli">Caricamento articoli...</div>
+  </section>
+
+</section>
+
+<div class="pannello">
+  <a href="index.html" style="color:#ffd34e;">← Torna alla homepage</a>
+</div>
+
+</main>
+
+<footer>
+  INSIDEOUTHABBO · Area riservata alla redazione
+</footer>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL =
+'https://mlgxlsstmaoxhigtqdhb.supabase.co';
+
+// Inserisci qui la stessa chiave publishable già utilizzata in index.html
+const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const messaggio = document.getElementById('messaggio');
+const errore = document.getElementById('errore');
+const contenuto = document.getElementById('contenuto');
+const elenco = document.getElementById('elencoArticoli');
+
+let utente = null;
+let ruolo = null;
+
+async function avviaPannello() {
+  const { data: { session }, error: erroreSessione } =
+    await supabase.auth.getSession();
+
+  if (erroreSessione || !session) {
+    messaggio.textContent = 'Devi accedere per entrare nella redazione.';
+    errore.innerHTML =
+      '<a href="accesso.html" style="color:#ffd34e;">Vai all’accesso</a>';
+    return;
+  }
+
+  utente = session.user;
+
+  const { data: profilo, error } = await supabase
+    .from('profiles')
+    .select('habbo_name, role')
+    .eq('id', utente.id)
+    .maybeSingle();
+
+  if (error || !profilo) {
+    messaggio.textContent = 'Impossibile verificare il tuo profilo.';
+    return;
+  }
+
+  ruolo = profilo.role;
+
+  if (!['redattore', 'caporedattore'].includes(ruolo)) {
+    messaggio.textContent =
+      'Accesso non autorizzato. Questa area è riservata alla redazione.';
+    return;
+  }
+
+  document.getElementById('titoloBenvenuto').textContent =
+    ruolo === 'caporedattore'
+      ? 'Area caporedattore'
+      : 'Area redattore';
+
+  messaggio.textContent =
+    'Benvenuto ' + (profilo.habbo_name || '') +
+    '. Hai effettuato l’accesso come ' + ruolo + '.';
+
+  if (ruolo === 'caporedattore') {
+    document.getElementById('titoloArticoli').textContent =
+      'Articoli della redazione';
+
+    document.getElementById('descrizioneArticoli').textContent =
+      'Visualizza gli articoli, controlla i contenuti e gestisci le pubblicazioni.';
+  } else {
+    document.getElementById('titoloArticoli').textContent =
+      'I miei articoli';
+
+    document.getElementById('descrizioneArticoli').textContent =
+      'Controlla i tuoi contenuti e il loro stato di pubblicazione.';
+  }
+
+  contenuto.hidden = false;
+  await caricaArticoli();
+}
+
+async function caricaArticoli() {
+  elenco.textContent = 'Caricamento articoli...';
+
+  let richiesta = supabase
+    .from('articles')
+    .select('id, title, excerpt, category, status, created_at, published_at, author_id')
+    .order('created_at', { ascending: false });
+
+  if (ruolo === 'redattore') {
+    richiesta = richiesta.eq('author_id', utente.id);
+  }
+
+  const { data: articoli, error } = await richiesta;
+
+  if (error) {
+    elenco.textContent =
+      'Errore nel caricamento degli articoli: ' + error.message;
+    return;
+  }
+
+  elenco.replaceChildren();
+
+  if (!articoli || articoli.length === 0) {
+    elenco.textContent = ruolo === 'caporedattore'
+      ? 'Non ci sono ancora articoli nella redazione.'
+      : 'Non hai ancora scritto articoli.';
+    return;
+  }
+
+  let autori = [];
+
+  if (ruolo === 'caporedattore') {
+    const ids = [...new Set(
+      articoli.map(a => a.author_id).filter(Boolean)
+    )];
+
+    if (ids.length) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, habbo_name, display_name')
+        .in('id', ids);
+
+      autori = data || [];
+    }
+  }
+
+  articoli.forEach(articolo => {
+    const scheda = document.createElement('article');
+    scheda.className = 'articolo';
+
+    const titolo = document.createElement('h3');
+    titolo.textContent = articolo.title || 'Articolo senza titolo';
+
+    const categoria = document.createElement('span');
+    categoria.className = 'etichetta';
+    categoria.textContent = articolo.category || 'Senza categoria';
+
+    const stato = document.createElement('p');
+    stato.className = 'stato';
+
+    const nomiStato = {
+      draft: 'Bozza',
+      published: 'Pubblicato'
+    };
+
+    stato.textContent =
+      'Stato: ' + (nomiStato[articolo.status] || articolo.status || 'Non specificato');
+
+    const data = document.createElement('p');
+    data.className = 'testo';
+    data.textContent = articolo.created_at
+      ? 'Creato il: ' +
+        new Date(articolo.created_at).toLocaleDateString('it-IT')
+      : '';
+
+    scheda.append(titolo, categoria, stato, data);
+
+    if (ruolo === 'caporedattore') {
+      const autore = autori.find(a => a.id === articolo.author_id);
+
+      const nomeAutore = document.createElement('p');
+      nomeAutore.className = 'testo';
+      nomeAutore.textContent = 'Autore: ' +
+        (autore?.display_name || autore?.habbo_name || 'Non disponibile');
+
+      scheda.appendChild(nomeAutore);
+
+      const pulsantePubblicazione = document.createElement('button');
+      pulsantePubblicazione.textContent =
+        articolo.status === 'published'
+          ? 'Ritira dalla pubblicazione'
+          : 'Pubblica articolo';
+
+      pulsantePubblicazione.addEventListener('click', async () => {
+        const nuovoStato =
+          articolo.status === 'published' ? 'draft' : 'published';
+
+        if (!confirm(
+          nuovoStato === 'published'
+            ? 'Vuoi pubblicare questo articolo?'
+            : 'Vuoi ritirare questo articolo dalla pubblicazione?'
+        )) return;
+
+        pulsantePubblicazione.disabled = true;
+
+        const { error } = await supabase
+          .from('articles')
+          .update({
+            status: nuovoStato,
+            published_at: nuovoStato === 'published'
+              ? new Date().toISOString()
+              : null
+          })
+          .eq('id', articolo.id);
+
+        if (error) {
+          alert('Operazione non riuscita: ' + error.message);
+          pulsantePubblicazione.disabled = false;
+          return;
+        }
+
+        alert('Stato dell’articolo aggiornato.');
+        await caricaArticoli();
+      });
+
+      scheda.appendChild(pulsantePubblicazione);
+    }
+
+    elenco.appendChild(scheda);
+  });
+}
+
+avviaPannello();
+</script>
+
+</body>
+</html>
