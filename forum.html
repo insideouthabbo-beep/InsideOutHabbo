@@ -268,13 +268,12 @@
   InsideOutHabbo · Il punto d'incontro della community
 </footer>
 
-  <script type="module">
+  
+<script type="module">
 import { createClient } from
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
-
-// Inserisci la stessa chiave publishable già usata in admin.html
 const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -286,19 +285,83 @@ const elenco = document.getElementById('elencoDiscussioni');
 
 let utenteCorrente = null;
 
+async function caricaDiscussioni() {
+  elenco.innerHTML = '<p class="nota">Caricamento delle discussioni...</p>';
+
+  const { data, error } = await supabase
+    .from('forum_topics')
+    .select('*')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    elenco.innerHTML = '';
+    const errore = document.createElement('p');
+    errore.className = 'nota';
+    errore.textContent = 'Errore nel caricamento delle discussioni: ' + error.message;
+    elenco.appendChild(errore);
+    console.error('Errore forum:', error);
+    return;
+  }
+
+  elenco.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    elenco.innerHTML =
+      '<p class="nota">Non ci sono ancora discussioni approvate.</p>';
+    return;
+  }
+
+  data.forEach(discussione => {
+    const scheda = document.createElement('article');
+    scheda.className = 'discussione';
+
+    const titolo = document.createElement('h3');
+    titolo.textContent = discussione.title || 'Discussione senza titolo';
+
+    const testo = document.createElement('p');
+    testo.textContent = discussione.content || '';
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+
+    if (discussione.created_at) {
+      meta.textContent =
+        'Pubblicata il ' +
+        new Date(discussione.created_at).toLocaleDateString('it-IT');
+    } else {
+      meta.textContent = 'Discussione approvata';
+    }
+
+    scheda.appendChild(titolo);
+    scheda.appendChild(meta);
+    scheda.appendChild(testo);
+
+    elenco.appendChild(scheda);
+  });
+}
+
 async function verificaAccesso() {
   const { data: { session } } = await supabase.auth.getSession();
 
   utenteCorrente = session?.user || null;
 
-  pulsanteNuova.style.display = utenteCorrente ? 'inline-block' : 'none';
+  pulsanteNuova.style.display =
+    utenteCorrente ? 'inline-block' : 'none';
 
-  if (!utenteCorrente) {
+  const vecchiaNota = document.getElementById('notaAccesso');
+
+  if (!utenteCorrente && !vecchiaNota) {
     const nota = document.createElement('p');
+    nota.id = 'notaAccesso';
     nota.className = 'nota';
     nota.textContent =
       'Per partecipare alle discussioni devi accedere al tuo account.';
     elenco.before(nota);
+  }
+
+  if (utenteCorrente && vecchiaNota) {
+    vecchiaNota.remove();
   }
 }
 
@@ -315,7 +378,7 @@ document.getElementById('annullaDiscussione')
     form.reset();
   });
 
-    form.addEventListener('submit', async (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   if (!utenteCorrente) {
@@ -346,64 +409,23 @@ document.getElementById('annullaDiscussione')
 
   if (error) {
     alert('Errore durante l’invio: ' + error.message);
-    invia.disabled = false;
-    invia.textContent = 'Invia per approvazione';
-    return;
+  } else {
+    alert('Discussione inviata! Sarà visibile dopo l’approvazione.');
+    form.reset();
+    sezioneNuova.style.display = 'none';
   }
 
-  alert('Discussione inviata! Sarà visibile dopo l’approvazione.');
-  form.reset();
-  sezioneNuova.style.display = 'none';
   invia.disabled = false;
   invia.textContent = 'Invia per approvazione';
 });
-    form.addEventListener('submit', async (event) => {
-  event.preventDefault();
 
-  if (!utenteCorrente) {
-    alert('Devi effettuare l’accesso per partecipare.');
-    return;
-  }
-
-  const titolo = document.getElementById('titoloDiscussione').value.trim();
-  const contenuto = document.getElementById('testoDiscussione').value.trim();
-
-  if (!titolo || !contenuto) {
-    alert('Compila tutti i campi.');
-    return;
-  }
-
-  const invia = form.querySelector('button[type="submit"]');
-  invia.disabled = true;
-  invia.textContent = 'Invio in corso...';
-
-  const { error } = await supabase
-    .from('forum_topics')
-    .insert({
-      title: titolo,
-      content: contenuto,
-      author_id: utenteCorrente.id,
-      status: 'pending'
-    });
-
-  if (error) {
-    alert('Errore durante l’invio: ' + error.message);
-    invia.disabled = false;
-    invia.textContent = 'Invia per approvazione';
-    return;
-  }
-
-  alert('Discussione inviata! Sarà visibile dopo l’approvazione.');
-  form.reset();
-  sezioneNuova.style.display = 'none';
-  invia.disabled = false;
-  invia.textContent = 'Invia per approvazione';
-});
 await verificaAccesso();
+await caricaDiscussioni();
 
 supabase.auth.onAuthStateChange(() => {
   verificaAccesso();
 });
 </script>
+
 </body>
 </html>
