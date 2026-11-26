@@ -774,12 +774,14 @@ document.getElementById('apriPartner').addEventListener('click', () => {
 });
 
 // Apertura gestione pubblicità
-document.getElementById('apriPubblicita').addEventListener('click', () => {
+document.getElementById('apriPubblicita').addEventListener('click', async () => {
   document.getElementById('contenuto').hidden = true;
   document.getElementById('utentiPanel').hidden = true;
   document.getElementById('articoliPanel').hidden = true;
   document.getElementById('partnerPanel').hidden = true;
   document.getElementById('pubblicitaPanel').hidden = false;
+
+  await caricaBanner();
 });
 
 // Ritorno al pannello principale
