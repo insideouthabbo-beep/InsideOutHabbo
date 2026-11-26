@@ -282,7 +282,7 @@ async function caricaDiscussioni() {
 
   const { data, error } = await supabase
     .from('forum_topics')
-    .select('*')
+    .select('id, content, created_at, author_id')
     .eq('status', 'approved')
     .order('created_at', { ascending: false });
 
@@ -290,9 +290,8 @@ async function caricaDiscussioni() {
     elenco.innerHTML = '';
     const errore = document.createElement('p');
     errore.className = 'nota';
-    errore.textContent = 'Errore nel caricamento delle discussioni: ' + error.message;
+    errore.textContent = 'Errore nel caricamento: ' + error.message;
     elenco.appendChild(errore);
-    console.error('Errore forum:', error);
     return;
   }
 
@@ -304,28 +303,55 @@ async function caricaDiscussioni() {
     return;
   }
 
+  const authorIds = [...new Set(
+    data.map(d => d.author_id).filter(Boolean)
+  )];
+
+  const { data: autori, error: erroreAutori } = await supabase
+    .from('forum_authors')
+    .select('id, habbo_name, display_name')
+    .in('id', authorIds);
+
+  if (erroreAutori) {
+    elenco.innerHTML = '';
+    const errore = document.createElement('p');
+    errore.className = 'nota';
+    errore.textContent =
+      'Errore nel caricamento degli autori: ' + erroreAutori.message;
+    elenco.appendChild(errore);
+    return;
+  }
+
+  const mappaAutori = new Map(
+    (autori || []).map(a => [a.id, a])
+  );
+
   data.forEach(discussione => {
     const scheda = document.createElement('article');
     scheda.className = 'discussione';
 
-  
-    const testo = document.createElement('p');
-    testo.textContent = discussione.content || '';
+    const autore = mappaAutori.get(discussione.author_id);
+
+    const nome = document.createElement('h3');
+    nome.textContent =
+      autore?.habbo_name || 'Utente non disponibile';
+
+    const pg = document.createElement('div');
+    pg.className = 'meta';
+    pg.textContent =
+      'PG: ' + (autore?.display_name || 'Non indicato');
 
     const meta = document.createElement('div');
     meta.className = 'meta';
+    meta.textContent = discussione.created_at
+      ? 'Pubblicata il ' +
+        new Date(discussione.created_at).toLocaleDateString('it-IT')
+      : 'Discussione approvata';
 
-    if (discussione.created_at) {
-      meta.textContent =
-        'Pubblicata il ' +
-        new Date(discussione.created_at).toLocaleDateString('it-IT');
-    } else {
-      meta.textContent = 'Discussione approvata';
-    }
+    const testo = document.createElement('p');
+    testo.textContent = discussione.content || '';
 
-   scheda.appendChild(meta);
-scheda.appendChild(testo);
-
+    scheda.append(nome, pg, meta, testo);
     elenco.appendChild(scheda);
   });
 }
