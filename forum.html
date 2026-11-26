@@ -432,17 +432,6 @@ async function caricaDiscussioni() {
   elenco.appendChild(scheda);
 });
 
-scheda.append(
-  autoreRiga,
-  pg,
-  meta,
-  fumetto,
-  testo
-);
-
-elenco.appendChild(scheda);
-  });
-}
 
 async function verificaAccesso() {
   const { data: { session } } = await supabase.auth.getSession();
