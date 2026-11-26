@@ -187,6 +187,41 @@
         margin-right: 12px;
       }
     }
+    /* Fumetto interattivo Habbo */
+.avatar-pg {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.avatar-pg:hover {
+  transform: scale(1.12);
+}
+
+.fumetto-avatar {
+  display: none;
+  background: #fff;
+  color: #17243a;
+  border: 3px solid #f5c542;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  box-shadow: 3px 3px 0 #0b1220;
+}
+
+.fumetto-avatar.aperto {
+  display: block;
+}
+
+.fumetto-avatar::before {
+  content: "💬 Messaggio";
+  display: block;
+  font-weight: bold;
+  color: #9a7410;
+  margin-bottom: 8px;
+}
   </style>
 </head>
 
@@ -349,10 +384,27 @@ async function caricaDiscussioni() {
       : 'Discussione approvata';
 
     const testo = document.createElement('p');
-    testo.textContent = discussione.content || '';
+testo.textContent = discussione.content || '';
 
-    scheda.append(nome, pg, meta, testo);
-    elenco.appendChild(scheda);
+const fumetto = document.createElement('div');
+fumetto.className = 'fumetto-avatar';
+fumetto.textContent = discussione.content || '';
+
+avatar.title = 'Clicca per leggere il messaggio nel fumetto';
+
+avatar.addEventListener('click', () => {
+  fumetto.classList.toggle('aperto');
+});
+
+scheda.append(
+  autoreRiga,
+  pg,
+  meta,
+  fumetto,
+  testo
+);
+
+elenco.appendChild(scheda);
   });
 }
 
