@@ -1,0 +1,634 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventi | InsideOutHabbo</title>
+
+  <style>
+    :root {
+      --navy: #243b68;
+      --blue: #4e80ba;
+      --yellow: #ffd34e;
+      --muted: #68758b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #243b68;
+    }
+
+    header {
+      background: #182947;
+      color: white;
+      padding: 25px 7%;
+      border-bottom: 5px solid var(--yellow);
+    }
+
+    .brand {
+      font-size: 27px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .brand span {
+      color: var(--yellow);
+    }
+
+    nav {
+      background: var(--navy);
+      padding: 13px 7%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      color: var(--yellow);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+      min-height: 500px;
+    }
+
+    .hero {
+      background: white;
+      border-left: 6px solid var(--yellow);
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      box-shadow: 0 3px 12px #00000008;
+    }
+
+    .tag {
+      color: #b18a17;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 12px 0;
+      font-size: 32px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 25px 0;
+    }
+
+    button {
+      border: none;
+      border-radius: 5px;
+      padding: 13px 20px;
+      background: var(--navy);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--blue);
+    }
+
+    .publish-btn {
+      background: #eabf35;
+      color: #243b68;
+    }
+
+    .delete-btn {
+      background: #a83232;
+      margin-top: 20px;
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .event-card {
+      display: block;
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid #e7eaf0;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .event-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 18px #00000012;
+    }
+
+    .event-card small {
+      color: #b18a17;
+      font-weight: bold;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    .event-card h2 {
+      font-size: 20px;
+      margin: 12px 0;
+    }
+
+    .event-card p {
+      color: var(--muted);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .event-date {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 18px;
+    }
+
+    .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid #e7eaf0;
+      margin-bottom: 25px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 18px 0 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d8deea;
+      border-radius: 5px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    .detail-description {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .back-link {
+      display: inline-block;
+      color: var(--blue);
+      margin-bottom: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .message {
+      padding: 15px;
+      background: white;
+      border-radius: 6px;
+      color: var(--muted);
+      margin: 20px 0;
+    }
+
+    footer {
+      text-align: center;
+      background: #182947;
+      color: white;
+      padding: 25px;
+      margin-top: 60px;
+      font-size: 12px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media(max-width: 650px) {
+      .event-list {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      header {
+        padding: 22px;
+      }
+
+      nav {
+        padding: 15px 22px;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">INSIDEOUT<span>HABBO</span></div>
+</header>
+
+<nav>
+  <a href="index.html">HOME</a>
+  <a href="categoria.html?categoria=Attualit%C3%A0">ATTUALITÀ</a>
+  <a href="categoria.html?categoria=Habbo">HABBO</a>
+  <a href="categoria.html?categoria=Roleplay">ROLEPLAY</a>
+  <a href="forum.html">FORUM</a>
+  <a href="chi-siamo.html">CHI SIAMO</a>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <div class="tag">VIVI LA COMMUNITY</div>
+    <h1>Eventi InsideOutHabbo</h1>
+    <p>
+      Scopri tutti gli eventi, le iniziative e gli appuntamenti
+      organizzati dalla community di InsideOutHabbo.
+    </p>
+  </section>
+
+  <div class="toolbar" id="toolbar">
+    <h2>Archivio eventi</h2>
+    <button class="publish-btn" id="openForm" hidden>
+      + PUBBLICA EVENTO
+    </button>
+  </div>
+
+  <section class="panel" id="publishPanel" hidden>
+    <h2>Pubblica un nuovo evento</h2>
+
+    <form id="eventForm">
+      <label for="eventTitle">Titolo dell'evento</label>
+      <input
+        type="text"
+        id="eventTitle"
+        maxlength="150"
+        required
+        placeholder="Inserisci il titolo"
+      >
+
+      <label for="eventDescription">Descrizione</label>
+      <textarea
+        id="eventDescription"
+        required
+        placeholder="Descrivi l'evento..."
+      ></textarea>
+
+      <button type="submit" id="publishButton">
+        PUBBLICA
+      </button>
+    </form>
+  </section>
+
+  <div id="message" class="message">
+    Caricamento degli eventi...
+  </div>
+
+  <section id="eventList" class="event-list"></section>
+
+  <section id="eventDetail" hidden>
+    <a href="eventi.html" class="back-link">
+      ← TORNA AGLI EVENTI
+    </a>
+
+    <div class="panel">
+      <small id="detailDate" class="event-date"></small>
+      <h1 id="detailTitle"></h1>
+      <div id="detailDescription" class="detail-description"></div>
+
+      <button class="delete-btn" id="deleteButton" hidden>
+        ELIMINA EVENTO
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  INSIDEOUTHABBO © Tutti i diritti riservati
+</footer>
+
+<script type="module">
+  import { createClient }
+    from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const SUPABASE_URL =
+    "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+  const client = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const ruoliAutorizzati = [
+    "redattore",
+    "caporedattore",
+    "admin"
+  ];
+
+  let utenteAutorizzato = false;
+  let eventoCorrente = null;
+
+  const message = document.getElementById("message");
+  const eventList = document.getElementById("eventList");
+  const eventDetail = document.getElementById("eventDetail");
+  const publishPanel = document.getElementById("publishPanel");
+  const openForm = document.getElementById("openForm");
+
+  function mostraMessaggio(testo) {
+    message.textContent = testo;
+    message.hidden = false;
+  }
+
+  function formattaData(data) {
+    return new Date(data).toLocaleDateString("it-IT", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    });
+  }
+
+  async function verificaPermessi() {
+    const { data: sessionData } =
+      await client.auth.getSession();
+
+    const user = sessionData.session?.user;
+
+    if (!user) return;
+
+    const { data: profilo, error } = await client
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Errore profilo:", error);
+      return;
+    }
+
+    utenteAutorizzato =
+      ruoliAutorizzati.includes(profilo?.role);
+
+    openForm.hidden = !utenteAutorizzato;
+  }
+
+  function mostraElenco() {
+    eventDetail.hidden = true;
+    eventList.hidden = false;
+    document.getElementById("toolbar").hidden = false;
+    publishPanel.hidden = true;
+  }
+
+  async function caricaEventi() {
+    mostraElenco();
+
+    message.hidden = false;
+    eventList.innerHTML = "";
+
+    const { data: eventi, error } = await client
+      .from("events")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      mostraMessaggio("Non è stato possibile caricare gli eventi.");
+      return;
+    }
+
+    if (!eventi || eventi.length === 0) {
+      mostraMessaggio("Non ci sono ancora eventi pubblicati.");
+      return;
+    }
+
+    message.hidden = true;
+
+    eventi.forEach(evento => {
+      const card = document.createElement("a");
+      card.className = "event-card";
+      card.href = "eventi.html?id=" + encodeURIComponent(evento.id);
+
+      const categoria = document.createElement("small");
+      categoria.textContent = "EVENTO INSIDEOUTHABBO";
+
+      const titolo = document.createElement("h2");
+      titolo.textContent = evento.title;
+
+      const descrizione = document.createElement("p");
+      descrizione.textContent =
+        evento.description.length > 180
+          ? evento.description.slice(0, 180) + "..."
+          : evento.description;
+
+      const data = document.createElement("div");
+      data.className = "event-date";
+      data.textContent = "Pubblicato il " +
+        formattaData(evento.created_at);
+
+      card.append(categoria, titolo, descrizione, data);
+      eventList.appendChild(card);
+    });
+  }
+
+  async function caricaDettaglio(id) {
+    eventList.hidden = true;
+    document.getElementById("toolbar").hidden = true;
+    publishPanel.hidden = true;
+    eventDetail.hidden = false;
+    message.hidden = true;
+
+    const { data: evento, error } = await client
+      .from("events")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error || !evento) {
+      eventDetail.hidden = true;
+      mostraMessaggio("Evento non trovato.");
+      return;
+    }
+
+    eventoCorrente = evento;
+
+    document.getElementById("detailTitle").textContent =
+      evento.title;
+
+    document.getElementById("detailDescription").textContent =
+      evento.description;
+
+    document.getElementById("detailDate").textContent =
+      "PUBBLICATO IL " + formattaData(evento.created_at);
+
+    document.getElementById("deleteButton").hidden =
+      !utenteAutorizzato;
+  }
+
+  openForm.addEventListener("click", () => {
+    publishPanel.hidden = !publishPanel.hidden;
+
+    if (!publishPanel.hidden) {
+      document.getElementById("eventTitle").focus();
+    }
+  });
+
+  document.getElementById("eventForm")
+    .addEventListener("submit", async (e) => {
+
+      e.preventDefault();
+
+      if (!utenteAutorizzato) {
+        alert("Non hai i permessi per pubblicare eventi.");
+        return;
+      }
+
+      const titolo =
+        document.getElementById("eventTitle").value.trim();
+
+      const descrizione =
+        document.getElementById("eventDescription").value.trim();
+
+      if (!titolo || !descrizione) {
+        alert("Compila entrambi i campi.");
+        return;
+      }
+
+      const publishButton =
+        document.getElementById("publishButton");
+
+      publishButton.disabled = true;
+      publishButton.textContent = "PUBBLICAZIONE...";
+
+      const { data: sessionData } =
+        await client.auth.getSession();
+
+      const user = sessionData.session?.user;
+
+      if (!user) {
+        alert("Devi accedere al tuo account.");
+        publishButton.disabled = false;
+        publishButton.textContent = "PUBBLICA";
+        return;
+      }
+
+      const { error } = await client
+        .from("events")
+        .insert([{
+          title: titolo,
+          description: descrizione,
+          created_by: user.id
+        }]);
+
+      publishButton.disabled = false;
+      publishButton.textContent = "PUBBLICA";
+
+      if (error) {
+        console.error(error);
+        alert("Errore durante la pubblicazione: " + error.message);
+        return;
+      }
+
+      document.getElementById("eventForm").reset();
+      publishPanel.hidden = true;
+
+      await caricaEventi();
+
+      alert("Evento pubblicato correttamente!");
+    });
+
+  document.getElementById("deleteButton")
+    .addEventListener("click", async () => {
+
+      if (!utenteAutorizzato || !eventoCorrente) {
+        alert("Non hai i permessi per eliminare questo evento.");
+        return;
+      }
+
+      const conferma = confirm(
+        "Vuoi davvero eliminare questo evento? L'operazione non può essere annullata."
+      );
+
+      if (!conferma) return;
+
+      const { error } = await client
+        .from("events")
+        .delete()
+        .eq("id", eventoCorrente.id);
+
+      if (error) {
+        console.error(error);
+        alert("Errore durante l'eliminazione: " + error.message);
+        return;
+      }
+
+      alert("Evento eliminato correttamente!");
+
+      history.pushState({}, "", "eventi.html");
+      await caricaEventi();
+    });
+
+  window.addEventListener("popstate", () => {
+    avviaPagina();
+  });
+
+  async function avviaPagina() {
+    await verificaPermessi();
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (id) {
+      await caricaDettaglio(id);
+    } else {
+      await caricaEventi();
+    }
+  }
+
+  avviaPagina();
+</script>
+
+</body>
+</html>
