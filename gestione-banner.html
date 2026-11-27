@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestione Banner | InsideOutHabbo</title>
+
+<style>
+:root {
+  --navy:#243b68;
+  --blue:#4e80ba;
+  --yellow:#ffd34e;
+  --muted:#68758b;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f5f9;
+  color:var(--navy);
+}
+
+header {
+  background:#182947;
+  color:white;
+  padding:25px 7%;
+  border-bottom:5px solid var(--yellow);
+}
+
+.brand { font-size:27px;font-weight:bold; }
+.brand span { color:var(--yellow); }
+
+nav {
+  background:var(--navy);
+  padding:14px 7%;
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+}
+
+nav a {
+  color:white;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:bold;
+}
+
+main {
+  max-width:1050px;
+  margin:40px auto;
+  padding:0 20px;
+  min-height:550px;
+}
+
+.panel {
+  background:white;
+  padding:25px;
+  border-radius:9px;
+  border:1px solid #e7eaf0;
+  margin-bottom:25px;
+  box-shadow:0 3px 12px #00000008;
+}
+
+h1 { margin:10px 0; }
+h2 { margin-top:0; }
+
+.tag {
+  color:#b18a17;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+
+p { color:var(--muted);line-height:1.6; }
+
+label {
+  display:block;
+  font-weight:bold;
+  margin:18px 0 8px;
+  font-size:13px;
+}
+
+input {
+  width:100%;
+  padding:13px;
+  border:1px solid #d8deea;
+  border-radius:5px;
+  font:inherit;
+}
+
+input[type="file"] { background:#f8f9fc; }
+
+button {
+  border:0;
+  border-radius:5px;
+  padding:12px 17px;
+  background:var(--navy);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover { background:var(--blue); }
+button:disabled { opacity:.55;cursor:wait; }
+
+.primary { background:#eabf35;color:#243b68; }
+.danger { background:#a83232; }
+.secondary { background:#68758b; }
+
+.preview {
+  width:100%;
+  aspect-ratio:16 / 5;
+  background:#e9edf4;
+  border:2px dashed #c5cedc;
+  border-radius:7px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:12px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.preview img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.banner-list {
+  display:grid;
+  gap:18px;
+}
+
+.banner-item {
+  background:white;
+  border:1px solid #e7eaf0;
+  border-radius:8px;
+  padding:18px;
+}
+
+.banner-item img {
+  display:block;
+  width:100%;
+  aspect-ratio:16 / 5;
+  object-fit:cover;
+  border-radius:5px;
+  background:#e9edf4;
+}
+
+.banner-info {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:13px 0;
+}
+
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.actions button { margin:0; }
+
+.status {
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#edf0f5;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.status.active {
+  background:#dff3e5;
+  color:#23623b;
+}
+
+.message {
+  padding:14px;
+  border-radius:6px;
+  background:#edf1f7;
+  margin:15px 0;
+  color:var(--navy);
+  white-space:pre-wrap;
+}
+
+.help {
+  font-size:12px;
+  color:var(--muted);
+}
+
+footer {
+  background:#182947;
+  color:white;
+  text-align:center;
+  padding:25px;
+  margin-top:60px;
+  font-size:12px;
+}
+
+[hidden] { display:none !important; }
+
+@media(max-width:600px) {
+  header { padding:22px; }
+  nav { padding:15px 22px; }
+  .panel { padding:18px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">INSIDEOUT<span>HABBO</span></div>
+</header>
+
+<nav>
+  <a href="index.html">HOME</a>
+  <a href="redazione.html">REDAZIONE</a>
+  <a href="eventi.html">EVENTI</a>
+</nav>
+
+<main>
+
+  <section class="panel">
+    <div class="tag">AREA RISERVATA</div>
+    <h1>Gestione Banner</h1>
+    <p>
+      Gestisci le immagini promozionali da mostrare
+      nella homepage di InsideOutHabbo.
+    </p>
+    <p class="help">
+      Formato consigliato: orizzontale 16:5.
+      Immagini JPG, PNG, WEBP o GIF, massimo 5 MB.
+      Puoi conservare più banner, ma soltanto uno può
+      essere attivo alla volta.
+    </p>
+  </section>
+
+  <section class="panel" id="formPanel" hidden>
+    <h2 id="formTitle">Crea un nuovo banner</h2>
+
+    <form id="bannerForm">
+
+      <label for="bannerImage">Immagine del banner</label>
+      <input
+        type="file"
+        id="bannerImage"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+      >
+
+      <div class="preview" id="preview">
+        Anteprima immagine 16:5
+      </div>
+
+      <label for="bannerLink">Collegamento (facoltativo)</label>
+      <input
+        type="url"
+        id="bannerLink"
+        placeholder="https://..."
+      >
+
+      <p class="help">
+        Se inserisci un collegamento, i visitatori potranno
+        cliccare sul banner per aprirlo.
+      </p>
+
+      <div class="actions" style="margin-top:20px">
+        <button type="submit" class="primary" id="saveButton">
+          SALVA BANNER
+        </button>
+        <button type="button" class="secondary" id="cancelButton">
+          ANNULLA
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="banner-info">
+      <h2>I tuoi banner</h2>
+      <button class="primary" id="newButton">+ NUOVO BANNER</button>
+    </div>
+
+    <div id="message" class="message">
+      Caricamento...
+    </div>
+
+    <div id="bannerList" class="banner-list"></div>
+  </section>
+
+</main>
+
+<footer>
+  INSIDEOUTHABBO © Tutti i diritti riservati
+</footer>
+
+<script type="module">
+
+import { createClient }
+from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL =
+"https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+const client = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const BUCKET = "banners";
+
+let bannerInModifica = null;
+let immagineTemporanea = null;
+
+const formPanel = document.getElementById("formPanel");
+const bannerForm = document.getElementById("bannerForm");
+const bannerImage = document.getElementById("bannerImage");
+const bannerLink = document.getElementById("bannerLink");
+const preview = document.getElementById("preview");
+const bannerList = document.getElementById("bannerList");
+const message = document.getElementById("message");
+const saveButton = document.getElementById("saveButton");
+
+function messaggio(testo) {
+  message.textContent = testo;
+  message.hidden = false;
+}
+
+function validaLink(valore) {
+  if (!valore) return true;
+
+  try {
+    const url = new URL(valore);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function mostraAnteprima(url) {
+  preview.innerHTML = "";
+
+  if (!url) {
+    preview.textContent = "Anteprima immagine 16:5";
+    return;
+  }
+
+  const img = document.createElement("img");
+  img.src = url;
+  img.alt = "Anteprima banner";
+  preview.appendChild(img);
+}
+
+async function verificaAdmin() {
+  const { data: sessionData } =
+    await client.auth.getSession();
+
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    document.querySelector("main").innerHTML =
+      "<section class='panel'><h1>Accesso riservato</h1>" +
+      "<p>Devi accedere con il tuo account amministratore.</p>" +
+      "<a href='accesso.html'>Vai alla pagina di accesso</a></section>";
+    return false;
+  }
+
+  const { data: profilo, error } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error || profilo?.role !== "admin") {
+    document.querySelector("main").innerHTML =
+      "<section class='panel'><h1>Accesso negato</h1>" +
+      "<p>Questa pagina è riservata esclusivamente all'amministratore.</p>" +
+      "</section>";
+    return false;
+  }
+
+  return true;
+}
+
+function apriNuovo() {
+  bannerInModifica = null;
+  bannerForm.reset();
+  mostraAnteprima(null);
+
+  document.getElementById("formTitle").textContent =
+    "Crea un nuovo banner";
+
+  saveButton.textContent = "SALVA BANNER";
+  formPanel.hidden = false;
+  formPanel.scrollIntoView({ behavior:"smooth" });
+}
+
+function apriModifica(banner) {
+  bannerInModifica = banner;
+  bannerForm.reset();
+
+  bannerLink.value = banner.link_url || "";
+
+  mostraAnteprima(banner.image_url);
+
+  document.getElementById("formTitle").textContent =
+    "Modifica banner";
+
+  saveButton.textContent = "SALVA MODIFICHE";
+  formPanel.hidden = false;
+  formPanel.scrollIntoView({ behavior:"smooth" });
+}
+
+document.getElementById("newButton")
+.addEventListener("click", apriNuovo);
+
+document.getElementById("cancelButton")
+.addEventListener("click", () => {
+  formPanel.hidden = true;
+  bannerForm.reset();
+  mostraAnteprima(null);
+});
+
+bannerImage.addEventListener("change", () => {
+  const file = bannerImage.files[0];
+
+  if (!file) {
+    mostraAnteprima(bannerInModifica?.image_url || null);
+    return;
+  }
+
+  const tipiConsentiti = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif"
+  ];
+
+  if (!tipiConsentiti.includes(file.type)) {
+    alert("Formato non consentito. Usa JPG, PNG, WEBP o GIF.");
+    bannerImage.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("L'immagine supera il limite di 5 MB.");
+    bannerImage.value = "";
+    return;
+  }
+
+  if (immagineTemporanea) {
+    URL.revokeObjectURL(immagineTemporanea);
+  }
+
+  immagineTemporanea = URL.createObjectURL(file);
+  mostraAnteprima(immagineTemporanea);
+});
+
+async function caricaImmagine(file) {
+  const estensione = file.name.split(".").pop().toLowerCase();
+  const percorso =
+    "banner-" + crypto.randomUUID() + "." + estensione;
+
+  const { error } = await client.storage
+    .from(BUCKET)
+    .upload(percorso, file, {
+      contentType: file.type,
+      upsert: false
+    });
+
+  if (error) throw error;
+
+  const { data } = client.storage
+    .from(BUCKET)
+    .getPublicUrl(percorso);
+
+  return {
+    path: percorso,
+    url: data.publicUrl
+  };
+}
+
+bannerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const file = bannerImage.files[0];
+  const link = bannerLink.value.trim();
+
+  if (!validaLink(link)) {
+    alert("Inserisci un collegamento valido che inizi con http:// o https://.");
+    return;
+  }
+
+  if (!bannerInModifica && !file) {
+    alert("Seleziona un'immagine per il banner.");
+    return;
+  }
+
+  saveButton.disabled = true;
+  saveButton.textContent = "SALVATAGGIO...";
+
+  try {
+    let imageUrl = bannerInModifica?.image_url || null;
+    let imagePath = bannerInModifica?.image_path || null;
+    let vecchioPercorso = null;
+
+    if (file) {
+      const nuovoFile = await caricaImmagine(file);
+      imageUrl = nuovoFile.url;
+      imagePath = nuovoFile.path;
+
+      if (bannerInModifica) {
+        vecchioPercorso = bannerInModifica.image_path;
+      }
+    }
+
+    const dati = {
+      image_url: imageUrl,
+      image_path: imagePath,
+      link_url: link || null
+    };
+
+    let errore;
+
+    if (bannerInModifica) {
+      const risultato = await client
+        .from("banners")
+        .update(dati)
+        .eq("id", bannerInModifica.id);
+
+      errore = risultato.error;
+    } else {
+      const risultato = await client
+        .from("banners")
+        .insert(dati);
+
+      errore = risultato.error;
+    }
+
+    if (errore) {
+      console.error(errore);
+      throw errore;
+    }
+
+    if (vecchioPercorso) {
+      const { error: deleteError } = await client.storage
+        .from(BUCKET)
+        .remove([vecchioPercorso]);
+
+      if (deleteError) {
+        console.error("Impossibile eliminare la vecchia immagine:", deleteError);
+        alert("Banner salvato, ma la vecchia immagine non è stata eliminata.");
+      }
+    }
+
+    formPanel.hidden = true;
+    bannerForm.reset();
+    mostraAnteprima(null);
+
+    await caricaBanner();
+
+    alert("Banner salvato correttamente!");
+
+  } catch (error) {
+    console.error(error);
+    alert("Errore durante il salvataggio: " + error.message);
+  }
+
+  saveButton.disabled = false;
+  saveButton.textContent =
+    bannerInModifica ? "SALVA MODIFICHE" : "SALVA BANNER";
+});
+
+async function attivaBanner(id) {
+  const conferma = confirm(
+    "Vuoi attivare questo banner? L'eventuale banner attualmente attivo verrà disattivato."
+  );
+
+  if (!conferma) return;
+
+  const { error: disattivaErrore } = await client
+    .from("banners")
+    .update({ is_active:false })
+    .eq("is_active", true);
+
+  if (disattivaErrore) {
+    alert("Non è stato possibile disattivare il banner precedente: " + disattivaErrore.message);
+    return;
+  }
+
+  const { error } = await client
+    .from("banners")
+    .update({ is_active:true })
+    .eq("id", id);
+
+  if (error) {
+    alert("Errore durante l'attivazione: " + error.message);
+    await caricaBanner();
+    return;
+  }
+
+  await caricaBanner();
+  alert("Banner attivato!");
+}
+
+async function disattivaBanner(id) {
+  const { error } = await client
+    .from("banners")
+    .update({ is_active:false })
+    .eq("id", id);
+
+  if (error) {
+    alert("Errore durante la disattivazione: " + error.message);
+    return;
+  }
+
+  await caricaBanner();
+}
+
+async function eliminaBanner(banner) {
+  const conferma = confirm(
+    "Vuoi eliminare definitivamente questo banner?"
+  );
+
+  if (!conferma) return;
+
+  const { error } = await client
+    .from("banners")
+    .delete()
+    .eq("id", banner.id);
+
+  if (error) {
+    alert("Errore durante l'eliminazione: " + error.message);
+    return;
+  }
+
+  const { error: storageError } = await client.storage
+    .from(BUCKET)
+    .remove([banner.image_path]);
+
+  if (storageError) {
+    console.error(storageError);
+    alert("Banner eliminato, ma non è stato possibile eliminare la sua immagine.");
+  } else {
+    alert("Banner eliminato correttamente!");
+  }
+
+  await caricaBanner();
+}
+
+async function caricaBanner() {
+  bannerList.innerHTML = "";
+  messaggio("Caricamento dei banner...");
+
+  const { data, error } = await client
+    .from("banners")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  if (error) {
+    console.error(error);
+    messaggio("Errore nel caricamento dei banner: " + error.message);
+    return;
+  }
+
+  message.hidden = true;
+
+  if (!data || data.length === 0) {
+    messaggio("Non hai ancora creato nessun banner.");
+    return;
+  }
+
+  data.forEach(banner => {
+    const item = document.createElement("article");
+    item.className = "banner-item";
+
+    const img = document.createElement("img");
+    img.src = banner.image_url;
+    img.alt = "Banner InsideOutHabbo";
+
+    const info = document.createElement("div");
+    info.className = "banner-info";
+
+    const stato = document.createElement("span");
+    stato.className = "status" + (banner.is_active ? " active" : "");
+    stato.textContent = banner.is_active ? "ATTIVO IN HOMEPAGE" : "DISATTIVATO";
+
+    const dataCreazione = document.createElement("small");
+    dataCreazione.textContent =
+      "Creato il " +
+      new Date(banner.created_at).toLocaleDateString("it-IT");
+
+    info.append(stato, dataCreazione);
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const edit = document.createElement("button");
+    edit.textContent = "MODIFICA";
+    edit.addEventListener("click", () => apriModifica(banner));
+
+    const toggle = document.createElement("button");
+    toggle.className = banner.is_active ? "secondary" : "primary";
+    toggle.textContent = banner.is_active ? "DISATTIVA" : "ATTIVA";
+    toggle.addEventListener("click", () => {
+      if (banner.is_active) {
+        disattivaBanner(banner.id);
+      } else {
+        attivaBanner(banner.id);
+      }
+    });
+
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.textContent = "ELIMINA";
+    remove.addEventListener("click", () => eliminaBanner(banner));
+
+    actions.append(edit, toggle, remove);
+    item.append(img, info, actions);
+    bannerList.appendChild(item);
+  });
+}
+
+async function avvia() {
+  const admin = await verificaAdmin();
+
+  if (!admin) return;
+
+  await caricaBanner();
+}
+
+avvia();
+
+</script>
+
+</body>
+</html>
