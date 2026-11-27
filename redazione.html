@@ -1,0 +1,503 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Redazione | InsideOutHabbo</title>
+
+  <style>
+    :root {
+      --navy: #243b68;
+      --blue: #4e80ba;
+      --yellow: #ffd34e;
+      --muted: #68758b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: var(--navy);
+    }
+
+    header {
+      background: #182947;
+      color: white;
+      padding: 25px 7%;
+      border-bottom: 5px solid var(--yellow);
+    }
+
+    .brand {
+      font-size: 27px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .brand span {
+      color: var(--yellow);
+    }
+
+    nav {
+      background: var(--navy);
+      padding: 13px 7%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      color: var(--yellow);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+      min-height: 500px;
+    }
+
+    .hero {
+      background: white;
+      border-left: 6px solid var(--yellow);
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 3px 12px #00000008;
+    }
+
+    .tag {
+      color: #b18a17;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 12px 0;
+      font-size: 32px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .section-title {
+      margin: 35px 0 20px;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .member-card {
+      background: white;
+      border: 1px solid #e7eaf0;
+      border-radius: 9px;
+      padding: 25px 18px;
+      text-align: center;
+      box-shadow: 0 3px 12px #00000008;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      margin: 0 auto 12px;
+      display: block;
+      background: #edf1f7;
+      border-radius: 8px;
+    }
+
+    .member-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 8px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .role {
+      display: inline-block;
+      background: #e9eff8;
+      color: var(--navy);
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .role.admin {
+      background: #fff1c4;
+      color: #8a6410;
+    }
+
+    .role.caporedattore {
+      background: #e5e9ff;
+      color: #394d91;
+    }
+
+    .role.redattore {
+      background: #e3f2e8;
+      color: #28653e;
+    }
+
+    .task {
+      margin-top: 13px;
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .admin-tools {
+      border-top: 1px solid #e7eaf0;
+      margin-top: 18px;
+      padding-top: 15px;
+      text-align: left;
+    }
+
+    .admin-tools label {
+      display: block;
+      font-size: 11px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    .admin-tools input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d8deea;
+      border-radius: 5px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    button {
+      border: none;
+      border-radius: 5px;
+      padding: 11px 15px;
+      background: var(--navy);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    button:hover {
+      background: var(--blue);
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .message {
+      background: white;
+      border-radius: 7px;
+      padding: 18px;
+      color: var(--muted);
+      margin: 20px 0;
+    }
+
+    footer {
+      text-align: center;
+      background: #182947;
+      color: white;
+      padding: 25px;
+      margin-top: 60px;
+      font-size: 12px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media(max-width: 800px) {
+      .team-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media(max-width: 500px) {
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      header {
+        padding: 22px;
+      }
+
+      nav {
+        padding: 15px 22px;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">INSIDEOUT<span>HABBO</span></div>
+</header>
+
+<nav>
+  <a href="index.html">HOME</a>
+  <a href="categoria.html?categoria=Attualit%C3%A0">ATTUALITÀ</a>
+  <a href="categoria.html?categoria=Habbo">HABBO</a>
+  <a href="categoria.html?categoria=Roleplay">ROLEPLAY</a>
+  <a href="eventi.html">EVENTI</a>
+  <a href="forum.html">FORUM</a>
+  <a href="chi-siamo.html">CHI SIAMO</a>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <div class="tag">DIETRO LE QUINTE</div>
+    <h1>La Redazione</h1>
+    <p>
+      Le persone che raccontano, informano e animano
+      InsideOutHabbo. Scopri chi lavora dietro ogni
+      notizia, intervista ed evento.
+    </p>
+  </section>
+
+  <h2 class="section-title">I componenti della redazione</h2>
+
+  <div id="message" class="message">
+    Caricamento della redazione...
+  </div>
+
+  <section id="teamGrid" class="team-grid"></section>
+
+</main>
+
+<footer>
+  INSIDEOUTHABBO © Tutti i diritti riservati
+</footer>
+
+<script type="module">
+  import { createClient }
+    from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const SUPABASE_URL =
+    "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+
+  const client = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const ruoli = {
+    admin: "Amministratore",
+    caporedattore: "Caporedattore",
+    redattore: "Redattore"
+  };
+
+  let isAdmin = false;
+
+  const message = document.getElementById("message");
+  const teamGrid = document.getElementById("teamGrid");
+
+  function mostraMessaggio(testo) {
+    message.textContent = testo;
+    message.hidden = false;
+  }
+
+  function creaAvatar(nome) {
+    const avatar = document.createElement("img");
+    avatar.className = "avatar";
+    avatar.alt = "Avatar Habbo di " + nome;
+    avatar.src =
+      "https://www.habbo.it/habbo-imaging/avatarimage?user=" +
+      encodeURIComponent(nome) +
+      "&direction=2&head_direction=3&gesture=sml&size=l";
+
+    avatar.onerror = () => {
+      avatar.style.display = "none";
+    };
+
+    return avatar;
+  }
+
+  async function verificaAdmin() {
+    const { data: sessionData } =
+      await client.auth.getSession();
+
+    const user = sessionData.session?.user;
+
+    if (!user) return;
+
+    const { data: profilo, error } = await client
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Errore verifica amministratore:", error);
+      return;
+    }
+
+    isAdmin = profilo?.role === "admin";
+  }
+
+  async function salvaMansione(userId, input, button) {
+    const mansione = input.value.trim();
+
+    button.disabled = true;
+    button.textContent = "SALVATAGGIO...";
+
+    const { error } = await client
+      .from("redazione_mansioni")
+      .upsert({
+        user_id: userId,
+        mansione: mansione || null,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: "user_id"
+      });
+
+    button.disabled = false;
+    button.textContent = "SALVA MANSIONE";
+
+    if (error) {
+      console.error(error);
+      alert("Errore durante il salvataggio: " + error.message);
+      return;
+    }
+
+    alert("Mansione aggiornata correttamente!");
+    await caricaRedazione();
+  }
+
+  async function caricaRedazione() {
+    teamGrid.innerHTML = "";
+    mostraMessaggio("Caricamento della redazione...");
+
+    const { data: profili, error } = await client
+      .from("profiles")
+      .select("id, habbo_name, display_name, role")
+      .in("role", ["admin", "caporedattore", "redattore"])
+      .order("role");
+
+    if (error) {
+      console.error("Errore caricamento profili:", error);
+      mostraMessaggio(
+        "Non è stato possibile caricare la redazione. " +
+        "Verifica i permessi di lettura della tabella profiles."
+      );
+      return;
+    }
+
+    if (!profili || profili.length === 0) {
+      mostraMessaggio("Non ci sono ancora componenti nella redazione.");
+      return;
+    }
+
+    const ids = profili.map(p => p.id);
+
+    const { data: mansioni, error: mansioniError } = await client
+      .from("redazione_mansioni")
+      .select("user_id, mansione")
+      .in("user_id", ids);
+
+    if (mansioniError) {
+      console.error("Errore caricamento mansioni:", mansioniError);
+      mostraMessaggio(
+        "Impossibile caricare le mansioni. Verifica i permessi della tabella redazione_mansioni."
+      );
+      return;
+    }
+
+    const mappaMansioni = new Map(
+      (mansioni || []).map(m => [m.user_id, m.mansione])
+    );
+
+    message.hidden = true;
+
+    profili.forEach(profilo => {
+      const nome = profilo.habbo_name || profilo.display_name || "Utente Habbo";
+      const ruolo = profilo.role;
+      const mansione = mappaMansioni.get(profilo.id) || "";
+
+      const card = document.createElement("article");
+      card.className = "member-card";
+
+      card.appendChild(creaAvatar(nome));
+
+      const nomeElemento = document.createElement("div");
+      nomeElemento.className = "member-name";
+      nomeElemento.textContent = nome;
+      card.appendChild(nomeElemento);
+
+      const ruoloElemento = document.createElement("span");
+      ruoloElemento.className = "role " + ruolo;
+      ruoloElemento.textContent = ruoli[ruolo] || ruolo;
+      card.appendChild(ruoloElemento);
+
+      const task = document.createElement("div");
+      task.className = "task";
+      task.textContent = mansione || "";
+      card.appendChild(task);
+
+      if (isAdmin) {
+        const tools = document.createElement("div");
+        tools.className = "admin-tools";
+
+        const label = document.createElement("label");
+        label.textContent = "MANSIONE PERSONALIZZATA";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 100;
+        input.placeholder = "Es. Responsabile Social";
+        input.value = mansione;
+
+        const button = document.createElement("button");
+        button.textContent = "SALVA MANSIONE";
+
+        button.addEventListener("click", () => {
+          salvaMansione(profilo.id, input, button);
+        });
+
+        tools.append(label, input, button);
+        card.appendChild(tools);
+      }
+
+      teamGrid.appendChild(card);
+    });
+  }
+
+  async function avviaPagina() {
+    await verificaAdmin();
+    await caricaRedazione();
+  }
+
+  avviaPagina();
+</script>
+
+</body>
+</html>
