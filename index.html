@@ -20,19 +20,14 @@ nav a:hover{background:#304875;color:var(--yellow)}
 .container{max-width:1180px;margin:35px auto;padding:0 20px}
 .section-title{font-size:13px;letter-spacing:1.5px;font-weight:900;color:var(--navy);border-left:4px solid var(--yellow);padding-left:11px;margin-bottom:20px}
 .layout{display:grid;grid-template-columns:2fr 1fr;gap:25px}
-.hero{background:linear-gradient(120deg,#172849,#304d7c);color:white;padding:42px;border-radius:9px;min-height:270px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;background-size:cover;background-position:center}
-.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,53,.96),rgba(29,49,88,.78));z-index:0}
-.hero>*{position:relative;z-index:1}
+.hero{background:linear-gradient(120deg,#172849,#304d7c);color:white;padding:42px;border-radius:9px;min-height:270px;display:flex;flex-direction:column;justify-content:center}
 .hero .tag{color:var(--yellow);font-size:11px;font-weight:bold;letter-spacing:1.5px;margin-bottom:16px}
 .hero h1{font-size:clamp(28px,4vw,43px);line-height:1.12;margin:0 0 15px;max-width:650px}
-.hero p{color:#d5deed;line-height:1.6;max-width:570px;margin:0 0 18px}
-.hero-meta{font-size:12px;color:#d5deed;margin-top:15px}
-.hero-link{display:inline-block;align-self:flex-start;margin-top:20px;background:var(--yellow);color:var(--navy);text-decoration:none;padding:11px 16px;border-radius:5px;font-size:12px;font-weight:900;letter-spacing:.5px}
-.hero-link:hover{background:#ffe58a}
+.hero p{color:#d5deed;line-height:1.6;max-width:570px;margin:0}
 .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:17px;margin-top:25px}
 .card{background:white;border-radius:8px;padding:23px;border:1px solid #e7eaf0;transition:transform .2s,box-shadow .2s}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 22px #15213a12}
-.cover{height:100px;background:#edf1f8;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:17px;overflow:hidden}
+.cover{height:100px;background:#edf1f8;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:17px}
 .pixel-icon{width:64px;height:64px;shape-rendering:crispEdges;image-rendering:pixelated}
 .card small{color:#b18a17;font-weight:bold;font-size:10px;letter-spacing:1px}
 .card h3{margin:9px 0;font-size:17px;color:var(--navy)}
@@ -67,7 +62,6 @@ footer strong{color:white}
       <a href="#" id="voceProfilo">Il mio profilo</a>
       <a href="impostazioni.html">Impostazioni account</a>
       <a href="scrivi-articolo.html" id="voceScriviArticolo" style="display:none">✍️ Scrivi un articolo</a>
-      <a href="scrivi-intervista.html" id="voceScriviIntervista" style="display:none">🎙️ Scrivi intervista</a>
       <a href="bacheca-redazionale.html" id="voceBacheca" style="display:none">Bacheca redazionale</a>
       <a href="moderazione-forum.html" id="voceModerazione" style="display:none">Moderazione Forum</a>
       <a href="pannello-redazione.html" id="voceModerazioneCommenti" style="display:none">Moderazione commenti</a>
@@ -99,12 +93,10 @@ footer strong{color:white}
   <div class="section-title">IN PRIMO PIANO</div>
   <div class="layout">
     <div>
-      <section class="hero" id="articolo-in-evidenza">
-        <div class="tag" id="evidenzaCategoria">BENVENUTI SU INSIDEOUTHABBO</div>
-        <h1 id="evidenzaTitolo">Dietro ogni pixel, c'è una storia da raccontare.</h1>
-        <p id="evidenzaAnteprima">Notizie, personaggi, eventi e storie dalla community Habbo e dal mondo RPG. La tua finestra su un universo tutto da scoprire.</p>
-        <div class="hero-meta" id="evidenzaMeta"></div>
-        <a class="hero-link" id="evidenzaLink" href="categoria.html?categoria=Attualit%C3%A0">SCOPRI LE NOTIZIE</a>
+      <section class="hero">
+        <div class="tag">BENVENUTI SU INSIDEOUTHABBO</div>
+        <h1>Dietro ogni pixel, c'è una storia da raccontare.</h1>
+        <p>Notizie, personaggi, eventi e storie dalla community Habbo e dal mondo RPG. La tua finestra su un universo tutto da scoprire.</p>
       </section>
       <div class="cards">
         <article class="card"><div class="cover"><svg class="pixel-icon" viewBox="0 0 32 32" aria-label="Giornale"><rect x="6" y="3" width="20" height="26" fill="#243b68"/><rect x="9" y="6" width="14" height="20" fill="#fff"/><rect x="11" y="8" width="10" height="3" fill="#ffd34e"/><rect x="11" y="14" width="4" height="5" fill="#e5a83a"/><rect x="17" y="14" width="4" height="2" fill="#243b68"/><rect x="17" y="18" width="4" height="1" fill="#243b68"/><rect x="11" y="21" width="10" height="2" fill="#243b68"/></svg></div><small>INFORMAZIONE</small><h3>Attualità</h3><p>Le notizie, gli aggiornamenti e gli avvenimenti più importanti della community.</p></article>
@@ -130,7 +122,7 @@ footer strong{color:white}
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL='https://mlgxlsstmaoxhigtqdhb.supabase.co';
-const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUZKg4tpw_XWxRI8Mj';
+const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const loginLink=document.getElementById("loginLink");
 const loginText=document.getElementById("loginText");
@@ -141,14 +133,13 @@ const voceProfilo=document.getElementById("voceProfilo");
 const logoutButton=document.getElementById("logoutButton");
 const voceBacheca=document.getElementById("voceBacheca");
 const voceScriviArticolo=document.getElementById("voceScriviArticolo");
-const voceScriviIntervista=document.getElementById("voceScriviIntervista");
 const voceAdmin=document.getElementById("voceAdmin");
 const voceModerazione=document.getElementById("voceModerazione");
 const voceModerazioneCommenti=document.getElementById("voceModerazioneCommenti");
 let utenteAutenticato=false;
 function chiudiMenu(){dropdownMenu.style.display="none"}
 async function aggiornaAccesso(){
-  voceBacheca.style.display="none";voceAdmin.style.display="none";voceModerazione.style.display="none";voceModerazioneCommenti.style.display="none";voceScriviArticolo.style.display="none";voceScriviIntervista.style.display="none";
+  voceBacheca.style.display="none";voceAdmin.style.display="none";voceModerazione.style.display="none";voceModerazioneCommenti.style.display="none";voceScriviArticolo.style.display="none";
   const {data:{session}}=await supabase.auth.getSession();
   if(!session){utenteAutenticato=false;loginText.textContent="ACCEDI / REGISTRATI";loginLink.href="accesso.html";miniAvatar.style.display="none";menuFreccia.style.display="none";chiudiMenu();return}
   const {data:profilo,error}=await supabase.from("profiles").select("habbo_name, role").eq("id",session.user.id).maybeSingle();
@@ -157,7 +148,7 @@ async function aggiornaAccesso(){
   loginLink.href="profilo.html?utente="+encodeURIComponent(profilo.habbo_name);voceProfilo.href=loginLink.href;
   miniAvatar.src="https://www.habbo.it/habbo-imaging/avatarimage?user="+encodeURIComponent(profilo.habbo_name)+"&direction=2&head_direction=3&size=s&gesture=std&action=std";
   miniAvatar.style.display="inline-block";miniAvatar.style.cursor="pointer";menuFreccia.style.display="inline";
-  if(["redattore","caporedattore","admin"].includes(profilo.role)){voceBacheca.style.display="block";voceScriviArticolo.style.display="block";voceScriviIntervista.style.display="block";voceModerazioneCommenti.style.display="block"}
+  if(["redattore","caporedattore","admin"].includes(profilo.role)){voceBacheca.style.display="block";voceScriviArticolo.style.display="block";voceModerazioneCommenti.style.display="block"}
   if(profilo.role==="admin")voceAdmin.style.display="block";
   const {data:puoModerare,error:erroreModerazione}=await supabase.rpc("can_moderate_forum");
   if(!erroreModerazione&&puoModerare===true)voceModerazione.style.display="block";
@@ -169,7 +160,6 @@ document.addEventListener("click",(evento)=>{if(!document.getElementById("accoun
 logoutButton.addEventListener("click",async()=>{const {error}=await supabase.auth.signOut();if(error){alert("Non è stato possibile uscire dall'account.");return}window.location.href="index.html"});
 aggiornaAccesso();
 supabase.auth.onAuthStateChange(()=>{aggiornaAccesso()});
-
 const contenitore=document.getElementById('ultimi-articoli');
 async function caricaUltimiArticoli(){
   try{
@@ -187,35 +177,7 @@ async function caricaUltimiArticoli(){
     });
   }catch(errore){console.error('Errore nel caricamento degli articoli:',errore);contenitore.textContent='Non è stato possibile caricare gli articoli.'}
 }
-async function caricaArticoloInEvidenza(){
-  const sezione=document.getElementById('articolo-in-evidenza');
-  try{
-    const {data,error}=await supabase.from('articles')
-      .select('id, title, excerpt, content, cover_image_url, category, published_at')
-      .eq('status','published')
-      .order('published_at',{ascending:false,nullsFirst:false})
-      .limit(1)
-      .maybeSingle();
-    if(error)throw error;
-    if(!data)return;
-
-    document.getElementById('evidenzaCategoria').textContent=(data.category||'ARTICOLO IN EVIDENZA').toUpperCase();
-    document.getElementById('evidenzaTitolo').textContent=data.title||'Articolo in evidenza';
-    const testo=data.excerpt||(data.content||'').replace(/<[^>]*>/g,' ').trim();
-    document.getElementById('evidenzaAnteprima').textContent=testo.length>260?testo.slice(0,257)+'...':(testo||'Leggi l’articolo completo su InsideOutHabbo.');
-    const dataPubblicazione=data.published_at?new Date(data.published_at).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'}):'';
-    document.getElementById('evidenzaMeta').textContent=dataPubblicazione?'Pubblicato il '+dataPubblicazione:'';
-    document.getElementById('evidenzaLink').href=`articolo.html?id=${encodeURIComponent(data.id)}`;
-    document.getElementById('evidenzaLink').textContent='LEGGI L’ARTICOLO';
-    if(data.cover_image_url){
-      sezione.style.backgroundImage=`linear-gradient(90deg,rgba(16,27,53,.96),rgba(29,49,88,.78)),url("${data.cover_image_url.replace(/"/g,'%22')}")`;
-    }
-  }catch(errore){
-    console.error('Errore nel caricamento dell’articolo in evidenza:',errore);
-  }
-}
 caricaUltimiArticoli();
-caricaArticoloInEvidenza();
 </script>
 </body>
 </html>
