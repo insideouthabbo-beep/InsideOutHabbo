@@ -201,6 +201,40 @@ logoutButton.addEventListener("click",async()=>{const {error}=await supabase.aut
 aggiornaAccesso();
 supabase.auth.onAuthStateChange(()=>{aggiornaAccesso()});
 const contenitore=document.getElementById('ultimi-articoli');
+  
+async function caricaBanner() {
+  const contenitoreBanner = document.getElementById("bannerBenvenuto");
+  const immagineBanner = document.getElementById("bannerBenvenutoImg");
+  const linkBanner = document.getElementById("bannerBenvenutoLink");
+
+  try {
+    const { data, error } = await supabase
+      .from("banners")
+      .select("image_url, link_url")
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return;
+
+    immagineBanner.src = data.image_url;
+    contenitoreBanner.style.display = "block";
+
+    if (data.link_url) {
+      linkBanner.href = data.link_url;
+      linkBanner.target = "_blank";
+      linkBanner.rel = "noopener noreferrer";
+    } else {
+      linkBanner.removeAttribute("href");
+      linkBanner.style.cursor = "default";
+    }
+  } catch (errore) {
+    console.error("Errore caricamento banner:", errore);
+  }
+}
+
+caricaBanner();
+
  async function caricaUltimiArticoli(){
   try{
     const {data,error}=await supabase.from('articles').select('id, title, excerpt, content, cover_image_url, category, published_at').eq('status','published').order('published_at',{ascending:false,nullsFirst:false}).limit(3);
