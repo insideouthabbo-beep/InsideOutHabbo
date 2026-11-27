@@ -190,30 +190,48 @@
     }
 
     async function verificaAccesso() {
-      const { data: { user }, error: erroreUtente } = await supabase.auth.getUser();
-      if (erroreUtente || !user) {
-        stato.style.display = "none";
-        accessoNegato.style.display = "block";
-        return;
-      }
+  stato.textContent = "Verifica della sessione...";
 
-      const { data: profilo, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
+  const { data: { session }, error: erroreSessione } =
+    await supabase.auth.getSession();
 
-      if (error || !profilo || !ruoliAutorizzati.includes(profilo.role)) {
-        stato.style.display = "none";
-        accessoNegato.style.display = "block";
-        return;
-      }
+  if (erroreSessione || !session) {
+    stato.style.display = "none";
+    accessoNegato.style.display = "block";
+    return;
+  }
 
-      utenteCorrente = user;
-      stato.style.display = "none";
-      editor.style.display = "block";
-      aggiungiDomanda();
-    }
+  stato.textContent = "Verifica del ruolo...";
+
+  const { data: profilo, error } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Errore lettura profilo:", error);
+    stato.textContent = "Errore nel controllo del profilo: " + error.message;
+    return;
+  }
+
+  if (!profilo) {
+    stato.textContent = "Profilo non trovato per questo account.";
+    return;
+  }
+
+  if (!ruoliAutorizzati.includes(profilo.role)) {
+    stato.textContent = "Ruolo non autorizzato: " + profilo.role;
+    return;
+  }
+
+  utenteCorrente = session.user;
+  stato.style.display = "none";
+  accessoNegato.style.display = "none";
+  editor.style.display = "block";
+
+  aggiungiDomanda();
+}
 
     async function salvaIntervista(status) {
       if (invioInCorso) return;
