@@ -95,6 +95,7 @@ footer strong{color:white}
 
 <section class="container">
   <div class="section-title">ULTIMI ARTICOLI</div>
+<div id="ultimi-articoli" class="cards"></div>
 
 </section>
 
@@ -200,7 +201,7 @@ logoutButton.addEventListener("click",async()=>{const {error}=await supabase.aut
 aggiornaAccesso();
 supabase.auth.onAuthStateChange(()=>{aggiornaAccesso()});
 const contenitore=document.getElementById('ultimi-articoli');
-async function caricaUltimiArticoli(){
+ async function caricaUltimiArticoli(){
   try{
     const {data,error}=await supabase.from('articles').select('id, title, excerpt, content, cover_image_url, category, published_at').eq('status','published').order('published_at',{ascending:false,nullsFirst:false}).limit(3);
     if(error)throw error;
