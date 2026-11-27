@@ -223,9 +223,10 @@
       <form id="formLogin">
         <h3>Hai già un account?</h3>
 
-        <label for="emailLogin">Email</label>
-        <input id="emailLogin" type="email" required
-          placeholder="La tua email">
+        <label for="nicknameLogin">Nickname Habbo</label>
+<input id="nicknameLogin" type="text" required
+  maxlength="30"
+  placeholder="Il tuo nickname Habbo">
 
         <label for="passwordLogin">Password</label>
         <input id="passwordLogin" type="password" required
@@ -511,27 +512,43 @@
       }
     });
 
-  document.getElementById("formLogin")
-    .addEventListener("submit", async function(event) {
-      event.preventDefault();
+  
+document.getElementById("formLogin")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-      mostraMessaggio("Accesso in corso...");
+    mostraMessaggio("Accesso in corso...");
 
-      const email = document.getElementById("emailLogin").value.trim();
-      const password = document.getElementById("passwordLogin").value;
+    const nickname = document.getElementById("nicknameLogin").value.trim();
+    const password = document.getElementById("passwordLogin").value;
 
-      const { error } = await client.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (error) {
-        mostraMessaggio("Errore: " + error.message);
-        return;
+    const { data, error } = await client.functions.invoke(
+      "login-with-habbo",
+      {
+        body: {
+          nickname: nickname,
+          password: password
+        }
       }
+    );
 
-      mostraMessaggio("Accesso effettuato. Caricamento del profilo...");
+    if (error || !data || !data.access_token || !data.refresh_token) {
+      mostraMessaggio("Nickname o password non corretti.");
+      return;
+    }
+
+    const { error: sessionError } = await client.auth.setSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token
     });
+
+    if (sessionError) {
+      mostraMessaggio("Errore durante l'accesso: " + sessionError.message);
+      return;
+    }
+
+    mostraMessaggio("Accesso effettuato. Caricamento del profilo...");
+  });
 
   document.getElementById("verificaHabbo")
     .addEventListener("click", verificaPersonaggio);
