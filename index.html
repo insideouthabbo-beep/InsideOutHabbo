@@ -141,7 +141,7 @@ const voceModerazioneCommenti=document.getElementById("voceModerazioneCommenti")
 let utenteAutenticato=false;
 function chiudiMenu(){dropdownMenu.style.display="none"}
 async function aggiornaAccesso(){
-  voceBacheca.style.display="none";voceAdmin.style.display="none";voceModerazione.style.display="none";voceModerazioneCommenti.style.display="none";voceScriviArticolo.style.display="none";
+  voceBacheca.style.display="none";voceAdmin.styvoceBacheca.style.display="none";voceAdmin.style.display="none";voceModerazione.style.display="none";voceModerazioneCommenti.style.display="none";voceScriviArticolo.style.display="none";voceScriviIntervista.style.display="none";
   const {data:{session}}=await supabase.auth.getSession();
   if(!session){utenteAutenticato=false;loginText.textContent="ACCEDI / REGISTRATI";loginLink.href="accesso.html";miniAvatar.style.display="none";menuFreccia.style.display="none";chiudiMenu();return}
   const {data:profilo,error}=await supabase.from("profiles").select("habbo_name, role").eq("id",session.user.id).maybeSingle();
