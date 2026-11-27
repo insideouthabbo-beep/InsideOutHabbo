@@ -45,6 +45,20 @@ nav a:hover{background:#304875;color:var(--yellow)}
 .description{font-size:13px;line-height:1.6;color:var(--muted);margin:0 0 18px}
 .read-link{display:inline-block;align-self:flex-start;margin-top:auto;background:var(--navy);color:#fff;text-decoration:none;padding:11px 15px;border-radius:5px;font-size:12px;font-weight:bold}
 .read-link:hover{background:var(--blue-light);color:var(--yellow)}
+  .write-interview-link{
+  display:inline-block;
+  background:var(--yellow);
+  color:var(--navy);
+  text-decoration:none;
+  padding:13px 19px;
+  border-radius:5px;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:25px;
+}
+.write-interview-link:hover{
+  background:#f0bd35;
+}
 .state-message{background:#fff;border:1px solid #e7eaf0;border-radius:8px;padding:25px;color:var(--muted);line-height:1.6}
 .state-message strong{color:var(--navy)}
 footer{margin-top:45px;background:var(--navy);color:#c4cde0;text-align:center;padding:28px 20px;font-size:12px;line-height:1.8}
@@ -82,6 +96,11 @@ footer strong{color:#fff}
 </section>
 
 <main class="container">
+  <a href="scrivi-intervista.html" id="pulsanteScriviIntervista"
+     class="write-interview-link" style="display:none">
+    🎙️ SCRIVI INTERVISTA
+  </a>
+
   <div class="section-title">TUTTE LE INTERVISTE</div>
   <div id="elencoInterviste" class="interviews-grid">
     <div class="state-message">Caricamento delle interviste...</div>
@@ -100,6 +119,29 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://mlgxlsstmaoxhigtqdhb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const pulsanteScriviIntervista = document.getElementById('pulsanteScriviIntervista');
+
+async function verificaPermessiIntervista() {
+  pulsanteScriviIntervista.style.display = 'none';
+
+  const { data: { session }, error: erroreSessione } = await supabase.auth.getSession();
+
+  if (erroreSessione || !session) return;
+
+  const { data: profilo, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (error || !profilo) return;
+
+  if (['admin', 'redattore', 'caporedattore'].includes(profilo.role)) {
+    pulsanteScriviIntervista.style.display = 'inline-block';
+  }
+}
+
+verificaPermessiIntervista();
 
 const elenco = document.getElementById('elencoInterviste');
 
