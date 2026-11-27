@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room ufficiali | InsideOutHabbo</title>
+<style>
+:root {
+  --bg:#071426;
+  --panel:#10243d;
+  --panel2:#152d49;
+  --text:#f3f6fb;
+  --muted:#aabbd0;
+  --yellow:#ffd447;
+  --blue:#4ca4ff;
+  --line:rgba(255,255,255,.1);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#142d4b 0,var(--bg) 48%);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  line-height:1.6;
+}
+header{
+  background:rgba(5,15,29,.95);
+  border-bottom:1px solid var(--line);
+  padding:18px 5%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+.brand{
+  color:var(--yellow);
+  font-weight:900;
+  letter-spacing:1px;
+  text-decoration:none;
+}
+.home{
+  color:var(--text);
+  text-decoration:none;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 13px;
+  font-size:13px;
+}
+.hero{
+  padding:55px 5%;
+  background:linear-gradient(120deg,#102b49,#0a1a30);
+  border-bottom:1px solid var(--line);
+}
+.hero-inner{max-width:1100px;margin:auto}
+.eyebrow{
+  color:var(--yellow);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+h1{
+  font-size:clamp(32px,5vw,48px);
+  line-height:1.15;
+  margin:10px 0;
+}
+.hero p{color:var(--muted);max-width:650px}
+main{width:min(1100px,92%);margin:40px auto 70px}
+.section-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+.section-heading h2{font-size:20px;margin:0}
+button,.button{
+  display:inline-block;
+  border:0;
+  border-radius:8px;
+  padding:12px 18px;
+  background:var(--yellow);
+  color:#14243a;
+  font-weight:900;
+  cursor:pointer;
+  text-decoration:none;
+  font-size:14px;
+}
+button:hover,.button:hover{filter:brightness(1.08)}
+button:disabled{opacity:.6;cursor:not-allowed}
+.secondary{
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--line);
+}
+.danger{background:#a83245;color:white}
+.rooms-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:22px;
+}
+.room-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform .2s,border-color .2s;
+}
+.room-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--yellow);
+}
+.room-card img,.room-placeholder{
+  width:100%;
+  height:190px;
+  object-fit:cover;
+  display:block;
+  background:var(--panel2);
+}
+.room-placeholder{
+  display:grid;
+  place-items:center;
+  color:var(--yellow);
+  font-weight:900;
+  letter-spacing:2px;
+}
+.room-info{padding:20px}
+.room-info h3{margin:0 0 9px;font-size:20px}
+.room-info p{
+  color:var(--muted);
+  margin:0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.room-link{
+  display:inline-block;
+  color:var(--yellow);
+  font-size:12px;
+  font-weight:900;
+  margin-top:16px;
+  letter-spacing:1px;
+}
+.message{
+  color:var(--muted);
+  padding:30px 10px;
+  text-align:center;
+  grid-column:1/-1;
+}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:25px;
+  margin-top:25px;
+}
+.panel h2{margin-top:0}
+label{
+  display:block;
+  color:var(--yellow);
+  font-size:13px;
+  font-weight:800;
+  margin:18px 0 7px;
+}
+input,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#091a2d;
+  color:white;
+  font:inherit;
+}
+textarea{min-height:130px;resize:vertical}
+.hint{font-size:12px;color:var(--muted);margin-top:7px}
+.preview{
+  max-width:420px;
+  max-height:260px;
+  width:100%;
+  object-fit:cover;
+  border-radius:10px;
+  margin-top:14px;
+}
+.detail-cover{
+  width:100%;
+  max-height:480px;
+  object-fit:cover;
+  border-radius:14px;
+  margin:20px 0;
+}
+.detail-description{
+  background:var(--panel);
+  border-left:4px solid var(--yellow);
+  padding:22px;
+  border-radius:0 12px 12px 0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.detail-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:25px;
+}
+.error{color:#ff9eaa}
+.success{color:#8de0aa}
+[hidden]{display:none!important}
+footer{
+  border-top:1px solid var(--line);
+  padding:24px 5%;
+  color:var(--muted);
+  text-align:center;
+  font-size:13px;
+}
+@media(max-width:800px){
+  .rooms-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:550px){
+  .rooms-grid{grid-template-columns:1fr}
+  .hero{padding:38px 6%}
+  main{margin-top:28px}
+  .panel{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="index.html">INSIDEOUTHABBO</a>
+  <a class="home" href="index.html">← TORNA ALLA HOME</a>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">ESPLORA IL NOSTRO UNIVERSO</div>
+    <h1>Room ufficiali</h1>
+    <p>Scopri le stanze della community InsideOutHabbo, visita i luoghi di incontro e trova nuove room da esplorare.</p>
+  </div>
+</section>
+
+<main>
+
+  <section id="archivio">
+    <div class="section-heading">
+      <h2>TUTTE LE ROOM</h2>
+      <button id="apriForm" hidden>+ AGGIUNGI ROOM</button>
+    </div>
+
+    <div id="elencoRoom" class="rooms-grid">
+      <div class="message">Caricamento delle room...</div>
+    </div>
+
+    <section class="panel" id="formRoom" hidden>
+      <h2>Pubblica una nuova room</h2>
+      <p class="hint">Compila i campi per aggiungere una stanza all'archivio ufficiale.</p>
+
+      <form id="moduloRoom">
+        <label for="nomeRoom">Nome della room</label>
+        <input id="nomeRoom" type="text" maxlength="100" required placeholder="Es. Piazza InsideOutHabbo">
+
+        <label for="linkRoom">Link della stanza Habbo</label>
+        <input id="linkRoom" type="url" required placeholder="https://www.habbo.it/room/...">
+        <div class="hint">Inserisci il collegamento diretto alla stanza su Habbo.</div>
+
+        <label for="descrizioneRoom">Descrizione</label>
+        <textarea id="descrizioneRoom" maxlength="3000" required placeholder="Racconta cosa si può trovare in questa stanza..."></textarea>
+
+        <label for="fotoRoom">Fotografia della room</label>
+        <input id="fotoRoom" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <div class="hint">Carica una foto dal computer o dal cellulare. Formati JPG, PNG e WEBP. Massimo 5 MB.</div>
+
+        <div id="anteprima" hidden>
+          <img id="immagineAnteprima" class="preview" alt="Anteprima della room">
+          <button type="button" id="rimuoviFoto" class="secondary" style="margin-top:10px">Rimuovi foto</button>
+        </div>
+
+        <div class="detail-actions">
+          <button type="submit" id="pubblicaRoom">PUBBLICA ROOM</button>
+          <button type="button" id="annullaForm" class="secondary">ANNULLA</button>
+        </div>
+        <p id="messaggioForm" class="hint" aria-live="polite"></p>
+      </form>
+    </section>
+  </section>
+
+  <section id="dettaglio" hidden>
+    <button type="button" class="secondary" id="tornaArchivio">← TORNA ALLE ROOM</button>
+    <div class="panel">
+      <div class="eyebrow">ROOM UFFICIALE · INSIDEOUTHABBO</div>
+      <h1 id="titoloDettaglio"></h1>
+      <img id="fotoDettaglio" class="detail-cover" alt="Fotografia della room">
+      <div id="descrizioneDettaglio" class="detail-description"></div>
+      <div class="detail-actions">
+        <a id="entraRoom" class="button" href="#" target="_blank" rel="noopener noreferrer">ENTRA NELLA ROOM SU HABBO</a>
+        <button type="button" id="eliminaRoom" class="danger" hidden>🗑️ ELIMINA ROOM</button>
+      </div>
+      <p id="messaggioDettaglio" class="hint" aria-live="polite"></p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>INSIDEOUTHABBO</strong><br>
+  Il mondo Habbo raccontato da noi.<br>
+  Una community, tante storie, un solo universo.
+</footer>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://mlgxlsstmaoxhigtqdhb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const elencoRoom = document.getElementById("elencoRoom");
+const archivio = document.getElementById("archivio");
+const dettaglio = document.getElementById("dettaglio");
+const formRoom = document.getElementById("formRoom");
+const moduloRoom = document.getElementById("moduloRoom");
+const fotoRoom = document.getElementById("fotoRoom");
+const anteprima = document.getElementById("anteprima");
+const immagineAnteprima = document.getElementById("immagineAnteprima");
+const messaggioForm = document.getElementById("messaggioForm");
+
+let utenteCorrente = null;
+let isAdmin = false;
+let fileRoom = null;
+let urlAnteprima = null;
+let roomCorrente = null;
+
+function mostraMessaggio(testo, elemento = elencoRoom, classe = "message") {
+  elemento.innerHTML = "";
+  const p = document.createElement("p");
+  p.className = classe;
+  p.textContent = testo;
+  elemento.appendChild(p);
+}
+
+function validaLinkHabbo(valore) {
+  try {
+    const url = new URL(valore);
+    return url.protocol === "https:" &&
+      (url.hostname === "habbo.it" ||
+       url.hostname.endsWith(".habbo.it") ||
+       url.hostname === "habbo.com" ||
+       url.hostname.endsWith(".habbo.com"));
+  } catch {
+    return false;
+  }
+}
+
+async function verificaAdmin() {
+  const { data: { session }, error } = await supabase.auth.getSession();
+
+  if (error || !session) return;
+
+  utenteCorrente = session.user;
+
+  const { data: profilo, error: erroreProfilo } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (!erroreProfilo && profilo?.role === "admin") {
+    isAdmin = true;
+    document.getElementById("apriForm").hidden = false;
+  }
+}
+
+function creaScheda(room) {
+  const scheda = document.createElement("article");
+  scheda.className = "room-card";
+  scheda.tabIndex = 0;
+  scheda.setAttribute("role", "button");
+  scheda.setAttribute("aria-label", "Apri room " + room.name);
+
+  if (room.image_url) {
+    const img = document.createElement("img");
+    img.src = room.image_url;
+    img.alt = "Fotografia di " + room.name;
+    img.loading = "lazy";
+    img.onerror = () => {
+      const segnaposto = document.createElement("div");
+      segnaposto.className = "room-placeholder";
+      segnaposto.textContent = "INSIDEOUTHABBO";
+      img.replaceWith(segnaposto);
+    };
+    scheda.appendChild(img);
+  } else {
+    const segnaposto = document.createElement("div");
+    segnaposto.className = "room-placeholder";
+    segnaposto.textContent = "INSIDEOUTHABBO";
+    scheda.appendChild(segnaposto);
+  }
+
+  const info = document.createElement("div");
+  info.className = "room-info";
+
+  const titolo = document.createElement("h3");
+  titolo.textContent = room.name;
+
+  const descrizione = document.createElement("p");
+  descrizione.textContent = room.description.length > 150
+    ? room.description.slice(0, 150) + "..."
+    : room.description;
+
+  const link = document.createElement("span");
+  link.className = "room-link";
+  link.textContent = "SCOPRI LA ROOM →";
+
+  info.append(titolo, descrizione, link);
+  scheda.appendChild(info);
+
+  scheda.addEventListener("click", () => apriDettaglio(room));
+  scheda.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      apriDettaglio(room);
+    }
+  });
+
+  return scheda;
+}
+
+async function caricaRoom() {
+  mostraMessaggio("Caricamento delle room...");
+
+  const { data, error } = await supabase
+    .from("rooms")
+    .select("id, name, habbo_url, description, image_url, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    mostraMessaggio("Non è stato possibile caricare le room. Riprova più tardi.");
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    mostraMessaggio("Non ci sono ancora room pubblicate. Torna a trovarci presto!");
+    return;
+  }
+
+  elencoRoom.innerHTML = "";
+  data.forEach(room => elencoRoom.appendChild(creaScheda(room)));
+}
+
+function apriDettaglio(room) {
+  roomCorrente = room;
+
+  archivio.hidden = true;
+  dettaglio.hidden = false;
+
+  document.getElementById("titoloDettaglio").textContent = room.name;
+  document.getElementById("descrizioneDettaglio").textContent = room.description;
+
+  const foto = document.getElementById("fotoDettaglio");
+  if (room.image_url) {
+    foto.src = room.image_url;
+    foto.hidden = false;
+  } else {
+    foto.hidden = true;
+  }
+
+  document.getElementById("entraRoom").href = room.habbo_url;
+  document.getElementById("eliminaRoom").hidden = !isAdmin;
+  document.getElementById("messaggioDettaglio").textContent = "";
+
+  history.pushState({}, "", "?id=" + encodeURIComponent(room.id));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function tornaArchivio() {
+  dettaglio.hidden = true;
+  archivio.hidden = false;
+  roomCorrente = null;
+  history.pushState({}, "", window.location.pathname);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("tornaArchivio").addEventListener("click", tornaArchivio);
+
+document.getElementById("apriForm").addEventListener("click", () => {
+  formRoom.hidden = false;
+  formRoom.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+document.getElementById("annullaForm").addEventListener("click", () => {
+  moduloRoom.reset();
+  pulisciAnteprima();
+  messaggioForm.textContent = "";
+  formRoom.hidden = true;
+});
+
+function pulisciAnteprima() {
+  fileRoom = null;
+  fotoRoom.value = "";
+  immagineAnteprima.src = "";
+  anteprima.hidden = true;
+
+  if (urlAnteprima) {
+    URL.revokeObjectURL(urlAnteprima);
+    urlAnteprima = null;
+  }
+}
+
+fotoRoom.addEventListener("change", () => {
+  const file = fotoRoom.files[0];
+  if (!file) return;
+
+  const formati = ["image/jpeg", "image/png", "image/webp"];
+
+  if (!formati.includes(file.type)) {
+    alert("Formato non supportato. Scegli JPG, PNG o WEBP.");
+    pulisciAnteprima();
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("La fotografia non può superare i 5 MB.");
+    pulisciAnteprima();
+    return;
+  }
+
+  fileRoom = file;
+
+  if (urlAnteprima) URL.revokeObjectURL(urlAnteprima);
+  urlAnteprima = URL.createObjectURL(file);
+
+  immagineAnteprima.src = urlAnteprima;
+  anteprima.hidden = false;
+});
+
+document.getElementById("rimuoviFoto").addEventListener("click", pulisciAnteprima);
+
+async function caricaFotografia() {
+  if (!fileRoom || !utenteCorrente) {
+    throw new Error("Seleziona una fotografia.");
+  }
+
+  const estensioni = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+  };
+
+  const estensione = estensioni[fileRoom.type];
+  const percorso = `${utenteCorrente.id}/${Date.now()}-${crypto.randomUUID()}.${estensione}`;
+
+  const { data, error } = await supabase.storage
+    .from("rooms")
+    .upload(percorso, fileRoom, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: fileRoom.type
+    });
+
+  if (error) throw error;
+
+  const { data: pubblico } = supabase.storage
+    .from("rooms")
+    .getPublicUrl(data.path);
+
+  return {
+    url: pubblico.publicUrl,
+    path: data.path
+  };
+}
+
+moduloRoom.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!isAdmin || !utenteCorrente) {
+    alert("Solo l'amministratore può pubblicare nuove room.");
+    return;
+  }
+
+  const nome = document.getElementById("nomeRoom").value.trim();
+  const link = document.getElementById("linkRoom").value.trim();
+  const descrizione = document.getElementById("descrizioneRoom").value.trim();
+  const pulsante = document.getElementById("pubblicaRoom");
+
+  if (!nome || !descrizione || !fileRoom) {
+    messaggioForm.textContent = "Compila tutti i campi e seleziona una fotografia.";
+    messaggioForm.className = "error";
+    return;
+  }
+
+  if (!validaLinkHabbo(link)) {
+    messaggioForm.textContent = "Inserisci un link HTTPS valido di Habbo.";
+    messaggioForm.className = "error";
+    return;
+  }
+
+  pulsante.disabled = true;
+  pulsante.textContent = "PUBBLICAZIONE IN CORSO...";
+  messaggioForm.textContent = "Caricamento della fotografia e pubblicazione...";
+
+  let fotografia = null;
+
+  try {
+    fotografia = await caricaFotografia();
+
+    const { error } = await supabase
+      .from("rooms")
+      .insert({
+        name: nome,
+        habbo_url: link,
+        description: descrizione,
+        image_url: fotografia.url,
+        created_by: utenteCorrente.id
+      });
+
+    if (error) throw error;
+
+    moduloRoom.reset();
+    pulisciAnteprima();
+    formRoom.hidden = true;
+    messaggioForm.textContent = "";
+
+    alert("Room pubblicata correttamente!");
+    await caricaRoom();
+
+  } catch (errore) {
+    console.error("Errore pubblicazione room:", errore);
+
+    if (fotografia?.path) {
+      await supabase.storage.from("rooms").remove([fotografia.path]);
+    }
+
+    messaggioForm.textContent = "Non è stato possibile pubblicare la room: " + errore.message;
+    messaggioForm.className = "error";
+
+  } finally {
+    pulsante.disabled = false;
+    pulsante.textContent = "PUBBLICA ROOM";
+  }
+});
+
+function ricavaPercorsoImmagine(url) {
+  const marcatore = "/storage/v1/object/public/rooms/";
+  const posizione = url.indexOf(marcatore);
+
+  if (posizione === -1) return null;
+
+  return decodeURIComponent(url.substring(posizione + marcatore.length));
+}
+
+document.getElementById("eliminaRoom").addEventListener("click", async () => {
+  if (!isAdmin || !roomCorrente) return;
+
+  const conferma = confirm(
+    `Vuoi eliminare definitivamente la room "${roomCorrente.name}"?`
+  );
+
+  if (!conferma) return;
+
+  const pulsante = document.getElementById("eliminaRoom");
+  const messaggio = document.getElementById("messaggioDettaglio");
+
+  pulsante.disabled = true;
+  pulsante.textContent = "ELIMINAZIONE IN CORSO...";
+
+  try {
+    const { error } = await supabase
+      .from("rooms")
+      .delete()
+      .eq("id", roomCorrente.id);
+
+    if (error) throw error;
+
+    if (roomCorrente.image_url) {
+      const percorso = ricavaPercorsoImmagine(roomCorrente.image_url);
+
+      if (percorso) {
+        const { error: erroreFoto } = await supabase.storage
+          .from("rooms")
+          .remove([percorso]);
+
+        if (erroreFoto) {
+          console.error("Errore eliminazione fotografia:", erroreFoto);
+        }
+      }
+    }
+
+    alert("Room eliminata correttamente.");
+    tornaArchivio();
+    await caricaRoom();
+
+  } catch (errore) {
+    console.error("Errore eliminazione room:", errore);
+    messaggio.textContent = "Non è stato possibile eliminare la room. " + errore.message;
+    messaggio.className = "error";
+
+  } finally {
+    pulsante.disabled = false;
+    pulsante.textContent = "🗑️ ELIMINA ROOM";
+  }
+});
+
+async function avviaPagina() {
+  await verificaAdmin();
+  await caricaRoom();
+
+  const id = new URLSearchParams(window.location.search).get("id");
+
+  if (id) {
+    const { data, error } = await supabase
+      .from("rooms")
+      .select("id, name, habbo_url, description, image_url, created_at")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (!error && data) {
+      apriDettaglio(data);
+    }
+  }
+}
+
+window.addEventListener("popstate", () => {
+  const id = new URLSearchParams(window.location.search).get("id");
+  if (!id) {
+    dettaglio.hidden = true;
+    archivio.hidden = false;
+    roomCorrente = null;
+  }
+});
+
+avviaPagina();
+</script>
+</body>
+</html>
