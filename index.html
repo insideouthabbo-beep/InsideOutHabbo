@@ -202,6 +202,7 @@ aggiornaAccesso();
 supabase.auth.onAuthStateChange(()=>{aggiornaAccesso()});
 const contenitore=document.getElementById('ultimi-articoli');
   
+
 async function caricaBanner() {
   const contenitoreBanner = document.getElementById("bannerBenvenuto");
   const immagineBanner = document.getElementById("bannerBenvenutoImg");
@@ -220,20 +221,40 @@ async function caricaBanner() {
     immagineBanner.src = data.image_url;
     contenitoreBanner.style.display = "block";
 
-    if (data.link_url) {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    let isAdmin = false;
+
+    if (session) {
+      const { data: profilo } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      isAdmin = profilo?.role === "admin";
+    }
+
+    if (isAdmin) {
+      linkBanner.href = "gestione-banner.html";
+      linkBanner.style.cursor = "pointer";
+    } else if (data.link_url) {
       linkBanner.href = data.link_url;
       linkBanner.target = "_blank";
       linkBanner.rel = "noopener noreferrer";
+      linkBanner.style.cursor = "pointer";
     } else {
       linkBanner.removeAttribute("href");
       linkBanner.style.cursor = "default";
     }
+
   } catch (errore) {
     console.error("Errore caricamento banner:", errore);
   }
 }
 
 caricaBanner();
+
 
  async function caricaUltimiArticoli(){
   try{
