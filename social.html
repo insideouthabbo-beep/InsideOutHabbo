@@ -75,6 +75,31 @@ header{
   border:1px solid #e7eaf0;
 }
 .social-card h3{color:var(--navy);margin:0 0 10px}
+  
+.social-icon{
+  width:76px;
+  height:76px;
+  background:#edf1f8;
+  border:2px solid #e2e8f2;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:18px;
+  image-rendering:pixelated;
+}
+
+.social-icon svg{
+  width:52px;
+  height:52px;
+  shape-rendering:crispEdges;
+}
+
+.social-icon span{
+  font-size:38px;
+  color:var(--yellow);
+}
+
 .social-card p{color:var(--muted);font-size:13px;line-height:1.5}
 .visit{
   display:inline-block;
@@ -281,6 +306,58 @@ async function verificaAdmin(){
   }
 }
 
+  
+function creaIconaSocial(nome){
+  const social = nome.toLowerCase().trim();
+
+  const icone = {
+    instagram: `
+      <svg viewBox="0 0 32 32">
+        <rect x="5" y="5" width="22" height="22" rx="5" fill="#c13584"/>
+        <rect x="9" y="9" width="14" height="14" rx="4" fill="none" stroke="white" stroke-width="2.5"/>
+        <circle cx="16" cy="16" r="3.5" fill="none" stroke="white" stroke-width="2.5"/>
+        <rect x="21" y="9" width="3" height="3" fill="white"/>
+      </svg>`,
+    tiktok: `
+      <svg viewBox="0 0 32 32">
+        <path d="M18 4h5c0 4 2 6 5 7v5c-3 0-6-2-8-4v10a8 8 0 1 1-8-8v5a3 3 0 1 0 3 3V4z" fill="#25d9e8"/>
+        <path d="M16 4h5c0 4 2 6 5 7v5c-3 0-6-2-8-4v10a8 8 0 1 1-8-8v5a3 3 0 1 0 3 3V4z" fill="#ee356c"/>
+        <path d="M17 4h4c0 4 2 6 5 7v4c-3 0-6-2-8-4v11a7 7 0 1 1-7-7v4a3 3 0 1 0 3 3V4z" fill="white"/>
+      </svg>`,
+    youtube: `
+      <svg viewBox="0 0 32 32">
+        <rect x="3" y="7" width="26" height="18" rx="5" fill="#ff2020"/>
+        <path d="M13 11l9 5-9 5z" fill="white"/>
+      </svg>`,
+    discord: `
+      <svg viewBox="0 0 32 32">
+        <path d="M7 8Q16 3 25 8L29 23Q23 28 19 26L18 24H14L13 26Q7 28 3 23Z" fill="#5865f2"/>
+        <circle cx="12" cy="16" r="2" fill="white"/>
+        <circle cx="21" cy="16" r="2" fill="white"/>
+      </svg>`,
+    twitch: `
+      <svg viewBox="0 0 32 32">
+        <path d="M5 4H28V21L20 28H15V24H10L5 19Z" fill="#9146ff"/>
+        <path d="M11 9h3v8h-3zm8 0h3v8h-3z" fill="white"/>
+      </svg>`,
+    facebook: `
+      <svg viewBox="0 0 32 32">
+        <rect x="4" y="4" width="24" height="24" rx="4" fill="#1877f2"/>
+        <path d="M18 28V18h4l1-5h-5v-2c0-1 1-2 2-2h3V4h-4c-5 0-7 3-7 7v2H9v5h3v10z" fill="white"/>
+      </svg>`
+  };
+
+  const chiave = Object.keys(icone).find(s => social.includes(s));
+
+  const contenitore = document.createElement("div");
+  contenitore.className = "social-icon";
+  contenitore.innerHTML = chiave
+    ? icone[chiave]
+    : '<span>★</span>';
+
+  return contenitore;
+}
+
 async function caricaSocial(){
   socialGrid.innerHTML='<div class="empty">Caricamento...</div>';
 
@@ -305,8 +382,9 @@ async function caricaSocial(){
 
   visibili.forEach(social=>{
     const card=document.createElement('article');
-    card.className='social-card';
+card.className='social-card';
 
+    card.appendChild(creaIconaSocial(social.name));
     const titolo=document.createElement('h3');
     titolo.textContent=social.name;
 
