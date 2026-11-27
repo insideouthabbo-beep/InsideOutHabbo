@@ -201,8 +201,94 @@
         <div class="qa-list">${blocchi || '<p class="status">Questa intervista non contiene ancora domande e risposte.</p>'}</div>
         ${conclusione}
         <div class="date">${dataFormattata ? `Pubblicata il ${dataFormattata}` : ""}</div>
+<div id="azioniRedazione"></div>
       `;
       document.title = `${intervista.title} | InsideOutHabbo`;
+      const { data: { session } } = await supabase.auth.getSession();
+
+if (session) {
+  const { data: profilo } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (profilo && ["admin", "caporedattore", "redattore"].includes(profilo.role)) {
+    document.getElementById("azioniRedazione").innerHTML = `
+      <button id="eliminaIntervista" style="
+        margin-top: 20px;
+        padding: 11px 18px;
+        background: #a83245;
+        color: white;
+        border: 0;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+      ">🗑️ Elimina intervista</button>
+    `;
+  }
+}
+      const pulsanteElimina = document.getElementById("eliminaIntervista");
+
+if (pulsanteElimina) {
+  pulsanteElimina.addEventListener("click", async () => {
+    const conferma = confirm(
+      "Vuoi davvero eliminare questa intervista? L'operazione non può essere annullata."
+    );
+
+    if (!conferma) return;
+
+    pulsanteElimina.disabled = true;
+    pulsanteElimina.textContent = "Eliminazione in corso...";
+
+    try {
+      // Elimina prima tutte le domande e risposte
+      const { error: erroreDomande } = await supabase
+        .from("interview_questions")
+        .delete()
+        .eq("interview_id", id);
+
+      if (erroreDomande) throw erroreDomande;
+
+      // Elimina l'intervista
+      const { error: erroreIntervista } = await supabase
+        .from("interviews")
+        .delete()
+        .eq("id", id);
+
+      if (erroreIntervista) throw erroreIntervista;
+
+      // Elimina la copertina, se presente
+      if (intervista.cover_image_url) {
+        const marcatore = "/storage/v1/object/public/interviste/";
+        const posizione = intervista.cover_image_url.indexOf(marcatore);
+
+        if (posizione !== -1) {
+          const percorso = decodeURIComponent(
+            intervista.cover_image_url.substring(posizione + marcatore.length)
+          );
+
+          const { error: erroreCopertina } = await supabase.storage
+            .from("interviste")
+            .remove([percorso]);
+
+          if (erroreCopertina) {
+            console.error("Errore eliminazione copertina:", erroreCopertina);
+          }
+        }
+      }
+
+      alert("Intervista eliminata correttamente.");
+      window.location.href = "interviste.html";
+
+    } catch (errore) {
+      console.error("Errore eliminazione:", errore);
+      alert("Non è stato possibile eliminare l'intervista. Controlla i permessi e riprova.");
+      pulsanteElimina.disabled = false;
+      pulsanteElimina.textContent = "🗑️ Elimina intervista";
+    }
+  });
+}
     }
 
     caricaIntervista();
