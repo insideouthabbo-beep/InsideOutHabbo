@@ -171,7 +171,7 @@ async function caricaUltimiArticoli(){
       const scheda=document.createElement('article');scheda.className='card';
       if(articolo.cover_image_url){const copertina=document.createElement('div');copertina.className='cover';const immagine=document.createElement('img');immagine.src=articolo.cover_image_url;immagine.alt=articolo.title;immagine.style.width='100%';immagine.style.height='100%';immagine.style.objectFit='cover';copertina.appendChild(immagine);scheda.appendChild(copertina)}
       const categoria=document.createElement('small');categoria.textContent=articolo.category||'ATTUALITÀ';
-      const titolo=document.createElement('h3');const linkTitolo=document.createElement('a');linkTitolo.href=articolo.html?id=${encodeURIComponent(articolo.id)};linkTitolo.textContent=articolo.title;linkTitolo.style.color='inherit';linkTitolo.style.textDecoration='none';titolo.appendChild(linkTitolo);
+      const titolo=document.createElement('h3');const linkTitolo=document.createElement('a');linkTitolo.href=`articolo.html?id=${encodeURIComponent(articolo.id)}`;linkTitolo.textContent=articolo.title;linkTitolo.style.color='inherit';linkTitolo.style.textDecoration='none';titolo.appendChild(linkTitolo);
       const anteprima=document.createElement('p');anteprima.textContent=articolo.excerpt||(articolo.content||'').slice(0,140);
       scheda.append(categoria,titolo,anteprima);contenitore.appendChild(scheda);
     });
