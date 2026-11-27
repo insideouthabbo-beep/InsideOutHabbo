@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social | InsideOutHabbo</title>
+<style>
+:root {
+  --navy:#101b35;
+  --blue:#1d3158;
+  --yellow:#ffd34e;
+  --light:#f3f5f9;
+  --text:#202b40;
+  --muted:#778198;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--light);
+  color:var(--text);
+}
+header{
+  background:var(--navy);
+  color:white;
+  padding:25px 7%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+}
+.brand{font-size:25px;font-weight:900;letter-spacing:1px}
+.brand span{color:var(--yellow)}
+.tagline{font-size:12px;color:#c4cde0;margin-top:5px}
+.back{
+  background:var(--yellow);
+  color:var(--navy);
+  text-decoration:none;
+  padding:12px 18px;
+  border-radius:5px;
+  font-weight:bold;
+  font-size:12px;
+}
+.container{max-width:1150px;margin:40px auto;padding:0 20px}
+.hero{
+  background:linear-gradient(120deg,#172849,#304d7c);
+  color:white;
+  padding:45px;
+  border-radius:10px;
+  margin-bottom:35px;
+}
+.hero small{color:var(--yellow);font-weight:bold;letter-spacing:2px}
+.hero h1{font-size:38px;margin:15px 0}
+.hero p{color:#d5deed;line-height:1.6;max-width:650px}
+.section-title{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  color:var(--navy);
+  border-left:4px solid var(--yellow);
+  padding-left:12px;
+  margin:30px 0 20px;
+}
+.social-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:18px;
+}
+.social-card{
+  background:white;
+  padding:25px;
+  border-radius:9px;
+  border:1px solid #e7eaf0;
+}
+.social-card h3{color:var(--navy);margin:0 0 10px}
+.social-card p{color:var(--muted);font-size:13px;line-height:1.5}
+.visit{
+  display:inline-block;
+  margin-top:12px;
+  padding:11px 16px;
+  background:var(--navy);
+  color:white;
+  border-radius:5px;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:bold;
+}
+.visit:hover{background:var(--blue);color:var(--yellow)}
+.admin-panel{
+  display:none;
+  background:white;
+  padding:25px;
+  border-radius:9px;
+  border:1px solid #e7eaf0;
+  margin-top:40px;
+}
+.admin-panel h2{color:var(--navy);margin-top:0}
+input,textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #dce1eb;
+  border-radius:5px;
+  font-family:Arial,sans-serif;
+  margin:7px 0 15px;
+}
+textarea{min-height:75px;resize:vertical}
+label{font-size:12px;font-weight:bold;color:var(--navy)}
+.form-buttons{display:flex;gap:10px;flex-wrap:wrap}
+button{
+  border:0;
+  border-radius:5px;
+  padding:11px 16px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:12px;
+}
+.primary{background:var(--yellow);color:var(--navy)}
+.secondary{background:#e8edf5;color:var(--navy)}
+.danger{background:#ffe4e4;color:#a32929}
+.admin-list{margin-top:25px}
+.admin-item{
+  padding:15px;
+  border:1px solid #e7eaf0;
+  border-radius:7px;
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.admin-item strong{color:var(--navy)}
+.admin-actions{display:flex;gap:7px;flex-wrap:wrap}
+.status{font-size:11px;font-weight:bold;color:#25834d}
+.status.off{color:#a32929}
+.message{font-size:13px;margin:12px 0;color:var(--navy)}
+.empty{
+  background:white;
+  padding:25px;
+  border-radius:8px;
+  color:var(--muted);
+}
+footer{
+  margin-top:60px;
+  background:var(--navy);
+  color:#c4cde0;
+  text-align:center;
+  padding:30px;
+  font-size:12px;
+  line-height:1.8;
+}
+footer strong{color:white}
+@media(max-width:600px){
+  .hero{padding:28px}
+  .hero h1{font-size:29px}
+  header{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">INSIDEOUT<span>HABBO</span></div>
+    <div class="tagline">Il mondo Habbo raccontato da noi.</div>
+  </div>
+  <a class="back" href="index.html">← TORNA ALLA HOME</a>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <small>INSIDEOUTHABBO COMMUNITY</small>
+    <h1>Seguici sui Social!</h1>
+    <p>
+      Resta aggiornato sulle novità, gli eventi e le iniziative
+      di InsideOutHabbo. Entra a far parte della nostra community
+      anche attraverso i nostri canali ufficiali.
+    </p>
+  </section>
+
+  <div class="section-title">I NOSTRI CANALI UFFICIALI</div>
+
+  <div id="socialGrid" class="social-grid">
+    <div class="empty">Caricamento dei canali social...</div>
+  </div>
+
+  <section class="admin-panel" id="adminPanel">
+    <h2>Gestione Social</h2>
+    <p>Da qui puoi aggiungere e gestire i canali ufficiali di InsideOutHabbo.</p>
+
+    <form id="socialForm">
+      <input type="hidden" id="socialId">
+
+      <label for="socialName">Nome del social</label>
+      <input id="socialName" type="text" placeholder="Es. Instagram" required>
+
+      <label for="socialUrl">Indirizzo del profilo</label>
+      <input id="socialUrl" type="url" placeholder="https://..." required>
+
+      <label for="socialDescription">Descrizione</label>
+      <textarea id="socialDescription" placeholder="Descrivi brevemente questo canale..."></textarea>
+
+      <div class="form-buttons">
+        <button type="submit" class="primary" id="saveButton">SALVA SOCIAL</button>
+        <button type="button" class="secondary" id="cancelButton" style="display:none">ANNULLA</button>
+      </div>
+    </form>
+
+    <div id="adminMessage" class="message"></div>
+
+    <div class="section-title">GESTISCI I CANALI</div>
+    <div id="adminList" class="admin-list"></div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>INSIDEOUTHABBO</strong><br>
+  Il mondo Habbo raccontato da noi.<br>
+  Una community, tante storie, un solo universo.
+</footer>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL='https://mlgxlsstmaoxhigtqdhb.supabase.co';
+const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
+
+const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const socialGrid=document.getElementById('socialGrid');
+const adminPanel=document.getElementById('adminPanel');
+const adminList=document.getElementById('adminList');
+const socialForm=document.getElementById('socialForm');
+const adminMessage=document.getElementById('adminMessage');
+
+let isAdmin=false;
+let canManage=false;
+
+function messaggio(testo){
+  adminMessage.textContent=testo;
+}
+
+function resetForm(){
+  socialForm.reset();
+  document.getElementById('socialId').value='';
+  document.getElementById('saveButton').textContent='SALVA SOCIAL';
+  document.getElementById('cancelButton').style.display='none';
+}
+
+function validaUrl(valore){
+  try{
+    const url=new URL(valore);
+    return url.protocol==='https:' || url.protocol==='http:';
+  }catch{
+    return false;
+  }
+}
+
+async function verificaAdmin(){
+  const {data:{session}}=await supabase.auth.getSession();
+
+  if(!session){
+    isAdmin=false;
+    return;
+  }
+
+  const {data:profilo,error}=await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id',session.user.id)
+    .maybeSingle();
+
+  if(!error && profilo?.role==='admin'){
+    isAdmin=true;
+    adminPanel.style.display='block';
+  }
+}
+
+async function caricaSocial(){
+  socialGrid.innerHTML='<div class="empty">Caricamento...</div>';
+
+  const {data,error}=await supabase
+    .from('social_links')
+    .select('*')
+    .order('created_at',{ascending:false});
+
+  if(error){
+    console.error(error);
+    socialGrid.textContent='Non è stato possibile caricare i canali social.';
+    return;
+  }
+
+  const visibili=(data||[]).filter(s=>s.is_active || isAdmin);
+
+  socialGrid.innerHTML='';
+
+  if(visibili.length===0){
+    socialGrid.innerHTML='<div class="empty">Non ci sono ancora canali social pubblicati.</div>';
+  }
+
+  visibili.forEach(social=>{
+    const card=document.createElement('article');
+    card.className='social-card';
+
+    const titolo=document.createElement('h3');
+    titolo.textContent=social.name;
+
+    const descrizione=document.createElement('p');
+    descrizione.textContent=social.description || 'Seguici sul nostro canale ufficiale.';
+
+    card.append(titolo,descrizione);
+
+    if(social.is_active){
+      const link=document.createElement('a');
+      link.className='visit';
+      link.href=social.url;
+      link.target='_blank';
+      link.rel='noopener noreferrer';
+      link.textContent='VISITA IL CANALE →';
+      card.appendChild(link);
+    }else if(isAdmin){
+      const stato=document.createElement('p');
+      stato.textContent='Canale disattivato';
+      stato.style.color='#a32929';
+      card.appendChild(stato);
+    }
+
+    socialGrid.appendChild(card);
+  });
+
+  if(isAdmin){
+    caricaGestione(data||[]);
+  }
+}
+
+function caricaGestione(social){
+  adminList.innerHTML='';
+
+  if(social.length===0){
+    adminList.textContent='Non hai ancora inserito canali social.';
+    return;
+  }
+
+  social.forEach(elemento=>{
+    const riga=document.createElement('div');
+    riga.className='admin-item';
+
+    const info=document.createElement('div');
+
+    const nome=document.createElement('strong');
+    nome.textContent=elemento.name;
+
+    const stato=document.createElement('div');
+    stato.className='status'+(elemento.is_active?'':' off');
+    stato.textContent=elemento.is_active?'ATTIVO':'DISATTIVATO';
+
+    info.append(nome,stato);
+
+    const azioni=document.createElement('div');
+    azioni.className='admin-actions';
+
+    const modifica=document.createElement('button');
+    modifica.className='secondary';
+    modifica.textContent='MODIFICA';
+    modifica.onclick=()=>modificaSocial(elemento);
+
+    const attiva=document.createElement('button');
+    attiva.className='secondary';
+    attiva.textContent=elemento.is_active?'DISATTIVA':'ATTIVA';
+    attiva.onclick=()=>cambiaStato(elemento);
+
+    const elimina=document.createElement('button');
+    elimina.className='danger';
+    elimina.textContent='ELIMINA';
+    elimina.onclick=()=>eliminaSocial(elemento);
+
+    azioni.append(modifica,attiva,elimina);
+    riga.append(info,azioni);
+    adminList.appendChild(riga);
+  });
+}
+
+function modificaSocial(social){
+  document.getElementById('socialId').value=social.id;
+  document.getElementById('socialName').value=social.name;
+  document.getElementById('socialUrl').value=social.url;
+  document.getElementById('socialDescription').value=social.description||'';
+  document.getElementById('saveButton').textContent='SALVA MODIFICHE';
+  document.getElementById('cancelButton').style.display='inline-block';
+  socialForm.scrollIntoView({behavior:'smooth'});
+}
+
+socialForm.addEventListener('submit',async(event)=>{
+  event.preventDefault();
+
+  if(!isAdmin){
+    messaggio('Non sei autorizzato a eseguire questa operazione.');
+    return;
+  }
+
+  const id=document.getElementById('socialId').value;
+  const name=document.getElementById('socialName').value.trim();
+  const url=document.getElementById('socialUrl').value.trim();
+  const description=document.getElementById('socialDescription').value.trim();
+
+  if(!validaUrl(url)){
+    messaggio('Inserisci un indirizzo web valido che inizi con http:// o https://.');
+    return;
+  }
+
+  const dati={name,url,description};
+
+  let risultato;
+
+  if(id){
+    risultato=await supabase.from('social_links').update(dati).eq('id',id);
+  }else{
+    risultato=await supabase.from('social_links').insert(dati);
+  }
+
+  if(risultato.error){
+    console.error(risultato.error);
+    messaggio('Errore durante il salvataggio del canale.');
+    return;
+  }
+
+  messaggio('Canale social salvato correttamente!');
+  resetForm();
+  await caricaSocial();
+});
+
+document.getElementById('cancelButton').addEventListener('click',resetForm);
+
+async function cambiaStato(social){
+  const {error}=await supabase
+    .from('social_links')
+    .update({is_active:!social.is_active})
+    .eq('id',social.id);
+
+  if(error){
+    messaggio('Non è stato possibile modificare lo stato.');
+    return;
+  }
+
+  messaggio('Stato del canale aggiornato.');
+  await caricaSocial();
+}
+
+async function eliminaSocial(social){
+  if(!confirm('Vuoi eliminare definitivamente '+social.name+'?'))return;
+
+  const {error}=await supabase
+    .from('social_links')
+    .delete()
+    .eq('id',social.id);
+
+  if(error){
+    messaggio('Non è stato possibile eliminare il canale.');
+    return;
+  }
+
+  messaggio('Canale eliminato.');
+  await caricaSocial();
+}
+
+async function avvia(){
+  await verificaAdmin();
+  await caricaSocial();
+}
+
+await avvia();
+
+supabase.auth.onAuthStateChange(()=>{
+  setTimeout(avvia,0);
+});
+</script>
+
+</body>
+</html>
