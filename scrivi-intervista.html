@@ -85,9 +85,34 @@
         <textarea id="introduzione" placeholder="Presenta l'ospite e racconta brevemente il tema dell'intervista..."></textarea>
         <label for="conclusione">Conclusione (facoltativa)</label>
         <textarea id="conclusione" placeholder="Concludi l'intervista con un pensiero finale, un ringraziamento o un saluto..."></textarea>
-        <label for="copertina">URL immagine di copertina (facoltativo)</label>
-        <input id="copertina" type="url" placeholder="https://...">
-        <div class="hint">Sia la conclusione sia la copertina sono facoltative: puoi pubblicare anche senza compilarle.</div>
+        
+<label for="copertina">Immagine di copertina (facoltativa)</label>
+
+<input
+  id="copertina"
+  type="file"
+  accept="image/jpeg,image/png,image/webp,image/gif"
+>
+
+<div class="hint">
+  Puoi scegliere un'immagine dal computer, dalla galleria del telefono oppure scattare una foto, se il dispositivo lo consente. Formati: JPG, PNG, WEBP e GIF. Massimo 5 MB.
+</div>
+
+<div id="anteprimaCopertina" style="display:none; margin-top:15px;">
+  <img
+    id="immagineAnteprima"
+    alt="Anteprima copertina intervista"
+    style="width:100%; max-width:420px; max-height:260px; object-fit:cover; border-radius:12px; display:block;"
+  >
+  <button type="button" class="remove" id="rimuoviCopertina" style="margin-top:10px;">
+    Rimuovi immagine
+  </button>
+</div>
+
+<div class="hint">
+  Sia la conclusione sia la copertina sono facoltative.
+</div>
+
       </div>
 
       <div class="panel">
@@ -119,6 +144,61 @@ const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
     const accessoNegato = document.getElementById("accessoNegato");
     const listaDomande = document.getElementById("listaDomande");
     const messaggio = document.getElementById("messaggio");
+    const inputCopertina = document.getElementById("copertina");
+const anteprimaCopertina = document.getElementById("anteprimaCopertina");
+const immagineAnteprima = document.getElementById("immagineAnteprima");
+const rimuoviCopertina = document.getElementById("rimuoviCopertina");
+
+let fileCopertina = null;
+let urlAnteprimaCopertina = null;
+
+inputCopertina.addEventListener("change", () => {
+  const file = inputCopertina.files[0];
+
+  if (!file) return;
+
+  const formatiConsentiti = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif"
+  ];
+
+  if (!formatiConsentiti.includes(file.type)) {
+    alert("Formato non supportato. Scegli JPG, PNG, WEBP o GIF.");
+    inputCopertina.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("L'immagine non può superare i 5 MB.");
+    inputCopertina.value = "";
+    return;
+  }
+
+  fileCopertina = file;
+
+  if (urlAnteprimaCopertina) {
+    URL.revokeObjectURL(urlAnteprimaCopertina);
+  }
+
+  urlAnteprimaCopertina = URL.createObjectURL(file);
+
+  immagineAnteprima.src = urlAnteprimaCopertina;
+  anteprimaCopertina.style.display = "block";
+});
+
+rimuoviCopertina.addEventListener("click", () => {
+  fileCopertina = null;
+  inputCopertina.value = "";
+  immagineAnteprima.src = "";
+  anteprimaCopertina.style.display = "none";
+
+  if (urlAnteprimaCopertina) {
+    URL.revokeObjectURL(urlAnteprimaCopertina);
+    urlAnteprimaCopertina = null;
+  }
+});
     const ruoliAutorizzati = ["redattore", "caporedattore", "admin"];
     let utenteCorrente = null;
     let numeroDomande = 0;
@@ -233,6 +313,42 @@ const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
   aggiungiDomanda();
 }
 
+    
+async function caricaCopertina() {
+  if (!fileCopertina) return null;
+
+  const estensioni = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif"
+  };
+
+  const estensione = estensioni[fileCopertina.type];
+
+  if (!estensione) {
+    throw new Error("Formato immagine non supportato.");
+  }
+
+  const percorso = `${utenteCorrente.id}/${Date.now()}-${crypto.randomUUID()}.${estensione}`;
+
+  const { data, error } = await supabase.storage
+    .from("interviste")
+    .upload(percorso, fileCopertina, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: fileCopertina.type
+    });
+
+  if (error) throw error;
+
+  const { data: urlPubblico } = supabase.storage
+    .from("interviste")
+    .getPublicUrl(data.path);
+
+  return urlPubblico.publicUrl;
+}
+
     async function salvaIntervista(status) {
       if (invioInCorso) return;
       messaggio.style.display = "none";
@@ -241,8 +357,7 @@ const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
       const intervistato = document.getElementById("intervistato").value.trim();
       const introduzione = document.getElementById("introduzione").value.trim();
       const conclusione = document.getElementById("conclusione").value.trim();
-      const copertina = document.getElementById("copertina").value.trim();
-
+     
       if (!titolo || !intervistato) {
         mostraMessaggio("Inserisci il titolo e il nome dell'intervistato.", "err");
         return;
@@ -256,29 +371,21 @@ const SUPABASE_KEY='sb_publishable_sTxl1t86vPFICBUzKg4tpw_XWxRI8Mj';
         return;
       }
 
-      if (copertina) {
-        try {
-          const url = new URL(copertina);
-          if (!["http:", "https:"].includes(url.protocol)) throw new Error();
-        } catch {
-          mostraMessaggio("L'URL della copertina non è valido. Correggilo oppure lascia il campo vuoto.", "err");
-          return;
-        }
-      }
-
       invioInCorso = true;
       const bottoneBozza = document.getElementById("bozza");
       const bottonePubblica = document.getElementById("pubblica");
       bottoneBozza.disabled = true;
       bottonePubblica.disabled = true;
 
-      try {
-        const record = {
+    try {
+  const copertinaUrl = await caricaCopertina();
+
+  const record = {
           title: titolo,
           interviewee: intervistato,
           introduction: introduzione || null,
           conclusion: conclusione || null,
-          cover_image_url: copertina || null,
+          cover_image_url: copertinaUrl,
           status,
           author_id: utenteCorrente.id,
           published_at: status === "published" ? new Date().toISOString() : null
